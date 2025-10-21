@@ -6,14 +6,13 @@ use App\Http\Controllers\Controller;
 use App\Models\Acara;
 use Illuminate\Http\Request;
 
-class PesananController extends Controller
+class AcaraController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-
         
     }
 
@@ -36,13 +35,12 @@ class PesananController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Acara  $checkout )
+    public function show(Acara $acara)
     {
-        $checkout->load('jenisTiket');
-        // dd($checkout);
+        $acara->load('jenisTiket');
 
         // dd($acara);
-        return view('pembeli.acara.checkout',['acara' => $checkout]);   
+        return view('pembeli.acara.show',compact('acara'));   
     }
 
     /**

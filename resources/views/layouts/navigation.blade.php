@@ -27,6 +27,10 @@
                         <x-nav-link :href="route('pembuat.acara.create')" :active="request()->routeIs('pembuat.acara.create')">
                             {{ __('Buat Acara') }}
                         </x-nav-link>
+
+                        <x-nav-link :href="route('pembuat.acara.index')" :active="request()->routeIs('pembuat.acara.index')">
+                            {{ __('Acara Saya') }}
+                        </x-nav-link>
                     @else
                         {{-- Jika di area pembeli (user biasa) --}}
                         <x-nav-link :href="route('pembeli.tiket.index')" :active="request()->routeIs('pembeli.tiket.index')">
@@ -34,9 +38,9 @@
                         </x-nav-link>
                     @endif
                 </div>
-
+                {{-- 
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex"> <x-nav-link :href="route('pembuat.acara.index')"
-                        :active="request()->routeIs('pembuat.acara.index')"> {{ __('Acara Saya') }} </x-nav-link> </div>
+                        :active="request()->routeIs('pembuat.acara.index')"> {{ __('Acara Saya') }} </x-nav-link> </div> --}}
             </div>
 
             <!-- Settings Dropdown -->
@@ -62,6 +66,14 @@
                         <x-dropdown-link :href="route('profile.edit')">
                             {{ __('Profile') }}
                         </x-dropdown-link>
+
+                        @role('pembuat_event')
+                            <x-dropdown-link :href="route('pembuat.dashboard')">
+                                {{ __('Dashboard Acara') }}
+                            </x-dropdown-link>
+                        @endrole
+
+                        
 
                         <!-- Authentication -->
                         <form method="POST" action="{{ route('logout') }}">
@@ -112,6 +124,11 @@
                 <x-responsive-nav-link :href="route('profile.edit')">
                     {{ __('Profile') }}
                 </x-responsive-nav-link>
+
+                <x-responsive-nav-link :href="route('profile.edit')">
+                    {{ __('Profile') }}
+                </x-responsive-nav-link>
+
 
                 <!-- Authentication -->
                 <form method="POST" action="{{ route('logout') }}">

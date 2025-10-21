@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\All;
 
 use App\Http\Controllers\Controller;
+use App\Models\Acara;
 use Illuminate\Http\Request;
 
 class BerandaController extends Controller
@@ -12,7 +13,11 @@ class BerandaController extends Controller
      */
     public function index()
     {
-        //
+
+        $acaras = Acara::with('jenisTiket')->get();
+
+        // dd($acaras);
+        return view('beranda', compact('acaras'));
     }
 
     /**

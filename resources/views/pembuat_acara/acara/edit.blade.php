@@ -8,14 +8,18 @@
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white shadow-sm sm:rounded-lg">
-                <form method="POST" action="{{ route('pembuat.acara.store') }}" enctype="multipart/form-data" class="p-6 space-y-6">
+                <form method="POST" action="{{ route('pembuat.acara.update', $acara->id) }}" enctype="multipart/form-data"
+                    class="p-6 space-y-6">
                     @csrf
+                    @method('PUT')
                     @if ($errors->any())
                         <div class="bg-red-50 border-l-4 border-red-500 p-4 mb-6">
                             <div class="flex items-center">
                                 <div class="flex-shrink-0">
                                     <svg class="h-5 w-5 text-red-400" fill="currentColor" viewBox="0 0 20 20">
-                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-9v4a1 1 0 11-2 0v-4a1 1 0 112 0zm-1-5a1 1 0 00-1 1v.01a1 1 0 102 0V5a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                                        <path fill-rule="evenodd"
+                                            d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-9v4a1 1 0 11-2 0v-4a1 1 0 112 0zm-1-5a1 1 0 00-1 1v.01a1 1 0 102 0V5a1 1 0 00-1-1z"
+                                            clip-rule="evenodd" />
                                     </svg>
                                 </div>
                                 <div class="ml-3">
@@ -38,12 +42,17 @@
                             <!-- Dropzone -->
                             <div id="bannerPreview"
                                 class="flex items-center justify-center w-full h-64 border-2 border-dashed border-gray-300 rounded-lg bg-gray-50 cursor-pointer hover:bg-gray-100 transition">
-                                <span class="text-gray-500 text-sm text-center">
-                                    <strong>Seret dan letakkan gambar di sini</strong><br>
-                                    atau klik untuk memilih file
-                                </span>
-                                <img id="previewImage" class="hidden w-full h-full object-cover rounded-lg"
-                                    alt="Preview Banner">
+                                @if ($acara->banner_acara)
+                                    <img id="previewImage" src="{{ asset('storage/' . $acara->banner_acara) }}"
+                                        class="w-full h-full object-cover rounded-lg" alt="Preview Banner">
+                                @else
+                                    <span class="text-gray-500 text-sm text-center">
+                                        <strong>Seret dan letakkan gambar di sini</strong><br>
+                                        atau klik untuk memilih file
+                                    </span>
+                                    <img id="previewImage" class="hidden w-full h-full object-cover rounded-lg"
+                                        alt="Preview Banner">
+                                @endif
                             </div>
 
                             <!-- Input tersembunyi -->
@@ -103,14 +112,15 @@
 
                     <div>
                         <label for="nama_acara" class="block text-sm font-medium text-gray-700">Nama Acara</label>
-                        <input type="text" name="nama_acara" id="nama_acara" required
+                        <input type="text" name="nama_acara" id="nama_acara"
+                            value="{{ old('nama_acara', $acara->nama_acara) }}" required
                             class="mt-1 h-10 block w-full rounded-md border border-gray-100 shadow-sm focus:border-sky-500">
                     </div>
                     <div class="flex gap-5 mt-5">
                         <div class="w-full" x-data="{
                             showModal: false,
-                            startDate: '',
-                            endDate: '',
+                            startDate: '{{ old('waktu_mulai', $acara->waktu_mulai ? \Carbon\Carbon::parse($acara->waktu_mulai)->format('Y-m-d') : '') }}',
+                            endDate: '{{ old('waktu_selesai', $acara->waktu_selesai ? \Carbon\Carbon::parse($acara->waktu_selesai)->format('Y-m-d') : '') }}',
                             get label() {
                                 if (this.startDate && this.endDate) {
                                     return `${this.formatDate(this.startDate)} - ${this.formatDate(this.endDate)}`;
@@ -183,7 +193,8 @@
                             <label class="mb-1.5 block text-sm font-medium text-gray-700 ">
                                 Lokasi
                             </label>
-                            <input type="text" name="lokasi" id="lokasi" name="lokasi"
+                            <input type="text" name="lokasi" id="lokasi"
+                                value="{{ old('lokasi', $acara->lokasi) }}"
                                 class=" shadow-theme-xs font-normal focus:border-blue-300 focus:ring-blue-500/10 h-11 w-full  border border-gray-300 rounded-lg bg-transparent px-4 py-2.5 text-lg text-gray-800 placeholder:text-gray-400 focus:ring-3 focus:outline-hidden ">
                         </div>
                     </div>
@@ -191,13 +202,14 @@
                     <div>
                         <label for="deskripsi" class="block text-sm font-medium text-gray-700">Deskripsi</label>
                         <textarea name="deskripsi_acara" id="deskripsi" rows="3"
-                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"></textarea>
+                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">{{ old('deskripsi_acara', $acara->deskripsi) }}</textarea>
                     </div>
                     <div class="w-full">
                         <label class="mb-1.5 block text-sm font-medium text-gray-700 ">
                             Info Kontak
                         </label>
-                        <input type="text" name="info_kontak" id="info_kontak" name="info_kontak"
+                        <input type="text" name="info_kontak" id="info_kontak"
+                            value="{{ old('info_kontak', $acara->info_kontak) }}"
                             class=" shadow-theme-xs font-normal focus:border-blue-300 focus:ring-blue-500/10 h-11 w-full  border border-gray-300 rounded-lg bg-transparent px-4 py-2.5 text-lg text-gray-800 placeholder:text-gray-400 focus:ring-3 focus:outline-hidden ">
                     </div>
                     <div>
@@ -216,11 +228,24 @@
                                 </h3>
                             </div>
                             <div x-data="{
-                                selected: 'gratis',
+                                selected: '{{ $acara->jenisTiket->count() > 0 ? 'berbayar' : 'gratis' }}',
                                 showModal: false,
                                 editIndex: null,
-                                kategoriList: [],
+                                kategoriList: {{ json_encode(
+                                    $acara->jenisTiket->map(function ($tiket) {
+                                            return [
+                                                'id' => $tiket->id,
+                                                'nama' => $tiket->nama_jenis,
+                                                'harga' => $tiket->harga,
+                                                'kuota' => $tiket->kuota,
+                                                'penjualan_mulai' => \Carbon\Carbon::parse($tiket->penjualan_mulai)->format('Y-m-d'),
+                                                'penjualan_selesai' => \Carbon\Carbon::parse($tiket->penjualan_selesai)->format('Y-m-d'),
+                                                'deskripsi' => $tiket->deskripsi ?? '',
+                                            ];
+                                        })->values(),
+                                ) }},
                                 kategoriBaru: {
+                                    id: null,
                                     nama: '',
                                     harga: '',
                                     kuota: '',
@@ -250,6 +275,7 @@
                                 },
                                 resetForm() {
                                     this.kategoriBaru = {
+                                        id: null,
                                         nama: '',
                                         harga: '',
                                         kuota: '',
@@ -295,7 +321,8 @@
 
                                 <!-- Daftar Kategori Tiket -->
                                 <div class="w-full mt-2" x-show="selected === 'berbayar'">
-                                    <template class="flex-col gap-4" x-for="(kategori, index) in kategoriList" :key="index">
+                                    <template class="flex-col gap-4" x-for="(kategori, index) in kategoriList"
+                                        :key="index">
                                         <div
                                             class="flex justify-between items-center border rounded-lg p-4 bg-gray-50">
                                             <div>
@@ -389,7 +416,7 @@
                                             <div>
                                                 <label
                                                     class="block text-sm font-medium text-gray-700 mb-1">Deskripsi</label>
-                                                <textarea x-model="kategoriBaru.deskripsi" rows="3" 
+                                                <textarea x-model="kategoriBaru.deskripsi" rows="3"
                                                     class="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm focus:border-blue-500 focus:ring-blue-500"></textarea>
                                             </div>
                                         </div>
@@ -419,7 +446,7 @@
                             <div class="space-y-6 border-t border-gray-100 p-5 sm:p-6">
                                 <!-- Elements -->
                                 <div class="flex flex-col w-full justify-center gap-8">
-                                    <div class="border p-4 rounded-lg flex items-center gap-4" x-data="{ checkboxToggle: false }"
+                                    <div class="border p-4 rounded-lg flex items-center gap-4" x-data="{ checkboxToggle: {{ $acara->maks_pembelian_per_akun ? 'true' : 'false' }} }"
                                         :class="checkboxToggle ? 'border-blue-500' : 'border-gray-200'">
                                         <div class="w-64">
                                             <label for="radioLabelOne"
@@ -439,10 +466,11 @@
                                         </div>
                                         <input type="number" :disabled="!checkboxToggle"
                                             name="maks_pembelian_per_akun"
+                                            value="{{ old('maks_pembelian_per_akun', $acara->maks_pembelian_per_akun) }}"
                                             class="
                                          shadow-theme-xs focus:border-blue-300 focus:ring-blue-500/10 h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 placeholder:text-gray-400 focus:ring-3 focus:outline-hidden " />
                                     </div>
-                                    <div class="border p-4 rounded-lg flex items-center gap-4" x-data="{ ticketLimitToggle: false }"
+                                    <div class="border p-4 rounded-lg flex items-center gap-4" x-data="{ ticketLimitToggle: {{ $acara->maks_tiket_per_transaksi ? 'true' : 'false' }} }"
                                         :class="ticketLimitToggle ? 'border-blue-500' : 'border-gray-200'">
                                         <div class="w-64">
                                             <label for="ticketLimitToggle"
@@ -462,6 +490,7 @@
                                         </div>
                                         <input type="number" :disabled="!ticketLimitToggle"
                                             name="maks_tiket_per_transaksi"
+                                            value="{{ old('maks_tiket_per_transaksi', $acara->maks_tiket_per_transaksi) }}"
                                             :class="!ticketLimitToggle ? 'opacity-50 cursor-not-allowed' : ''"
                                             class="
                                          shadow-theme-xs focus:border-blue-300 focus:ring-blue-500/10 h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 placeholder:text-gray-400 focus:ring-3 focus:outline-hidden " />

@@ -4,7 +4,11 @@ namespace App\Http\Controllers\Pembeli;
 
 use App\Http\Controllers\Controller;
 use App\Models\Acara;
+use App\Models\DetailPesanan;
+use App\Models\Pesanan;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 
 class PesananController extends Controller
 {
@@ -30,7 +34,25 @@ class PesananController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        // dd($request);
+
+        $pesanan = Pesanan::create([
+            'id_pembeli' => Auth::id(),
+            'kode_pesanan' => 'ORD-' . strtoupper(Str::random(8)),
+            'total_harga' => $request->grand_total,
+            'status_pembayaran' => 'pending'
+        ]);
+
+        foreach ($request->tickets as $ticket){
+            DetailPesanan::create([
+                'id_pesanan' => $pesanan->id,
+                'id_jenis_tiket' => $ticket['id'],
+                'jumlah' => $ticket['quantity'],
+                'harga_per_tiket' => $ticket['price']
+            ]);
+        }
+
+        return redirect()->route('beranda');
     }
 
     /**
@@ -43,6 +65,7 @@ class PesananController extends Controller
 
         // dd($acara);
         return view('pembeli.acara.checkout',['acara' => $checkout]);   
+
     }
 
     /**

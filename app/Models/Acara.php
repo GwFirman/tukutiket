@@ -9,12 +9,31 @@ use Spatie\Sluggable\SlugOptions;
 
 class Acara extends Model
 {
-   use HasFactory, HasSlug;
+    use HasFactory, HasSlug;
+
     protected $table = 'acara';
-    public function getSlugOptions() : SlugOptions{
+
+    protected $fillable = [
+        'id_pembuat',
+        'nama_acara',
+        'slug',
+        'deskripsi',
+        'lokasi',
+        'banner_acara',
+        'banner_tiket',
+        'waktu_mulai',
+        'waktu_selesai',
+        'info_kontak',
+        'status',
+        'maks_pembelian_per_akun',
+        'maks_tiket_per_transaksi',
+    ];
+
+    public function getSlugOptions(): SlugOptions
+    {
         return SlugOptions::create()
-        ->generateSlugsFrom('nama_acara')
-        ->saveSlugsTo('slug'); 
+            ->generateSlugsFrom('nama_acara')
+            ->saveSlugsTo('slug');
     }
 
     public function getRouteKeyName()
@@ -24,6 +43,6 @@ class Acara extends Model
 
     public function jenisTiket()
     {
-        return $this->hasMany(JenisTiket::class,'id_acara');
+        return $this->hasMany(JenisTiket::class, 'id_acara');
     }
 }

@@ -1,5 +1,75 @@
 <x-guest-layout>
     <div class="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50">
+        <!-- Top Navbar -->
+        <nav class="bg-white/80 backdrop-blur-md shadow-md sticky top-0 z-50">
+            <div class="container mx-auto px-6">
+                <div class="flex justify-between items-center py-4">
+                    <!-- Logo/Brand -->
+                    <div class="flex items-center space-x-2">
+                        <div class="bg-gradient-to-r from-indigo-600 to-purple-600 p-2 rounded-lg">
+                            <i data-lucide="ticket" class="w-6 h-6 text-white"></i>
+                        </div>
+                        <span class="text-2xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+                            TukuTiket
+                        </span>
+                    </div>
+
+                    <!-- Navigation Links & Auth Buttons -->
+                    <div class="flex items-center space-x-6">
+                        @auth
+                            <!-- User Info -->
+                            <div class="relative" x-data="{ open: false }">
+                                <button @click="open = !open" @click.away="open = false" class="flex items-center space-x-3 bg-indigo-50 hover:bg-indigo-100 px-4 py-2 rounded-lg transition-colors duration-200">
+                                    <i data-lucide="user-circle" class="w-5 h-5 text-indigo-600"></i>
+                                    <span class="text-sm font-semibold text-gray-700">{{ Auth::user()->name }}</span>
+                                    <i data-lucide="chevron-down" class="w-4 h-4 text-gray-500"></i>
+                                </button>
+                                
+                                <!-- Dropdown menu -->
+                                <div x-show="open" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100" x-transition:leave="transition ease-in duration-150" x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-95" class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-1 z-50" style="display: none;">
+                                    <a href="{{ route('profile.edit') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-indigo-50 flex items-center">
+                                        <i data-lucide="user" class="w-4 h-4 mr-2 text-indigo-500"></i>
+                                        Profile
+                                    </a>
+                                    
+                                    @if(!Auth::user()->hasRole('pembuat_event'))
+                                        <a href="{{ route('beranda') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-indigo-50 flex items-center">
+                                            <i data-lucide="star" class="w-4 h-4 mr-2 text-amber-500"></i>
+                                            Become Creator
+                                        </a>
+                                    @endif
+                                </div>
+                            </div>
+                            
+                            <!-- Logout Button -->
+                            <form method="POST" action="{{ route('logout') }}">
+                                @csrf
+                                <button type="submit"
+                                    class="flex items-center space-x-2 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white font-semibold px-4 py-2 rounded-lg transition-all duration-300 shadow-md hover:shadow-lg">
+                                    <i data-lucide="log-out" class="w-4 h-4"></i>
+                                    <span>Logout</span>
+                                </button>
+                            </form>
+                        @else
+                            <!-- Login Button -->
+                            <a href="{{ route('login') }}"
+                                class="flex items-center space-x-2 text-indigo-600 hover:text-indigo-800 font-semibold px-4 py-2 rounded-lg transition-all duration-300">
+                                <i data-lucide="log-in" class="w-4 h-4"></i>
+                                <span>Login</span>
+                            </a>
+                            
+                            <!-- Register Button -->
+                            <a href="{{ route('register') }}"
+                                class="flex items-center space-x-2 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-semibold px-4 py-2 rounded-lg transition-all duration-300 shadow-md hover:shadow-lg">
+                                <i data-lucide="user-plus" class="w-4 h-4"></i>
+                                <span>Register</span>
+                            </a>
+                        @endauth
+                    </div>
+                </div>
+            </div>
+        </nav>
+
         <!-- Hero Section with Animation -->
         <div class="container mx-auto px-6 py-20 relative overflow-hidden">
             <!-- Decorative Background Elements -->
@@ -23,24 +93,6 @@
                         Your one-stop solution for booking event tickets quickly and securely. 
                         <span class="block mt-2 text-lg text-gray-600">🎉 Experience unforgettable moments!</span>
                     </p>
-                    @guest
-                        <div class="flex flex-col space-y-4 sm:flex-row sm:space-y-0 sm:space-x-4 animate-fade-in-up animation-delay-400">
-                            <a href="{{ route('login') }}"
-                                class="group bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-bold py-4 px-8 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1">
-                                <span class="flex items-center justify-center">
-                                    <i data-lucide="log-in" class="w-5 h-5 mr-2"></i>
-                                    Login
-                                </span>
-                            </a>
-                            <a href="{{ route('register') }}"
-                                class="group bg-white hover:bg-gray-50 text-indigo-600 font-bold py-4 px-8 rounded-xl border-2 border-indigo-600 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1">
-                                <span class="flex items-center justify-center">
-                                    <i data-lucide="user-plus" class="w-5 h-5 mr-2"></i>
-                                    Register
-                                </span>
-                            </a>
-                        </div>
-                    @endguest
                 </div>
                 <div class="lg:w-1/2 flex justify-center items-center">
                     <div class="relative w-full max-w-md animate-fade-in-up animation-delay-600">

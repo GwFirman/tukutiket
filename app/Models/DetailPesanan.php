@@ -11,5 +11,11 @@ class DetailPesanan extends Model
 
     protected $table = 'detail_pesanan';
 
-    
+    protected $fillable = [
+        'id',
+        'id_pesanan',
+        'id_jenis_tiket',
+        'jumlah',
+        'harga_per_tiket',
+    ];
 }

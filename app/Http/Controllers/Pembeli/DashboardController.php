@@ -3,7 +3,9 @@
 namespace App\Http\Controllers\Pembeli;
 
 use App\Http\Controllers\Controller;
+use App\Models\Pesanan;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class DashboardController extends Controller
 {
@@ -12,7 +14,9 @@ class DashboardController extends Controller
      */
     public function index()
     {
-        return view('pembeli.dashboard');
+        $pesanan = Pesanan::where('id_pembeli', Auth::id())->with('detailPesanan','detailPesanan.jenisTiket','detailPesanan.jenisTiket.acara')->get();
+        // dd($pesanan);
+        return view('pembeli.tiket.index',compact('pesanan'));
     }
 
     /**

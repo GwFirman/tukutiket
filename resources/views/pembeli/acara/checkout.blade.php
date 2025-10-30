@@ -284,8 +284,6 @@
                             }
                         });
                     </script>
-
-
                 </div>
                 <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg col-span-4 p-6">
                     <p class="text-gray-800 font-medium">Informasi Pembelian</p>
@@ -297,7 +295,7 @@
                     </div>
                     <x-text-input
                         class="block mt-2 w-full border-2 rounded-lg p-2 outline-0 focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-                        name="nama_peserta">
+                        name="nama_pemesan">
                     </x-text-input>
 
 
@@ -315,9 +313,10 @@
                         <i data-lucide="mail" class="size-5 text-indigo-400"></i>
                         <x-input-label :value="__('Email')" class="text-gray-300" />
                     </div>
-                    <x-text-input id="email_peserta"
+                    <x-text-input id="email_pemesan"
                         class="block mt-1 w-full border-2 rounded-lg p-2 outline-0 focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-                        type="email" name="email_peserta" required />
+                        type="email" name="email_pemesan" required />
+
 
                     <p class="text-gray-800 font-medium mt-4">Detail Pesanan</p>
                     <div class="border-t border-gray-200 my-4"></div>
@@ -343,14 +342,12 @@
                         <x-input-label :value="__('Metode Pembayaran')" class="text-gray-300" />
                     </div>
 
-                    <select name="metode_pembayaran"
+                    <select name="metode_pembayaran" required
                         class="mt-2 w-full text-gray-600 outline-gray-300 rounded-lg p-2 outline-2 focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
                         <option value="" disabled selected>Pilih metode pembayaran</option>
-                        <option value="credit_card">Kartu Kredit / Debit</option>
                         <option value="bank_transfer">Transfer Bank</option>
                         <option value="e_wallet">E-Wallet (OVO/GoPay/DANA)</option>
                         <option value="virtual_account">Virtual Account</option>
-                        <option value="convenience_store">Gerai Retail (Alfamart/Indomaret)</option>
                     </select>
                     <button type="submit"
                         class="mt-4 bg-indigo-600 hover:bg-indigo-700 text-white block text-center font-medium py-2 px-4 rounded transition duration-300">Checkout</button>

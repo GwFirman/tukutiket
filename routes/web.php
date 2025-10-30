@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\All\BerandaController;
+use App\Http\Controllers\PembayaranController;
 use App\Http\Controllers\Pembeli\AcaraController as PembeliAcaraController;
 use App\Http\Controllers\Pembeli\DashboardController as DashboardPembeliController;
 use App\Http\Controllers\Pembeli\PesananController;
@@ -19,13 +20,17 @@ Route::middleware(['auth', 'verified'])->group(function () {
         $user = Auth::user();
 
         if ($user->hasRole('pembeli')) {
-            return redirect()->route('pembeli.dashboard');
+            return redirect()->route('pembeli.tiket-saya');
         } elseif ($user->hasRole('pembuat_event')) {
             return redirect()->route('pembuat.dashboard');
         }
 
         abort(403, 'Akses Ditolak');
     })->name('dashboard');
+    Route::get('/pembeli', function () {
+        return redirect()->route('pembeli.tiket-saya');
+    });
+    
 });
 
 Route::middleware(['auth', 'role:pembuat_event'])
@@ -40,8 +45,10 @@ Route::middleware(['auth', 'role:pembeli'])
     ->prefix('pembeli')
     ->name('pembeli.')
     ->group(function () {
-        Route::get('/dasboard', [DashboardPembeliController::class, 'index'])->name('dashboard');
+        // Route::get('/dasboard', [DashboardPembeliController::class, 'index'])->name('dashboard');
+        Route::get('/tiket-saya', [DashboardPembeliController::class, 'index'])->name('tiket-saya');
         Route::resource('tiket', TiketController::class);
+        Route::resource('pembayaran', PembayaranController::class);
         Route::resource('acara', PembeliAcaraController::class);
         Route::resource('checkout', PesananController::class);
         // Route::resource('tiket')

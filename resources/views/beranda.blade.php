@@ -33,9 +33,19 @@
                                     </a>
                                     
                                     @if(!Auth::user()->hasRole('pembuat_event'))
+                                        <a href="{{ route('pembeli.tiket-saya') }}" class=" px-4 py-2 text-sm text-gray-700 hover:bg-indigo-50 flex items-center">
+                                            <i data-lucide="calendar" class="w-4 h-4 mr-2 text-purple-500"></i>
+                                            Tiket Saya
+                                        </a>
                                         <a href="{{ route('beranda') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-indigo-50 flex items-center">
                                             <i data-lucide="star" class="w-4 h-4 mr-2 text-amber-500"></i>
                                             Become Creator
+                                        </a>
+                                    @endif
+                                    @if(Auth::user()->hasRole('pembuat_event'))
+                                        <a href="{{ route('pembuat.dashboard') }}" class=" px-4 py-2 text-sm text-gray-700 hover:bg-indigo-50 flex items-center">
+                                            <i data-lucide="calendar" class="w-4 h-4 mr-2 text-amber-500"></i>
+                                            Dashboard Kreator
                                         </a>
                                     @endif
                                 </div>
@@ -211,7 +221,8 @@
                                     <div>
                                         <p class="text-xs text-gray-500 mb-1">Starting from</p>
                                         <span class="text-2xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
-                                            {{ optional($acara->jenisTiket->first())->harga ?? 'Free' }}
+                                            {{-- {{  optional($acara->jenisTiket->first())->harga ?? 'Free' }} --}}
+                                            Rp {{ number_format( optional($acara->jenisTiket->first())->harga, 0, ',', '.') }}
                                         </span>
                                     </div>
                                     <a href="{{ route('pembeli.acara.show', $acara->slug ?? 1) }}"

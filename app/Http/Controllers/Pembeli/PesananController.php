@@ -34,15 +34,18 @@ class PesananController extends Controller
      */
     public function store(Request $request)
     {
-        // dd($request);
-
+        
         $pesanan = Pesanan::create([
             'id_pembeli' => Auth::id(),
             'kode_pesanan' => 'ORD-' . strtoupper(Str::random(8)),
             'total_harga' => $request->grand_total,
-            'status_pembayaran' => 'pending'
+            'status_pembayaran' => 'pending',
+            'metode_pembayaran' => $request->metode_pembayaran, 
+            'email_pemesan' => $request->email_pemesan, 
+            'nama_pemesan' => $request->nama_pemesan, 
+            'no_telp_peserta' => $request->no_telp_peserta, 
         ]);
-
+    
         foreach ($request->tickets as $ticket){
             DetailPesanan::create([
                 'id_pesanan' => $pesanan->id,
@@ -52,7 +55,16 @@ class PesananController extends Controller
             ]);
         }
 
-        return redirect()->route('beranda');
+        // Update kuota tiket
+        foreach ($request->tickets as $ticket) {
+            $jenisTiket = \App\Models\JenisTiket::find($ticket['id']);
+            if ($jenisTiket) {
+                $jenisTiket->kuota -= $ticket['quantity'];
+                $jenisTiket->save();
+            }
+        }
+
+        return redirect()->route('pembeli.pembayaran.show', $pesanan->kode_pesanan);
     }
 
     /**

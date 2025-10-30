@@ -18,4 +18,8 @@ class DetailPesanan extends Model
         'jumlah',
         'harga_per_tiket',
     ];
+
+    public function jenisTiket() {
+        return $this->belongsTo(JenisTiket::class,'id_jenis_tiket');
+    }
 }

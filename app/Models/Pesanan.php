@@ -11,11 +11,12 @@ class Pesanan extends Model
 
     protected $table = 'pesanan';
 
-    protected $fillable = ['id', 'id_pembeli', 'kode_pesanan','total_harga','status_pembayaran','metode_pembayaran'];
+    protected $fillable = ['id', 'id_pembeli', 'kode_pesanan','total_harga','status_pembayaran','metode_pembayaran','nama_pemesan','email_pemesan','no_telp_peserta'];
 
     public function detailPesanan(){
         
         return $this->hasMany(DetailPesanan::class,'id_pesanan');
     }
+    
 
 }

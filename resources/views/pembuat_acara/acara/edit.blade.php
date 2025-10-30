@@ -198,12 +198,21 @@
                                 class=" shadow-theme-xs font-normal focus:border-blue-300 focus:ring-blue-500/10 h-11 w-full  border border-gray-300 rounded-lg bg-transparent px-4 py-2.5 text-lg text-gray-800 placeholder:text-gray-400 focus:ring-3 focus:outline-hidden ">
                         </div>
                     </div>
-
-                    <div>
+                    <div class="mt-4">
+                        <label for="deskripsi_acara" class="block text-sm font-medium text-gray-700">Deskripsi</label>
+                        <div>
+                            <link rel="stylesheet"
+                                href="https://cdnjs.cloudflare.com/ajax/libs/trix/1.3.1/trix.min.css" />
+                            <input id="deskripsi_acara" name="deskripsi_acara" type="hidden" value="{{ old('deskripsi_acara', $acara->deskripsi) }}">
+                            <trix-editor input="deskripsi_acara"></trix-editor>
+                            <script src="https://cdnjs.cloudflare.com/ajax/libs/trix/1.3.1/trix.min.js"></script>
+                        </div>
+                    </div>
+                    {{-- <div>
                         <label for="deskripsi" class="block text-sm font-medium text-gray-700">Deskripsi</label>
                         <textarea name="deskripsi_acara" id="deskripsi" rows="3"
                             class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">{{ old('deskripsi_acara', $acara->deskripsi) }}</textarea>
-                    </div>
+                    </div> --}}
                     <div class="w-full">
                         <label class="mb-1.5 block text-sm font-medium text-gray-700 ">
                             Info Kontak

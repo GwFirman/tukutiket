@@ -73,5 +73,4 @@
         lucide.createIcons();
     </script>
 </body>
-
 </html>

@@ -35,7 +35,6 @@ class AcaraController extends Controller
      */
     public function store(Request $request)
     {
-
         $validate = $request->validate([
             'banner_acara' => 'nullable|image|mimes:jpg,jpeg,png',
             'nama_acara' => 'required|string|max:255',
@@ -221,6 +220,26 @@ class AcaraController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $acara = Acara::findOrFail($id);
+
+        // Pastikan hanya pembuat acara yang boleh menghapus
+        if ($acara->id_pembuat !== Auth::id()) {
+            abort(403, 'Kamu tidak memiliki izin untuk menghapus acara ini.');
+        }
+
+        // Hapus banner acara jika ada
+        if ($acara->banner_acara && Storage::disk('public')->exists($acara->banner_acara)) {
+            Storage::disk('public')->delete($acara->banner_acara);
+        }
+
+        // Hapus jenis tiket terkait
+        $acara->jenisTiket()->delete();
+
+        // Hapus acara
+        $acara->delete();
+
+        return redirect()->route('pembuat.acara.index')->with('success', 'Acara berhasil dihapus!');
     }
+
+    
 }

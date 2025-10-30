@@ -1,21 +1,26 @@
 <x-app-layout>
-    {{-- <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Dashboard') }}
-        </h2>
-    </x-slot> --}}
+    <x-slot name="header">
+        <div class="flex items-center gap-2 mb-4">
+            <i data-lucide="calendar" class="size-5 text-gray-600"></i>
+            <i data-lucide="chevron-right" class="size-4 font-medium text-gray-400"></i>
+            <p class="font-medium">Buat Acara</p>
+        </div>
+    </x-slot>
 
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white shadow-sm sm:rounded-lg">
-                <form method="POST" action="{{ route('pembuat.acara.store') }}" enctype="multipart/form-data" class="p-6 space-y-6">
+    <div class="">
+        <div class="mx-auto px-24">
+            <div class="">
+                <form method="POST" action="{{ route('pembuat.acara.store') }}" enctype="multipart/form-data"
+                    class="">
                     @csrf
                     @if ($errors->any())
                         <div class="bg-red-50 border-l-4 border-red-500 p-4 mb-6">
                             <div class="flex items-center">
                                 <div class="flex-shrink-0">
                                     <svg class="h-5 w-5 text-red-400" fill="currentColor" viewBox="0 0 20 20">
-                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-9v4a1 1 0 11-2 0v-4a1 1 0 112 0zm-1-5a1 1 0 00-1 1v.01a1 1 0 102 0V5a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                                        <path fill-rule="evenodd"
+                                            d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-9v4a1 1 0 11-2 0v-4a1 1 0 112 0zm-1-5a1 1 0 00-1 1v.01a1 1 0 102 0V5a1 1 0 00-1-1z"
+                                            clip-rule="evenodd" />
                                     </svg>
                                 </div>
                                 <div class="ml-3">
@@ -104,7 +109,7 @@
                     <div>
                         <label for="nama_acara" class="block text-sm font-medium text-gray-700">Nama Acara</label>
                         <input type="text" name="nama_acara" id="nama_acara" required
-                            class="mt-1 h-10 block w-full rounded-md border border-gray-100 shadow-sm focus:border-sky-500">
+                            class="mt-1 h-10 block w-full border-b-2 outline-0 border-gray-100 text-xl focus:border-sky-500">
                     </div>
                     <div class="flex gap-5 mt-5">
                         <div class="w-full" x-data="{
@@ -126,7 +131,7 @@
                             <label class="mb-1.5 block text-sm font-medium text-gray-700 ">
                                 Tanggal Acara
                             </label>
-                            <div class="flex items-center h-11 pl-4 rounded-lg cursor-pointer border border-gray-300"
+                            <div class="flex items-center justify-between  h-11 px-4 rounded-lg cursor-pointer border border-gray-300"
                                 @click="showModal = true">
                                 <label class="block text-md text-gray-700  mr-2" x-text="label"></label>
                                 <span class="-1/2 text-blue-500 ">
@@ -188,12 +193,17 @@
                         </div>
                     </div>
 
-                    <div>
-                        <label for="deskripsi" class="block text-sm font-medium text-gray-700">Deskripsi</label>
-                        <textarea name="deskripsi_acara" id="deskripsi" rows="3"
-                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"></textarea>
+                    <div class="mt-4">
+                        <label for="deskripsi_acara" class="block text-sm font-medium text-gray-700">Deskripsi</label>
+                        <div>
+                            <link rel="stylesheet"
+                                href="https://cdnjs.cloudflare.com/ajax/libs/trix/1.3.1/trix.min.css" />
+                            <input id="deskripsi_acara" name="deskripsi_acara" type="hidden">
+                            <trix-editor input ="deskripsi_acara"></trix-editor>
+                            <script src="https://cdnjs.cloudflare.com/ajax/libs/trix/1.3.1/trix.min.js"></script>
+                        </div>
                     </div>
-                    <div class="w-full">
+                    <div class="w-full mt-4">
                         <label class="mb-1.5 block text-sm font-medium text-gray-700 ">
                             Info Kontak
                         </label>
@@ -201,13 +211,13 @@
                             class=" shadow-theme-xs font-normal focus:border-blue-300 focus:ring-blue-500/10 h-11 w-full  border border-gray-300 rounded-lg bg-transparent px-4 py-2.5 text-lg text-gray-800 placeholder:text-gray-400 focus:ring-3 focus:outline-hidden ">
                     </div>
                     <div>
-                        <div class="mt-5 w-full">
+                        {{-- <div class="mt-5 w-full">
                             <label class="mb-1.5 block text-sm font-medium text-gray-700">
                                 Banner tiket
                             </label>
                             <input type="file" name="banner_tiket"
                                 class="focus:border-ring-brand-300 shadow-theme-xs focus:file:ring-brand-300 h-11 w-full overflow-hidden rounded-lg border border-gray-300 bg-transparent text-sm text-gray-500 transition-colors file:mr-5 file:border-collapse file:cursor-pointer file:rounded-l-lg file:border-0 file:border-r file:border-solid file:border-gray-200 file:bg-gray-50 file:py-3 file:pr-3 file:pl-3.5 file:text-sm file:text-gray-700 placeholder:text-gray-400 hover:file:bg-gray-100 focus:outline-hidden " />
-                        </div>
+                        </div> --}}
 
                         <div class="rounded-2xl border border-gray-200 bg-white mt-5 p-5">
                             <div class="px-5 py-4 sm:px-6 sm:py-5">
@@ -258,44 +268,102 @@
                                         deskripsi: ''
                                     };
                                 }
-                            }" class="flex flex-wrap items-center gap-8">
+                            }" class="flex flex-wrap items-center gap-2">
                                 <!-- Pilihan Gratis -->
-                                <div class="p-6 rounded-lg border transition-all duration-200"
-                                    :class="selected === 'gratis' ? 'border-blue-500' : 'border-gray-100'">
-                                    <label
-                                        class="flex cursor-pointer items-center text-sm font-medium text-gray-700 select-none">
-                                        <input type="radio" name="jenis_tiket" value="gratis" class="sr-only"
-                                            x-model="selected" />
-                                        <div :class="selected === 'gratis' ? 'border-blue-500 bg-blue-500' :
-                                            'bg-transparent border-gray-300'"
-                                            class="hover:border-blue-500 mr-3 flex h-5 w-5 items-center justify-center rounded-full border-[1.25px] transition-all duration-200">
-                                            <span class="h-2 w-2 rounded-full"
-                                                :class="selected === 'gratis' ? 'bg-white' : 'bg-white'"></span>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
+                                    <!-- Pilihan Gratis -->
+                                    <div class="group relative overflow-hidden rounded-xl border-2 transition-all duration-300 cursor-pointer"
+                                        :class="selected === 'gratis' ?
+                                            'border-green-500 bg-gradient-to-br from-green-50 to-emerald-50 ' :
+                                            'border-gray-200 bg-white hover:border-green-300'"
+                                        @click="selected = 'gratis'">
+                                        <div class="p-6">
+                                            <label class="flex items-center cursor-pointer">
+                                                <input type="radio" name="jenis_tiket" value="gratis"
+                                                    class="sr-only" x-model="selected" />
+                                                <div class="relative">
+                                                    <div :class="selected === 'gratis' ?
+                                                        'border-green-500 bg-green-500 shadow-green-200' :
+                                                        'border-gray-300 bg-white'"
+                                                        class="flex h-6 w-6 items-center justify-center rounded-full border-2 transition-all duration-200 shadow-sm">
+                                                        <svg x-show="selected === 'gratis'" x-transition.opacity
+                                                            class="h-3.5 w-3.5 text-white" fill="currentColor"
+                                                            viewBox="0 0 20 20">
+                                                            <path fill-rule="evenodd"
+                                                                d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                                                                clip-rule="evenodd" />
+                                                        </svg>
+                                                    </div>
+                                                </div>
+                                                <div class="ml-4">
+                                                    <div class="flex items-center gap-2 mb-1">
+                                                        <span
+                                                            class="text-sm font-medium text-gray-600 uppercase tracking-wider">Buat
+                                                            Tiket</span>
+                                                    </div>
+                                                    <h3 class="text-2xl font-bold text-gray-900 mb-1">Gratis</h3>
+                                                    <p class="text-sm text-gray-500">Tidak ada biaya untuk peserta</p>
+                                                </div>
+                                            </label>
                                         </div>
-                                        Gratis
-                                    </label>
-                                </div>
-
-                                <!-- Pilihan Berbayar -->
-                                <div class="p-6 rounded-lg border transition-all duration-200"
-                                    :class="selected === 'berbayar' ? 'border-blue-500' : 'border-gray-100'">
-                                    <label
-                                        class="flex cursor-pointer items-center text-sm font-medium text-gray-700 select-none">
-                                        <input type="radio" name="jenis_tiket" value="berbayar" class="sr-only"
-                                            x-model="selected" />
-                                        <div :class="selected === 'berbayar' ? 'border-blue-500 bg-blue-500' :
-                                            'bg-transparent border-gray-300'"
-                                            class="hover:border-blue-500 mr-3 flex h-5 w-5 items-center justify-center rounded-full border-[1.25px] transition-all duration-200">
-                                            <span class="h-2 w-2 rounded-full"
-                                                :class="selected === 'berbayar' ? 'bg-white' : 'bg-white'"></span>
+                                        <!-- Accent line -->
+                                        <div :class="selected === 'gratis' ? 'bg-green-500' : 'bg-gray-200'"
+                                            class="absolute bottom-0 left-0 h-1 w-full transition-all duration-300">
                                         </div>
-                                        Berbayar
-                                    </label>
+                                    </div>
+                                    <!-- Pilihan Berbayar -->
+                                    <div class="group relative overflow-hidden rounded-xl border-2 transition-all duration-300 cursor-pointer"
+                                        :class="selected === 'berbayar' ?
+                                            'border-blue-500 bg-gradient-to-br from-blue-50 to-indigo-50 shadow-lg' :
+                                            'border-gray-200 bg-white hover:border-blue-300 hover:shadow-md'"
+                                        @click="selected = 'berbayar'">
+                                        <div class="p-6">
+                                            <label class="flex items-center cursor-pointer">
+                                                <input type="radio" name="jenis_tiket" value="berbayar"
+                                                    class="sr-only" x-model="selected" />
+                                                <div class="relative">
+                                                    <div :class="selected === 'berbayar' ?
+                                                        'border-blue-500 bg-blue-500 shadow-blue-200' :
+                                                        'border-gray-300 bg-white'"
+                                                        class="flex h-6 w-6 items-center justify-center rounded-full border-2 transition-all duration-200 shadow-sm">
+                                                        <svg x-show="selected === 'berbayar'" x-transition.opacity
+                                                            class="h-3.5 w-3.5 text-white" fill="currentColor"
+                                                            viewBox="0 0 20 20">
+                                                            <path fill-rule="evenodd"
+                                                                d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                                                                clip-rule="evenodd" />
+                                                        </svg>
+                                                    </div>
+                                                </div>
+                                                <div class="ml-4">
+                                                    <div class="flex items-center gap-2 mb-1">
+                                                        <svg class="h-5 w-5 text-blue-500" fill="none"
+                                                            stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                                stroke-width="2"
+                                                                d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
+                                                        </svg>
+                                                        <span
+                                                            class="text-sm font-medium text-gray-600 uppercase tracking-wider">Buat
+                                                            Tiket</span>
+                                                    </div>
+                                                    <h3 class="text-2xl font-bold text-gray-900 mb-1">Berbayar</h3>
+                                                    <p class="text-sm text-gray-500">Tetapkan kategori dan harga tiket
+                                                    </p>
+                                                </div>
+                                            </label>
+                                        </div>
+                                        <!-- Accent line -->
+                                        <div :class="selected === 'berbayar' ? 'bg-blue-500' : 'bg-gray-200'"
+                                            class="absolute bottom-0 left-0 h-1 w-full transition-all duration-300">
+                                        </div>
+                                    </div>
                                 </div>
 
                                 <!-- Daftar Kategori Tiket -->
                                 <div class="w-full mt-2" x-show="selected === 'berbayar'">
-                                    <template class="flex-col gap-4" x-for="(kategori, index) in kategoriList" :key="index">
+                                    <template class="flex-col gap-4" x-for="(kategori, index) in kategoriList"
+                                        :key="index">
                                         <div
                                             class="flex justify-between items-center border rounded-lg p-4 bg-gray-50">
                                             <div>
@@ -389,7 +457,7 @@
                                             <div>
                                                 <label
                                                     class="block text-sm font-medium text-gray-700 mb-1">Deskripsi</label>
-                                                <textarea x-model="kategoriBaru.deskripsi" rows="3" 
+                                                <textarea x-model="kategoriBaru.deskripsi" rows="3"
                                                     class="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm focus:border-blue-500 focus:ring-blue-500"></textarea>
                                             </div>
                                         </div>
@@ -419,53 +487,45 @@
                             <div class="space-y-6 border-t border-gray-100 p-5 sm:p-6">
                                 <!-- Elements -->
                                 <div class="flex flex-col w-full justify-center gap-8">
-                                    <div class="border p-4 rounded-lg flex items-center gap-4" x-data="{ checkboxToggle: false }"
-                                        :class="checkboxToggle ? 'border-blue-500' : 'border-gray-200'">
-                                        <div class="w-64">
-                                            <label for="radioLabelOne"
-                                                class="flex cursor-pointer items-center text-sm font-medium text-gray-700 select-none">
+                                    <div class="flex gap-4 items-center justify-between">
+                                        <div class="">
+                                            <label for="">Maks Tiket per transaksi</label>
+                                            <p class="text-sm text-gray-400">Jumlah maksimal tiket yang dapat dibeli
+                                                dalam 1 transaksi</p>
+                                        </div>
+                                        <select name="maks_tiket_per_transaksi"
+                                            class="shadow-theme-xs w-24 focus:border-blue-300 focus:ring-blue-500/10 h-11 rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 focus:ring-3 focus:outline-hidden">
+                                            <option value="5">5 tiket</option>
+                                            <option value="4">4 tiket</option>
+                                            <option value="3">3 tiket</option>
+                                            <option value="2">2 tiket</option>
+                                            <option value="1">1 tiket</option>
+                                        </select>
+                                    </div>
+                                    <div class="flex items-center justify-between gap-4" x-data="{ switchToggle: false }">
+                                        <div class="">
+                                            <label for="">1 Tiket per Akun</label>
+                                            <p class="text-sm text-gray-400">1 Akun hanya dapat membeli 1 tiket</p>
+                                        </div>
+                                        <div class="flex items-center">
+                                            <label for="switchToggle" class="flex cursor-pointer items-center">
                                                 <div class="relative">
-                                                    <input type="checkbox" id="radioLabelOne" class="sr-only"
-                                                        @change="checkboxToggle = !checkboxToggle" />
-                                                    <div :class="checkboxToggle ? 'border-blue-500 bg-blue-500' :
-                                                        'bg-transparent border-gray-300'"
-                                                        class="hover:border-blue-500 mr-3 flex h-5 w-5 items-center justify-center rounded-full border-[1.25px]">
-                                                        <span class="h-2 w-2 rounded-full"
-                                                            :class="checkboxToggle ? 'bg-white' : 'bg-white'"></span>
+                                                    <input type="checkbox" id="switchToggle" class="sr-only"
+                                                        name="satu_tiket_per_akun"
+                                                        @change="switchToggle = !switchToggle" />
+                                                    <div :class="switchToggle ? 'bg-blue-500' : 'bg-gray-300'"
+                                                        class="block h-6 w-11 rounded-full transition-colors duration-200 ease-in-out">
+                                                    </div>
+                                                    <div :class="switchToggle ? 'translate-x-5' : 'translate-x-0'"
+                                                        class="absolute left-1 top-1 h-4 w-4 rounded-full bg-white transition-transform duration-200 ease-in-out">
                                                     </div>
                                                 </div>
-                                                Maks Pembelian per akun
                                             </label>
+                                            <input type="hidden" name="maks_pembelian_per_akun"
+                                                :value="switchToggle ? 1 : 0" />
                                         </div>
-                                        <input type="number" :disabled="!checkboxToggle"
-                                            name="maks_pembelian_per_akun"
-                                            class="
-                                         shadow-theme-xs focus:border-blue-300 focus:ring-blue-500/10 h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 placeholder:text-gray-400 focus:ring-3 focus:outline-hidden " />
                                     </div>
-                                    <div class="border p-4 rounded-lg flex items-center gap-4" x-data="{ ticketLimitToggle: false }"
-                                        :class="ticketLimitToggle ? 'border-blue-500' : 'border-gray-200'">
-                                        <div class="w-64">
-                                            <label for="ticketLimitToggle"
-                                                class="flex cursor-pointer items-center text-sm font-medium text-gray-700 select-none">
-                                                <div class="relative">
-                                                    <input type="checkbox" id="ticketLimitToggle" class="sr-only"
-                                                        @change="ticketLimitToggle = !ticketLimitToggle" />
-                                                    <div :class="ticketLimitToggle ? 'border-blue-500 bg-blue-500' :
-                                                        'bg-transparent border-gray-300'"
-                                                        class="hover:border-blue-500 mr-3 flex h-5 w-5 items-center justify-center rounded-full border-[1.25px]">
-                                                        <span class="h-2 w-2 rounded-full"
-                                                            :class="ticketLimitToggle ? 'bg-white' : 'bg-white'"></span>
-                                                    </div>
-                                                </div>
-                                                Maks tiket per transaksi
-                                            </label>
-                                        </div>
-                                        <input type="number" :disabled="!ticketLimitToggle"
-                                            name="maks_tiket_per_transaksi"
-                                            :class="!ticketLimitToggle ? 'opacity-50 cursor-not-allowed' : ''"
-                                            class="
-                                         shadow-theme-xs focus:border-blue-300 focus:ring-blue-500/10 h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 placeholder:text-gray-400 focus:ring-3 focus:outline-hidden " />
-                                    </div>
+
                                 </div>
                             </div>
                         </div>

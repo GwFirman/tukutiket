@@ -17,7 +17,7 @@ protected $fillable = [
     'penjualan_selesai',
 ];
 
-    public function Acara() {
+    public function acara() {
         return $this->belongsTo(Acara::class,'id_acara');
     }
 

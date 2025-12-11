@@ -31,7 +31,13 @@ class LaporanPenjualanController extends Controller
                 DB::raw("COALESCE(SUM(CASE WHEN p.status_pembayaran = 'paid' THEN dp.jumlah * dp.harga_per_tiket END), 0) AS total_pendapatan"),
                 DB::raw("COALESCE(SUM(CASE WHEN tp.status_checkin = 'sudah_digunakan' THEN 1 END), 0) AS total_sudah_checkin")
             )
-            ->groupBy('a.id')
+            ->groupBy(
+                'a.id',
+                'a.nama_acara',
+                'a.lokasi',
+                'a.waktu_mulai',
+                'a.waktu_selesai'
+            )
             ->first();
 
         // ================
@@ -54,7 +60,13 @@ class LaporanPenjualanController extends Controller
                 DB::raw("COALESCE(SUM(CASE WHEN p.status_pembayaran = 'paid' THEN dp.jumlah * dp.harga_per_tiket END), 0) AS pendapatan"),
                 DB::raw("COALESCE(SUM(CASE WHEN tp.status_checkin = 'sudah_digunakan' THEN 1 END), 0) AS checkin_count")
             )
-            ->groupBy('jt.id')
+            ->groupBy(
+                'jt.id',
+                'jt.nama_jenis',
+                'jt.harga',
+                'jt.kuota',
+                'jt.deskripsi'
+            )
             ->orderBy('jt.nama_jenis', 'ASC')
             ->get();
 

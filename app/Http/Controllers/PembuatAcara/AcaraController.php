@@ -96,7 +96,7 @@ class AcaraController extends Controller
     public function show(Acara $acara)
     {
         // Pastikan hanya pembuat acara yang dapat mengakses
-        if ($acara->id_pembuat !== Auth::id()) {
+        if ($acara->id_pembuat != Auth::id()) {
             abort(403, 'Acara tidak ditemukan');
         }
 

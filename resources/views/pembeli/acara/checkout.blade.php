@@ -47,7 +47,11 @@
                                                     {{ \Carbon\Carbon::parse($tiket->penjualan_selesai)->translatedFormat('d F Y') }}
                                                 </p>
                                                 <p class="text-indigo-600 font-bold">
-                                                    Rp {{ number_format($tiket->harga, 0, ',', '.') }}
+                                                    @if ($tiket->harga == 0)
+                                                        Gratis
+                                                    @else
+                                                        Rp {{ number_format($tiket->harga, 0, ',', '.') }}
+                                                    @endif
                                                 </p>
 
                                                 <!-- Tombol lihat detail -->
@@ -63,7 +67,7 @@
                                                 </button>
                                             </div>
                                             <div>
-                                                <div x-data="ticketCounter({{ $tiket->id }}, '{{ $tiket->nama_jenis }}', {{ $tiket->harga }})"
+                                                <div x-data="ticketCounter({{ $tiket->id }}, '{{ $tiket->nama_jenis }}', {{ $tiket->harga }}, {{ $acara->maks_tiket_per_transaksi ?? 5 }})"
                                                     class="flex items-center gap-3 bg-gray-100 rounded-full px-3 py-2 w-fit">
                                                     <!-- Tombol Minus -->
                                                     <button type="button" @click="decrementTicket()"
@@ -78,7 +82,8 @@
 
                                                     <!-- Tombol Plus -->
                                                     <button type="button" @click="incrementTicket()"
-                                                        class="p-1 text-center bg-indigo-500 text-white rounded-full hover:bg-indigo-600 transition-colors">
+                                                        class="p-1 text-center bg-indigo-500 text-white rounded-full hover:bg-indigo-600 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
+                                                        :disabled="!canAddMore()">
                                                         <i data-lucide="plus" class="size-5"></i>
                                                     </button>
                                                 </div>
@@ -159,17 +164,52 @@
 
                     <script>
                         const cart = {};
+                        const MAX_TICKETS = {{ $acara->maks_tiket_per_transaksi ?? 5 }};
+                        let savedPesertaData = {}; // Menyimpan data peserta yang sudah diisi
 
-                        function ticketCounter(ticketId, ticketName, ticketPrice) {
+                        function getTotalTickets() {
+                            return Object.values(cart).reduce((sum, item) => sum + item.quantity, 0);
+                        }
+
+                        // Fungsi untuk menyimpan data form sebelum re-render
+                        function savePesertaData() {
+                            const container = document.getElementById('peserta_forms_container');
+                            const inputs = container.querySelectorAll('input');
+
+                            inputs.forEach(input => {
+                                if (input.name && input.value) {
+                                    savedPesertaData[input.name] = input.value;
+                                }
+                            });
+                        }
+
+                        // Fungsi untuk mengembalikan data form setelah re-render
+                        function restorePesertaData() {
+                            for (const [name, value] of Object.entries(savedPesertaData)) {
+                                const input = document.querySelector(`input[name="${name}"]`);
+                                if (input) {
+                                    input.value = value;
+                                }
+                            }
+                        }
+
+                        function ticketCounter(ticketId, ticketName, ticketPrice, maxPerTransaction) {
                             return {
                                 count: 0,
                                 ticketId: ticketId,
                                 ticketName: ticketName,
                                 ticketPrice: ticketPrice,
+                                maxPerTransaction: maxPerTransaction,
+
+                                canAddMore() {
+                                    return getTotalTickets() < MAX_TICKETS;
+                                },
 
                                 incrementTicket() {
-                                    this.count++;
-                                    this.updateCart();
+                                    if (this.canAddMore()) {
+                                        this.count++;
+                                        this.updateCart();
+                                    }
                                 },
 
                                 decrementTicket() {
@@ -192,6 +232,11 @@
                                     }
                                     this.renderCart();
                                     this.updateHiddenInputs();
+
+                                    // Simpan data sebelum render, lalu kembalikan setelah render
+                                    savePesertaData();
+                                    this.renderPesertaForms();
+                                    restorePesertaData();
                                 },
 
                                 updateHiddenInputs() {
@@ -229,11 +274,89 @@
                                     container.appendChild(grandTotalInput);
                                 },
 
+                                renderPesertaForms() {
+                                    const container = document.getElementById('peserta_forms_container');
+                                    const totalTickets = getTotalTickets();
+
+                                    if (totalTickets === 0) {
+                                        container.innerHTML = `
+                                            <div class="text-center text-gray-400 text-sm py-6">
+                                                <i data-lucide="users" class="size-8 mx-auto mb-2 opacity-50"></i>
+                                                <p>Pilih tiket untuk mengisi data peserta</p>
+                                            </div>`;
+                                        lucide.createIcons();
+                                        return;
+                                    }
+
+                                    let html = '';
+                                    let pesertaIndex = 0;
+
+                                    for (const [ticketId, item] of Object.entries(cart)) {
+                                        for (let i = 0; i < item.quantity; i++) {
+                                            pesertaIndex++;
+                                            html += `
+                                                <div class="bg-gray-50 rounded-xl p-4 border border-gray-200">
+                                                    <div class="flex items-center justify-between mb-3">
+                                                        <div class="flex items-center gap-2">
+                                                            <div class="h-8 w-8 rounded-full bg-indigo-100 flex items-center justify-center">
+                                                                <span class="text-indigo-600 font-semibold text-sm">${pesertaIndex}</span>
+                                                            </div>
+                                                            <div>
+                                                                <p class="font-medium text-gray-800">Peserta ${pesertaIndex}</p>
+                                                                <p class="text-xs text-indigo-600">${item.name}</p>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    
+                                                    <div class="space-y-3">
+                                                        <div>
+                                                            <label class="text-xs text-gray-500 mb-1 block">Nama Lengkap *</label>
+                                                            <input type="text" 
+                                                                name="peserta[${ticketId}][${i}][nama]" 
+                                                                required
+                                                                class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                                                                placeholder="Masukkan nama lengkap">
+                                                        </div>
+                                                        <div class="grid grid-cols-2 gap-3">
+                                                            <div>
+                                                                <label class="text-xs text-gray-500 mb-1 block">Email</label>
+                                                                <input type="email" 
+                                                                    name="peserta[${ticketId}][${i}][email]"
+                                                                    class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                                                                    placeholder="email@example.com">
+                                                            </div>
+                                                            <div>
+                                                                <label class="text-xs text-gray-500 mb-1 block">No. Telepon</label>
+                                                                <input type="tel" 
+                                                                    name="peserta[${ticketId}][${i}][telp]"
+                                                                    class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                                                                    placeholder="08xxxxxxxxxx">
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>`;
+                                        }
+                                    }
+
+                                    container.innerHTML = html;
+                                    lucide.createIcons();
+                                },
+
                                 renderCart() {
                                     const detailPesanan = document.getElementById('detail_pesanan');
                                     const totalPriceElement = document.getElementById('total_price');
+                                    const ticketCountElement = document.getElementById('ticket_count');
 
                                     detailPesanan.innerHTML = '';
+                                    const totalTickets = getTotalTickets();
+
+                                    // Update ticket count badge
+                                    if (ticketCountElement) {
+                                        ticketCountElement.textContent = `${totalTickets}/${MAX_TICKETS} tiket`;
+                                        ticketCountElement.className = totalTickets >= MAX_TICKETS ?
+                                            'text-xs px-2 py-1 rounded-full bg-red-100 text-red-600' :
+                                            'text-xs px-2 py-1 rounded-full bg-indigo-100 text-indigo-600';
+                                    }
 
                                     if (Object.keys(cart).length === 0) {
                                         detailPesanan.innerHTML = `
@@ -286,39 +409,65 @@
                     </script>
                 </div>
                 <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg col-span-4 p-6">
-                    <p class="text-gray-800 font-medium">Informasi Pembelian</p>
-                    <div class="border-t border-gray-200 my-4"></div>
-
-                    <div class="flex items-center gap-2">
-                        <i data-lucide="user" class="size-5 text-indigo-400"></i>
-                        <x-input-label :value="__('Nama Lengkap')" class="text-gray-300" />
+                    <!-- Header dengan counter tiket -->
+                    <div class="flex items-center justify-between mb-4">
+                        <p class="text-gray-800 font-medium">Informasi Pemesan</p>
+                        <span id="ticket_count"
+                            class="text-xs px-2 py-1 rounded-full bg-indigo-100 text-indigo-600">0/{{ $acara->maks_tiket_per_transaksi ?? 5 }}
+                            tiket</span>
                     </div>
-                    <x-text-input
-                        class="block mt-2 w-full border-2 rounded-lg p-2 outline-0 focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-                        name="nama_pemesan">
-                    </x-text-input>
+                    <div class="border-t border-gray-200 mb-4"></div>
 
+                    <!-- Info Pemesan -->
+                    <div class="bg-indigo-50 rounded-xl p-4 mb-6">
+                        <div class="flex items-center gap-2 mb-3">
+                            <div class="h-8 w-8 rounded-full bg-indigo-100 flex items-center justify-center">
+                                <i data-lucide="user" class="size-4 text-indigo-600"></i>
+                            </div>
+                            <p class="font-medium text-gray-800">Data Pemesan</p>
+                        </div>
 
-                    <div class="flex items-center gap-2 mt-4">
-                        <i data-lucide="phone" class="size-5 text-indigo-400"></i>
-                        <x-input-label :value="__('Nomor Telepon')" class="text-gray-300" />
+                        <div class="space-y-3">
+                            <div>
+                                <label class="text-xs text-gray-500 mb-1 block">Nama Lengkap *</label>
+                                <input type="text" name="nama_pemesan" required
+                                    class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                                    placeholder="Masukkan nama lengkap">
+                            </div>
+                            <div class="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label class="text-xs text-gray-500 mb-1 block">Email *</label>
+                                    <input type="email" name="email_pemesan" required
+                                        class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                                        placeholder="email@example.com">
+                                </div>
+                                <div>
+                                    <label class="text-xs text-gray-500 mb-1 block">No. Telepon</label>
+                                    <input type="tel" name="no_telp_pemesan"
+                                        class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                                        placeholder="08xxxxxxxxxx">
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <x-text-input
-                        class="block mt-2 w-full border-2 rounded-lg p-2 outline-0 focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-                        type="number" name="no_telp_peserta">
-                    </x-text-input>
 
-
-                    <div class="flex items-center gap-2 mt-4">
-                        <i data-lucide="mail" class="size-5 text-indigo-400"></i>
-                        <x-input-label :value="__('Email')" class="text-gray-300" />
+                    <!-- Data Peserta Dinamis -->
+                    <div class="flex items-center justify-between mb-4">
+                        <p class="text-gray-800 font-medium">Data Peserta</p>
+                        <span class="text-xs text-gray-500">Maks {{ $acara->maks_tiket_per_transaksi ?? 5 }}
+                            peserta</span>
                     </div>
-                    <x-text-input id="email_pemesan"
-                        class="block mt-1 w-full border-2 rounded-lg p-2 outline-0 focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-                        type="email" name="email_pemesan" required />
+                    <div class="border-t border-gray-200 mb-4"></div>
 
+                    <div id="peserta_forms_container" class="space-y-4 max-h-96 overflow-y-auto">
+                        <div class="text-center text-gray-400 text-sm py-6">
+                            <i data-lucide="users" class="size-8 mx-auto mb-2 opacity-50"></i>
+                            <p>Pilih tiket untuk mengisi data peserta</p>
+                        </div>
+                    </div>
 
-                    <p class="text-gray-800 font-medium mt-4">Detail Pesanan</p>
+                    <!-- Detail Pesanan -->
+                    <p class="text-gray-800 font-medium mt-6">Detail Pesanan</p>
                     <div class="border-t border-gray-200 my-4"></div>
 
                     <!-- Detail Pesanan Container -->
@@ -350,7 +499,10 @@
                         <option value="virtual_account">Virtual Account</option>
                     </select>
                     <button type="submit"
-                        class="mt-4 bg-indigo-600 hover:bg-indigo-700 text-white block text-center font-medium py-2 px-4 rounded transition duration-300">Checkout</button>
+                        class="mt-4 w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white block text-center font-medium py-3 px-4 rounded-xl transition duration-300 shadow-lg shadow-indigo-500/25">
+                        <i data-lucide="shopping-bag" class="size-4 inline mr-2"></i>
+                        Checkout Sekarang
+                    </button>
                 </div>
             </div>
         </div>

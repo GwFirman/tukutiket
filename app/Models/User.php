@@ -48,4 +48,9 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    public function kreator()
+    {
+        return $this->hasOne(Kreator::class, 'id_user');
+    }
 }

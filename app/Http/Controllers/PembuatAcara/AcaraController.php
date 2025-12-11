@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Acara;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 
 class AcaraController extends Controller
@@ -18,8 +19,9 @@ class AcaraController extends Controller
         $userId = Auth::id();
 
         $acaras = Acara::where('id_pembuat', $userId)->get();
+        $totalAcara = $acaras->count();
 
-        return view('pembuat_acara.acara.index', compact('acaras'));
+        return view('pembuat_acara.acara.index', compact('acaras', 'totalAcara'));
     }
 
     /**
@@ -27,7 +29,9 @@ class AcaraController extends Controller
      */
     public function create()
     {
-        return view('pembuat_acara.acara.create');
+        $kreator = Auth::user()->kreator;
+
+        return view('pembuat_acara.acara.create', compact('kreator'));
     }
 
     /**
@@ -38,18 +42,19 @@ class AcaraController extends Controller
         $validate = $request->validate([
             'banner_acara' => 'nullable|image|mimes:jpg,jpeg,png',
             'nama_acara' => 'required|string|max:255',
+            'id_kreator' => 'required|string',
             'waktu_mulai' => 'required|date',
             'waktu_selesai' => 'required|date',
             'lokasi' => 'required|string',
             'deskripsi_acara' => 'required|string',
             'maks_pembelian_per_akun' => 'required',
             'maks_tiket_per_transaksi' => 'required',
-            'jenis_tiket' => 'required|in:gratis,berbayar',
         ]);
 
         $acara = new Acara;
         $acara->nama_acara = $request->nama_acara;
         $acara->id_pembuat = Auth::id();
+        $acara->id_kreator = $request->id_kreator;
         $acara->deskripsi = $request->deskripsi_acara;
         $acara->lokasi = $request->lokasi;
         $acara->waktu_mulai = $request->waktu_mulai;
@@ -66,19 +71,18 @@ class AcaraController extends Controller
 
         $acara->save();
 
-        // Jika jenis tiket berbayar, simpan kategori tiket
-        if ($validate['jenis_tiket'] === 'berbayar' && $request->has('kategori_tiket')) {
+        // Simpan kategori tiket gratis
+        if ($request->has('kategori_tiket') && is_array($request->kategori_tiket)) {
             foreach ($request->kategori_tiket as $kategori) {
                 $jenisTiket = new \App\Models\JenisTiket;
                 $jenisTiket->id_acara = $acara->id;
                 $jenisTiket->nama_jenis = $kategori['nama'];
-                $jenisTiket->harga = $kategori['harga'];
+                $jenisTiket->harga = $kategori['harga'] ?? 0; // Harga 0 untuk tiket gratis
                 $jenisTiket->kuota = $kategori['kuota'];
                 $jenisTiket->penjualan_mulai = $kategori['penjualan_mulai'];
                 $jenisTiket->penjualan_selesai = $kategori['penjualan_selesai'];
                 $jenisTiket->deskripsi = $kategori['deskripsi'] ?? null;
                 $jenisTiket->save();
-                // dd($request->kategori_tiket);
             }
         }
 
@@ -91,9 +95,13 @@ class AcaraController extends Controller
      */
     public function show(Acara $acara)
     {
+        // Pastikan hanya pembuat acara yang dapat mengakses
+        if ($acara->id_pembuat !== Auth::id()) {
+            abort(403, 'Acara tidak ditemukan');
+        }
+
         $acara->load('jenisTiket');
 
-        // dd($acara);
         return view('pembuat_acara.acara.show', compact('acara'));
     }
 
@@ -120,15 +128,12 @@ class AcaraController extends Controller
             'waktu_selesai' => 'required|date|after_or_equal:waktu_mulai',
             'lokasi' => 'required|string',
             'deskripsi_acara' => 'required|string',
-            'maks_pembelian_per_akun' => 'required|numeric|min:1',
+            'maks_pembelian_per_akun' => 'required|numeric|min:0',
             'maks_tiket_per_transaksi' => 'required|numeric|min:1',
-            'jenis_tiket' => 'required|in:gratis,berbayar',
             'kategori_tiket' => 'array',
             'kategori_tiket.*.nama' => 'required_with:kategori_tiket|string',
             'kategori_tiket.*.harga' => 'nullable|numeric|min:0',
             'kategori_tiket.*.kuota' => 'nullable|numeric|min:0',
-            // 'kategori_tiket.*.penjualan_mulai' => 'nullable|date',
-            // 'kategori_tiket.*.penjualan_selesai' => 'nullable|date|after_or_equal:kategori_tiket.*.penjualan_mulai',
         ]);
 
         // ✅ Ambil data acara
@@ -166,8 +171,8 @@ class AcaraController extends Controller
 
         $acara->save();
 
-        // ✅ Kelola jenis tiket (jika berbayar)
-        if ($validated['jenis_tiket'] === 'berbayar' && $request->has('kategori_tiket')) {
+        // ✅ Kelola jenis tiket (gratis dan berbayar)
+        if ($request->has('kategori_tiket') && is_array($request->kategori_tiket)) {
             $existingIds = [];
 
             foreach ($request->kategori_tiket as $kategori) {
@@ -209,6 +214,9 @@ class AcaraController extends Controller
             \App\Models\JenisTiket::where('id_acara', $acara->id)
                 ->whereNotIn('id', $existingIds)
                 ->delete();
+        } else {
+            // Jika tidak ada kategori tiket yang dikirim, hapus semua
+            \App\Models\JenisTiket::where('id_acara', $acara->id)->delete();
         }
 
         // ✅ Redirect dengan pesan sukses
@@ -241,5 +249,77 @@ class AcaraController extends Controller
         return redirect()->route('pembuat.acara.index')->with('success', 'Acara berhasil dihapus!');
     }
 
-    
+    public function archive(string $id)
+    {
+        $acara = Acara::findOrFail($id);
+
+        // Pastikan hanya pembuat acara yang boleh mengarsipkan
+        if ($acara->id_pembuat !== Auth::id()) {
+            abort(403, 'Kamu tidak memiliki izin untuk mengarsipkan acara ini.');
+        }
+
+        // Update status menjadi archived
+        $acara->update(['status' => 'archived']);
+
+        return redirect()->back()->with('success', 'Acara berhasil diarsipkan!');
+    }
+
+    public function restore(string $id)
+    {
+        $acara = Acara::findOrFail($id);
+
+        // Pastikan hanya pembuat acara yang boleh merestore
+        if ($acara->id_pembuat !== Auth::id()) {
+            abort(403, 'Kamu tidak memiliki izin untuk merestore acara ini.');
+        }
+
+        // Update status menjadi draft (atau published tergantung kebutuhan)
+        $acara->update(['status' => 'draft']);
+
+        return redirect()->back()->with('success', 'Acara berhasil direstore!');
+    }
+
+    public function publish(string $id)
+    {
+        $acara = Acara::findOrFail($id);
+
+        // Pastikan hanya pembuat acara yang boleh merestore
+        if ($acara->id_pembuat !== Auth::id()) {
+            abort(403, 'Kamu tidak memiliki izin untuk merestore acara ini.');
+        }
+
+        // Update status menjadi draft (atau published tergantung kebutuhan)
+        $acara->update(['status' => 'published']);
+
+        return redirect()->back()->with('success', 'Acara berhasil direstore!');
+    }
+
+    public function daftarPeserta(Acara $acara)
+    {
+        // Ambil semua peserta berdasarkan acara tertentu
+        $peserta = DB::table('tiket_peserta as tp')
+            ->join('detail_pesanan as dp', 'tp.id_detail_pesanan', '=', 'dp.id')
+            ->join('jenis_tiket as jt', 'dp.id_jenis_tiket', '=', 'jt.id')
+            ->join('pesanan as p', 'dp.id_pesanan', '=', 'p.id')
+            ->where('jt.id_acara', $acara->id)
+            ->select(
+                'tp.id',
+                'tp.kode_tiket',
+                'tp.nama_peserta',
+                'tp.email_peserta',
+                'tp.no_telp_peserta',
+                'tp.status_checkin',
+                'tp.waktu_checkin',
+                'jt.nama_jenis as jenis_tiket',
+                'p.kode_pesanan',
+                'p.nama_pemesan',
+                'p.email_pemesan'
+            )
+            ->get();
+
+        return view('pembuat_acara.acara.peserta.daftar-peserta', [
+            'acara' => $acara,
+            'peserta' => $peserta,
+        ]);
+    }
 }

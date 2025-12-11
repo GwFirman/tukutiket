@@ -7,13 +7,18 @@
         </div>
     </x-slot>
     <div class="">
-        <div class="px-6">
+        <div class="px-24">
             <!-- Dashboard Header -->
             <div class="mb-6 flex justify-between items-center">
                 <h1 class="text-2xl font-semibold text-gray-800">Dashboard Pembuat Acara</h1>
-                <button class="border-indigo-400 border-2 hover:bg-indigo-700 text-indigo-400 hover:text-white font-medium px-4 py-2 rounded-md">
-                    Buat Acara
-                </button>
+                <a href="{{ route('pembuat.acara.create') }}"
+                    class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                    </svg>
+                    Buat Acara Baru
+                </a>
             </div>
 
             <!-- Stats Cards -->
@@ -22,10 +27,10 @@
                     <div class="flex justify-between">
                         <div>
                             <h2 class="text-gray-500 text-sm">Total Acara</h2>
-                            <p class="text-3xl font-bold">12</p>
+                            <p class="text-xl font-bold">{{ $totalAcara }}</p>
                         </div>
                         <div class="bg-indigo-400 p-3 rounded-full">
-                           <i data-lucide="calendar" class="size-8 font-medium text-white"></i>
+                            <i data-lucide="calendar" class="size-6 font-medium text-white"></i>
                         </div>
                     </div>
                 </div>
@@ -34,10 +39,10 @@
                     <div class="flex justify-between">
                         <div>
                             <h2 class="text-gray-500 text-sm">Tiket Terjual</h2>
-                            <p class="text-3xl font-bold">384</p>
+                            <p class="text-xl font-bold">{{ $totalTiketTerjual }}</p>
                         </div>
-                         <div class="bg-purple-400 p-3 rounded-full">
-                           <i data-lucide="ticket" class="size-8 font-medium text-white"></i>
+                        <div class="bg-purple-400 p-3 rounded-full">
+                            <i data-lucide="ticket" class="size-6 font-medium text-white"></i>
                         </div>
                     </div>
                 </div>
@@ -46,10 +51,10 @@
                     <div class="flex justify-between">
                         <div>
                             <h2 class="text-gray-500 text-sm">Pendapatan</h2>
-                            <p class="text-3xl font-bold">Rp 12.5jt</p>
+                            <p class="text-xl font-bold">Rp {{ number_format($totalPendapatan, 0, ',', '.') }}</p>
                         </div>
                         <div class="bg-green-400 p-3 rounded-full">
-                           <i data-lucide="banknote-arrow-down" class="size-8 font-medium text-white"></i>
+                            <i data-lucide="banknote-arrow-down" class="size-6 font-medium text-white"></i>
                         </div>
                     </div>
                 </div>
@@ -58,17 +63,17 @@
                     <div class="flex justify-between">
                         <div>
                             <h2 class="text-gray-500 text-sm">Pengunjung</h2>
-                            <p class="text-3xl font-bold">1,254</p>
+                            <p class="text-xl font-bold">{{ $totalPeserta }}</p>
                         </div>
                         <div class="bg-amber-400 p-3 rounded-full">
-                           <i data-lucide="users" class="size-8 font-medium text-white"></i>
+                            <i data-lucide="users" class="size-6 font-medium text-white"></i>
                         </div>
                     </div>
                 </div>
             </div>
 
             <!-- Events Table -->
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg mb-6">
+            {{-- <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg mb-6">
                 <div class="p-6">
                     <h2 class="text-lg font-semibold mb-4 text-gray-700">Acara Terbaru</h2>
                     <div class="overflow-x-auto rounded-lg border-gray-300 border">
@@ -131,10 +136,10 @@
                         </table>
                     </div>
                 </div>
-            </div>
+            </div> --}}
 
             <!-- Quick Links -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {{-- <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                     <div class="p-6">
                         <h3 class="font-semibold text-lg mb-4">Menu Cepat</h3>
@@ -220,7 +225,7 @@
                         </div>
                     </div>
                 </div>
-            </div>
+            </div> --}}
         </div>
     </div>
 </x-app-layout>

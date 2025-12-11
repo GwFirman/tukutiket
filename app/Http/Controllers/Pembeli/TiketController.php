@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Pembeli;
 
 use App\Http\Controllers\Controller;
+use App\Models\TiketPeserta;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -13,8 +14,21 @@ class TiketController extends Controller
      */
     public function index()
     {
-        
-        return view('pembeli.tiket.index', compact('pesanan'));
+
+        $tiketList = TiketPeserta::query()
+            ->whereHas('detailPesanan.pesanan', function ($query) {
+                $query->where('id_pembeli', Auth::id())
+                    ->where('status_pembayaran', 'paid');
+            })
+            ->with([
+                'detailPesanan.jenisTiket.acara',
+                'detailPesanan.pesanan',
+            ])
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        // dd($pesanan);
+        return view('pembeli.tiket.index', compact('tiketList'));
     }
 
     /**

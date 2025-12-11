@@ -1,126 +1,217 @@
 <x-app-layout>
     <x-slot name="header">
         <div class="flex items-center gap-2 mb-4">
-            <i data-lucide="ticket " class="size-5 text-gray-600"></i>
+            <i data-lucide="ticket" class="size-5 text-gray-600"></i>
             <i data-lucide="chevron-right" class="size-4 font-medium text-gray-400"></i>
             <p class="font-medium">Tiket Saya</p>
-            <i data-lucide="chevron-right" class="size-4 font-medium text-gray-400"></i>
-            <p class="font-medium">Menunggu Pembayaran</p>
         </div>
     </x-slot>
-    <div class="">
-        <div class="px-18">
-            <div class="">
-                <div class="p-6 text-gray-900">
-                    @if ($pesanan->count() > 0)
-                        @foreach ($pesanan as $p)
-                            <div class="bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden mb-6">
-                                <!-- Header Section -->
-                                <div class="p-6 bg-gradient-to-r from-blue-50 to-indigo-50">
-                                    <div class="flex justify-between items-start">
-                                        <div class="flex gap-4 items-center">
-                                            <div class="relative">
-                                                {{-- <img src="{{ $p->detailPesanan->first()->jenisTiket->acara->banner_acara ? asset('storage/' . $p->detailPesanan->first()->jenisTiket->acara->banner_acara) : asset('images/default-event.jpg') }}"
-                                                alt="{{ $p->detailPesanan->first()->jenisTiket->acara->nama_acara }}"
-                                                class="w-16 h-16 object-cover rounded-lg shadow-md"> --}}
-                                            </div>
-                                            <div>
-                                                <h3 class="text-lg font-semibold text-gray-800 mb-1">
-                                                    @foreach ($p->detailPesanan as $detail)
-                                                        {{ $detail->jenisTiket->acara->nama_acara }}
-                                                    @break
-                                                @endforeach
-                                            </h3>
 
-                                        </div>
+    {{-- 
+        LOGIKA HITUNG JUMLAH (PHP)
+        Kita hitung di server agar datanya 100% akurat dan tidak nge-bug di frontend 
+    --}}
+    @php
+        // Menghitung jumlah tiket berdasarkan status
+        $countBelum = $tiketList->where('status_checkin', 'belum_digunakan')->count();
+        $countSudah = $tiketList->where('status_checkin', 'sudah_digunakan')->count();
+    @endphp
+
+    {{-- 
+        ALPINE JS DATA
+        Kita kirim hasil hitungan PHP ke variable Alpine (countBelum & countSudah)
+    --}}
+    <div class="px-6 lg:px-24" x-data="{
+        activeTab: 'belum_digunakan',
+        {{-- Default tab yang aktif --}}
+        countBelum: {{ $countBelum }},
+        countSudah: {{ $countSudah }}
+    }">
+
+        {{-- KONDISI: JIKA USER PUNYA TIKET --}}
+        @if ($tiketList->count() > 0)
+
+            {{-- ================= TABS NAVIGATION ================= --}}
+            <div class="flex flex-wrap gap-4 border-b border-gray-200 mb-8 overflow-x-auto">
+                {{-- Tab Semua --}}
+                <button @click="activeTab = 'all'"
+                    :class="activeTab === 'all'
+                        ?
+                        'border-blue-600 text-blue-600' :
+                        'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
+                    class="py-4 px-1 border-b-2 font-medium text-sm transition-colors duration-200 whitespace-nowrap">
+                    Semua
+                </button>
+
+                {{-- Tab Belum Digunakan (Ada Badge Counter Kecil) --}}
+                <button @click="activeTab = 'belum_digunakan'"
+                    :class="activeTab === 'belum_digunakan'
+                        ?
+                        'border-blue-600 text-blue-600' :
+                        'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
+                    class="py-4 px-1 border-b-2 font-medium text-sm transition-colors duration-200 flex items-center gap-2 whitespace-nowrap">
+                    Belum Digunakan
+                    <span x-show="countBelum > 0" x-text="countBelum"
+                        class="px-2 py-0.5 rounded-full bg-blue-50 text-xs text-blue-600 font-bold"></span>
+                </button>
+
+                {{-- Tab Sudah Digunakan --}}
+                <button @click="activeTab = 'sudah_digunakan'"
+                    :class="activeTab === 'sudah_digunakan'
+                        ?
+                        'border-blue-600 text-blue-600' :
+                        'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
+                    class="py-4 px-1 border-b-2 font-medium text-sm transition-colors duration-200 whitespace-nowrap">
+                    Sudah Digunakan
+                </button>
+            </div>
+
+            {{-- ================= LIST TIKET ================= --}}
+            <div>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    @foreach ($tiketList as $tiket)
+                        @php
+                            // 1. Ambil Data Penting
+                            $statusDB = $tiket->status_checkin; // 'belum_digunakan' atau 'sudah_digunakan'
+                            $acara = $tiket->detailPesanan->jenisTiket->acara;
+                            $waktuAcara = \Carbon\Carbon::parse($acara->waktu_mulai);
+
+                            // 2. Cek Kedaluwarsa (Expired)
+                            // Expired jika: Waktu sudah lewat DAN statusnya masih 'belum_digunakan'
+                            $isExpired = $waktuAcara->isPast() && $statusDB === 'belum_digunakan';
+
+                            // 3. Tentukan Tampilan Badge
+                            if ($statusDB === 'sudah_digunakan') {
+                                $badgeClass = 'bg-gray-600 text-white';
+                                $badgeText = 'Sudah Digunakan';
+                            } elseif ($isExpired) {
+                                $badgeClass = 'bg-red-500 text-white';
+                                $badgeText = 'Kedaluwarsa';
+                            } else {
+                                $badgeClass = 'bg-green-500 text-white';
+                                $badgeText = 'Belum Digunakan';
+                            }
+                        @endphp
+
+                        {{-- CARD ITEM --}}
+                        <div class="bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden flex flex-col h-full hover:shadow-xl transition-shadow duration-300"
+                            x-show="activeTab === 'all' || activeTab === '{{ $statusDB }}'"
+                            x-transition.opacity.duration.300ms>
+
+                            <div class="h-48 bg-gradient-to-br from-blue-500 to-purple-600 relative shrink-0">
+                                @if ($acara->banner_acara)
+                                    <img src="{{ asset('storage/' . $acara->banner_acara) }}"
+                                        alt="{{ $acara->nama_acara }}" class="w-full h-full object-cover">
+                                @else
+                                    <div class="w-full h-full flex items-center justify-center bg-gray-200">
+                                        <i data-lucide="image" class="size-10 text-gray-400"></i>
                                     </div>
+                                @endif
+
+                                <div class="absolute top-4 right-4">
                                     <span
-                                        class="px-4 py-2 text-sm font-semibold rounded-full {{ $p->status_pembayaran === 'PAID' ? 'bg-green-100 text-green-700 border border-green-200' : 'bg-orange-100 text-orange-700 border border-orange-200' }}">
-                                        {{ $p->status_pembayaran === 'paid' ? '✓ Sudah Dibayar' : '⏳ Menunggu Pembayaran' }}
+                                        class="px-3 py-1 rounded-full text-xs font-semibold shadow-sm {{ $badgeClass }}">
+                                        {{ $badgeText }}
                                     </span>
                                 </div>
                             </div>
 
-                            <!-- Content Section -->
-                            <div class="p-6">
-                                <div class="flex justify-between mb-2">
-                                    <p class="font-medium text-lg text-gray-400">Total Pesanan</p>
-                                    <p class="font-bold text-lg ">Rp {{ number_format($p->total_harga, 0, ',', '.') }}</p>
+                            <div class="p-6 flex flex-col flex-1">
+                                <h3 class="text-xl font-bold text-gray-800 mb-2 line-clamp-2"
+                                    title="{{ $acara->nama_acara }}">
+                                    {{ $acara->nama_acara }}
+                                </h3>
+
+                                <div class="space-y-3 mb-6 flex-1">
+                                    <div class="flex items-center text-sm text-gray-600">
+                                        <i data-lucide="ticket" class="size-4 mr-2 text-blue-600 shrink-0"></i>
+                                        <span
+                                            class="truncate font-medium">{{ $tiket->detailPesanan->jenisTiket->nama_jenis }}</span>
+                                    </div>
+
+                                    <div class="flex items-center text-sm text-gray-600">
+                                        <i data-lucide="user" class="size-4 mr-2 text-blue-600 shrink-0"></i>
+                                        <span class="truncate">{{ $tiket->nama_peserta }}</span>
+                                    </div>
+
+                                    <div class="flex items-center text-sm text-gray-600">
+                                        <i data-lucide="calendar" class="size-4 mr-2 text-blue-600 shrink-0"></i>
+                                        <span class="{{ $isExpired ? 'text-red-600 font-medium' : '' }}">
+                                            {{ $waktuAcara->format('d M Y, H:i') }}
+                                        </span>
+                                    </div>
+
+                                    <div class="flex items-center text-sm text-gray-600">
+                                        <i data-lucide="map-pin" class="size-4 mr-2 text-blue-600 shrink-0"></i>
+                                        <span class="truncate">{{ $acara->lokasi }}</span>
+                                    </div>
                                 </div>
-                                <!-- Action Section -->
-                                <div class="flex justify-between items-center pt-4 border-t border-gray-100">
-                                    <a href=""
-                                        class="text-blue-600 hover:text-blue-700 font-medium flex items-center gap-2 transition-colors">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor"
-                                            viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z">
-                                            </path>
-                                        </svg>
+
+                                <div
+                                    class="bg-gray-50 rounded-lg p-4 mb-4 text-center border border-dashed border-gray-300 group hover:border-blue-400 transition-colors">
+                                    <p class="text-xs text-gray-500 mb-1 uppercase tracking-wider">Kode Tiket</p>
+                                    <p class="text-lg font-mono font-bold text-gray-800 tracking-widest select-all">
+                                        {{ $tiket->kode_tiket }}
+                                    </p>
+                                </div>
+
+                                <div class="flex gap-2 mt-auto">
+                                    <a href="{{ route('pembeli.tiket.show', $tiket->id) }}"
+                                        class="flex-1 bg-blue-600 text-white text-center py-2.5 rounded-lg hover:bg-blue-700 transition font-medium text-sm flex items-center justify-center gap-2 shadow-sm">
                                         Lihat Detail
                                     </a>
-                                    <div class="flex gap-3">
-                                        <button
-                                            class="px-5 py-2.5 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-all duration-200 font-medium flex items-center gap-2">
-                                            <svg class="w-4 h-4" fill="none" stroke="currentColor"
-                                                viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round"
-                                                    stroke-width="2"
-                                                    d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z">
-                                                </path>
-                                            </svg>
-                                            Hubungi Kreator
-                                        </button>
-                                        @if ($p->status_pembayaran !== 'paid')
-                                            <a href="{{ route('pembeli.pembayaran.show', $p->kode_pesanan) }}"
-                                                class="px-6 py-2.5 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-200 font-medium shadow-md hover:shadow-lg flex items-center gap-2">
-                                                <svg class="w-4 h-4" fill="none" stroke="currentColor"
-                                                    viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                                        stroke-width="2"
-                                                        d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z">
-                                                    </path>
-                                                </svg>
-                                                Bayar Sekarang
-                                            </a>
-                                        @endif
-                                    </div>
+
+                                    <a href="{{ route('pembeli.tiket.download', $tiket->id) }}"
+                                        class="px-4 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition inline-flex items-center justify-center border border-gray-200"
+                                        title="Download PDF">
+                                        <i data-lucide="download" class="size-5"></i>
+                                    </a>
+
+                                    <a href="{{ route('pembeli.tiket.preview', $tiket->id) }}"
+                                        class="px-4 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition inline-flex items-center justify-center border border-gray-200"
+                                        title="Priview">
+                                        <i data-lucide="eye" class="size-5"></i>
+                                    </a>
                                 </div>
                             </div>
                         </div>
                     @endforeach
-                @else
-                    <!-- Empty State -->
-                    <div class=" p-12 text-center">
-                        <div class="max-w-md mx-auto">
-                            <div
-                                class="bg-gray-100 w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-6">
-                                <svg class="w-12 h-12 text-gray-400" fill="none" stroke="currentColor"
-                                    viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z" />
-                                </svg>
-                            </div>
-                            <h3 class="text-xl font-bold text-gray-900 mb-2">Belum Ada Tiket</h3>
-                            <p class="text-gray-500 mb-6">
-                                Anda belum memiliki tiket apapun. Jelajahi acara menarik dan dapatkan tiket Anda
-                                sekarang!
-                            </p>
-                            <a href="{{ route('beranda') }}"
-                                class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105">
-                                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                                </svg>
-                                Jelajahi Acara
-                            </a>
-                        </div>
+                </div>
+
+                {{-- ================= EMPTY STATE PER TAB ================= --}}
+                {{-- 
+                    Logic ini sekarang AMAN dari Bug. 
+                    Hanya muncul jika Active Tab sesuai DAN Jumlah Hitungan PHP adalah 0.
+                --}}
+                <div x-show="(activeTab === 'belum_digunakan' && countBelum === 0) || (activeTab === 'sudah_digunakan' && countSudah === 0)"
+                    class="text-center py-16" style="display: none;" {{-- Mencegah flicker saat halaman loading --}} x-transition.opacity>
+
+                    <div class="inline-block p-4 rounded-full bg-gray-50 mb-4">
+                        <i data-lucide="inbox" class="size-10 text-gray-300"></i>
                     </div>
-                @endif
+                    <p class="text-gray-500 font-medium">Tidak ada tiket pada kategori ini.</p>
+                </div>
+
             </div>
-        </div>
+
+            {{-- KONDISI: JIKA USER TIDAK PUNYA TIKET SAMA SEKALI (EMPTY DB) --}}
+        @else
+            <div class="py-12 text-center mt-10">
+                <div class="max-w-md mx-auto">
+                    <div class="bg-gray-100 w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-6">
+                        <i data-lucide="ticket" class="size-12 text-gray-400"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-2">Belum Ada Tiket</h3>
+                    <p class="text-gray-500 mb-6">
+                        Anda belum memiliki tiket apapun. Jelajahi acara menarik dan dapatkan tiket Anda sekarang!
+                    </p>
+                    <a href="{{ route('beranda') }}"
+                        class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105">
+                        <i data-lucide="search" class="size-5 mr-2"></i>
+                        Jelajahi Acara
+                    </a>
+                </div>
+            </div>
+        @endif
     </div>
-</div>
 </x-app-layout>

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Acara;
 use App\Models\DetailPesanan;
 use App\Models\Pesanan;
+use App\Models\TiketPeserta;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
@@ -18,7 +19,23 @@ class PesananController extends Controller
     public function index()
     {
 
-        
+        $tiketList = TiketPeserta::query()
+            ->whereHas('detailPesanan.pesanan', function ($query) {
+                $query->where('id_pembeli', Auth::id())
+                    ->where('status_pembayaran', 'paid');
+            })
+            ->with([
+                'detailPesanan.jenisTiket.acara',
+                'detailPesanan.pesanan',
+            ])
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        // dd($tiketList);
+        $pesanan = Pesanan::where('id_pembeli', Auth::id())->with('detailPesanan', 'detailPesanan.jenisTiket', 'detailPesanan.jenisTiket.acara')->get();
+
+        // dd($pesanan);
+        return view('pembeli.pesanan.index', compact('pesanan', 'tiketList'));
     }
 
     /**
@@ -34,24 +51,24 @@ class PesananController extends Controller
      */
     public function store(Request $request)
     {
-        
+        dd($request);
         $pesanan = Pesanan::create([
             'id_pembeli' => Auth::id(),
-            'kode_pesanan' => 'ORD-' . strtoupper(Str::random(8)),
+            'kode_pesanan' => 'ORD-'.strtoupper(Str::random(8)),
             'total_harga' => $request->grand_total,
             'status_pembayaran' => 'pending',
-            'metode_pembayaran' => $request->metode_pembayaran, 
-            'email_pemesan' => $request->email_pemesan, 
-            'nama_pemesan' => $request->nama_pemesan, 
-            'no_telp_peserta' => $request->no_telp_peserta, 
+            'metode_pembayaran' => $request->metode_pembayaran,
+            'email_pemesan' => $request->email_pemesan,
+            'nama_pemesan' => $request->nama_pemesan,
+            'no_telp_peserta' => $request->no_telp_peserta,
         ]);
-    
-        foreach ($request->tickets as $ticket){
+
+        foreach ($request->tickets as $ticket) {
             DetailPesanan::create([
                 'id_pesanan' => $pesanan->id,
                 'id_jenis_tiket' => $ticket['id'],
                 'jumlah' => $ticket['quantity'],
-                'harga_per_tiket' => $ticket['price']
+                'harga_per_tiket' => $ticket['price'],
             ]);
         }
 
@@ -70,13 +87,13 @@ class PesananController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Acara  $checkout )
+    public function show(Acara $checkout)
     {
         $checkout->load('jenisTiket');
         // dd($checkout);
 
         // dd($acara);
-        return view('pembeli.acara.checkout',['acara' => $checkout]);   
+        return view('pembeli.acara.checkout', ['acara' => $checkout]);
 
     }
 

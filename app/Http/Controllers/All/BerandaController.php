@@ -14,7 +14,7 @@ class BerandaController extends Controller
     public function index()
     {
 
-        $acaras = Acara::with('jenisTiket')->get();
+        $acaras = Acara::with('jenisTiket')->where('status', 'published')->get();
 
         // dd($acaras);
         return view('beranda', compact('acaras'));
@@ -39,9 +39,12 @@ class BerandaController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(Acara $acara)
     {
-        //
+        $acara->load('jenisTiket');
+
+        // dd($acara);
+        return view('pembeli.acara.show', compact('acara'));
     }
 
     /**

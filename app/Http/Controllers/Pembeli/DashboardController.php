@@ -3,21 +3,14 @@
 namespace App\Http\Controllers\Pembeli;
 
 use App\Http\Controllers\Controller;
-use App\Models\Pesanan;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 
 class DashboardController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
-    {
-        $pesanan = Pesanan::where('id_pembeli', Auth::id())->with('detailPesanan','detailPesanan.jenisTiket','detailPesanan.jenisTiket.acara')->get();
-        // dd($pesanan);
-        return view('pembeli.tiket.index',compact('pesanan'));
-    }
+    public function index() {}
 
     /**
      * Show the form for creating a new resource.

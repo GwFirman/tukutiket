@@ -20,4 +20,9 @@ class TiketPeserta extends Model
         'status_checkin',
         'waktu_checkin',
     ];
+
+    public function detailPesanan()
+    {
+        return $this->belongsTo(DetailPesanan::class, 'id_detail_pesanan');
+    }
 }

@@ -67,13 +67,13 @@
                             {{ __('Profile') }}
                         </x-dropdown-link>
 
-                        @role('pembuat_event')
+                        @role('kreator')
                             <x-dropdown-link :href="route('pembuat.dashboard')">
                                 {{ __('Dashboard Acara') }}
                             </x-dropdown-link>
                         @endrole
 
-                        
+
 
                         <!-- Authentication -->
                         <form method="POST" action="{{ route('logout') }}">

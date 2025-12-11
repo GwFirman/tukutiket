@@ -4,8 +4,10 @@ namespace App\Http\Controllers\PembuatAcara;
 
 use App\Http\Controllers\Controller;
 use App\Models\Acara;
+use App\Models\Pesanan;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class DashboardController extends Controller
 {
@@ -16,16 +18,38 @@ class DashboardController extends Controller
     {
         $userId = Auth::id();
         $acaras = Acara::where('id_pembuat', $userId)->get();
-        return view('pembuat_acara.dashboard', compact('acaras'));
+        $idPembuat = Auth::id();
+        $totalAcara = $acaras->count();
+        $totalPendapatan = Pesanan::whereHas('detailPesanan.jenisTiket.acara', function ($query) use ($idPembuat) {
+            $query->where('id_pembuat', $idPembuat);
+        })
+            ->where('status_pembayaran', 'paid')
+            ->sum('total_harga');
+
+        $totalPeserta = DB::table('tiket_peserta')
+            ->join('detail_pesanan', 'tiket_peserta.id_detail_pesanan', '=', 'detail_pesanan.id')
+            ->join('pesanan', 'detail_pesanan.id_pesanan', '=', 'pesanan.id')
+            ->join('jenis_tiket', 'detail_pesanan.id_jenis_tiket', '=', 'jenis_tiket.id')
+            ->join('acara', 'jenis_tiket.id_acara', '=', 'acara.id')
+            ->where('acara.id_pembuat', $idPembuat)
+            ->where('pesanan.status_pembayaran', 'paid')
+            ->count();
+
+        $totalTiketTerjual = DB::table('detail_pesanan')
+            ->join('pesanan', 'detail_pesanan.id_pesanan', '=', 'pesanan.id')
+            ->join('jenis_tiket', 'detail_pesanan.id_jenis_tiket', '=', 'jenis_tiket.id')
+            ->join('acara', 'jenis_tiket.id_acara', '=', 'acara.id')
+            ->where('acara.id_pembuat', $idPembuat)
+            ->where('pesanan.status_pembayaran', 'paid')
+            ->sum('detail_pesanan.jumlah');
+
+        return view('pembuat_acara.dashboard', compact('acaras', 'totalAcara', 'totalPendapatan', 'totalPeserta','totalTiketTerjual'));
     }
 
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
-    {
-        
-    }
+    public function create() {}
 
     /**
      * Store a newly created resource in storage.
@@ -38,10 +62,7 @@ class DashboardController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
-    {
-        
-    }
+    public function show(string $id) {}
 
     /**
      * Show the form for editing the specified resource.

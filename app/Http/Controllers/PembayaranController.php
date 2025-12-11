@@ -30,31 +30,39 @@ class PembayaranController extends Controller
      */
     public function store(Request $request)
     {
-         $validated = $request->validate([
-        'id_detail_pesanan' => 'required',
-        'nama_peserta' => 'required',
-        'kode_pesanan' => 'required|string', // tambahkan kode pesanan
-    ]);
-
-    // Simpan data ke tabel tiket_peserta
-    foreach ($validated['id_detail_pesanan'] as $index => $idDetail) {
-        TiketPeserta::create([
-            'id_detail_pesanan' => $idDetail,
-            'nama_peserta' => $validated['nama_peserta'][$index],
-            'email_peserta' => $validated['email_peserta'][$index] ?? null,
-            'no_telp_peserta' => $validated['no_telp_peserta'][$index] ?? null,
-            'kode_tiket' => strtoupper(Str::random(10)),
+        $validated = $request->validate([
+            'id_detail_pesanan' => 'required',
+            'nama_peserta' => 'required',
+            'email_peserta' => 'nullable',
+            'no_telp_peserta' => 'nullable',
+            'kode_pesanan' => 'required|string',
         ]);
-    }
 
-    // Update status pembayaran menjadi "lunas" berdasarkan kode pesanan
-    Pesanan::where('kode_pesanan', $validated['kode_pesanan'])
-        ->update(['status_pembayaran' => 'paid']);
+        // Simpan data ke tabel tiket_peserta
+        foreach ($validated['id_detail_pesanan'] as $index => $idDetail) {
+            // Ambil detail pesanan untuk mendapatkan jumlah tiket
+            $detailPesanan = \App\Models\DetailPesanan::find($idDetail);
+            $jumlahTiket = $detailPesanan->jumlah ?? 1;
 
-    return redirect()
-        ->route('pembeli.tiket-saya')
-        ->with('success', 'Pembayaran berhasil diverifikasi dan tiket peserta telah dibuat!');
+            // Generate tiket sesuai jumlah yang dibeli
+            for ($i = 0; $i < $jumlahTiket; $i++) {
+                TiketPeserta::create([
+                    'id_detail_pesanan' => $idDetail,
+                    'nama_peserta' => $validated['nama_peserta'][$index],
+                    'email_peserta' => $validated['email_peserta'][$index] ?? null,
+                    'no_telp_peserta' => $validated['no_telp_peserta'][$index] ?? null,
+                    'kode_tiket' => strtoupper(Str::random(10)),
+                ]);
+            }
+        }
 
+        // Update status pembayaran menjadi "paid" berdasarkan kode pesanan
+        Pesanan::where('kode_pesanan', $validated['kode_pesanan'])
+            ->update(['status_pembayaran' => 'paid']);
+
+        return redirect()
+            ->route('pembeli.tiket-saya')
+            ->with('success', 'Pembayaran berhasil diverifikasi dan tiket peserta telah dibuat!');
     }
 
     /**
@@ -67,7 +75,6 @@ class PembayaranController extends Controller
         $namaAcara = optional($pesanan->detailPesanan->first()->jenisTiket->acara)->nama_acara;
         $lokasi = optional($pesanan->detailPesanan->first()->jenisTiket->acara)->lokasi;
         $waktuMulai = optional($pesanan->detailPesanan->first()->jenisTiket->acara)->waktu_mulai;
-
         $waktuMulai = $waktuMulai ? \Carbon\Carbon::parse($waktuMulai)->locale('id')->translatedFormat('d F Y') : null;
         $daftarTiket = $pesanan->detailPesanan->map(function ($detail) {
             return [

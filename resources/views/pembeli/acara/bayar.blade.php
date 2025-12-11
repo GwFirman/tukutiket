@@ -100,7 +100,8 @@
                             </div>
                             <div class="bg-blue-50 rounded-lg p-4">
                                 <p class="text-xs text-gray-500 mb-2">Total Pembayaran</p>
-                                <p class="text-2xl font-bold text-blue-600">Rp {{ number_format($pesanan->total_harga, 0, ',', '.') }}</p>
+                                <p class="text-2xl font-bold text-blue-600">Rp
+                                    {{ number_format($pesanan->total_harga, 0, ',', '.') }}</p>
                             </div>
                         </div>
                     </div>
@@ -289,13 +290,13 @@
                                 <p class="text-xs text-gray-500 mb-2">Detail Tiket</p>
                                 <div class="space-y-2">
                                     @foreach ($daftarTiket as $tiket)
-                                        
-                                    <div class="flex justify-between text-sm">
-                                        <span class="text-gray-600">{{ $tiket['nama_tiket'] }}</span>
-                                        <span class="font-medium text-gray-900">Rp {{ number_format($tiket['harga'], 0, ',', '.') }}</span>
-                                    </div>
+                                        <div class="flex justify-between text-sm">
+                                            <span class="text-gray-600">{{ $tiket['nama_tiket'] }}</span>
+                                            <span class="font-medium text-gray-900">Rp
+                                                {{ number_format($tiket['harga'], 0, ',', '.') }}</span>
+                                        </div>
                                     @endforeach
-                                    
+
                                 </div>
                             </div>
 
@@ -305,7 +306,8 @@
                             <div class="space-y-2">
                                 <div class="flex justify-between text-sm">
                                     <span class="text-gray-600">Subtotal</span>
-                                    <span class="text-gray-900">Rp {{ number_format($pesanan->total_harga, 0, ',', '.') }}</span>
+                                    <span class="text-gray-900">Rp
+                                        {{ number_format($pesanan->total_harga, 0, ',', '.') }}</span>
                                 </div>
                                 <div class="flex justify-between text-sm">
                                     <span class="text-gray-600">Biaya Layanan</span>
@@ -318,7 +320,8 @@
                             <!-- Total -->
                             <div class="flex justify-between items-center">
                                 <span class="text-sm font-semibold text-gray-900">Total Pembayaran</span>
-                                <span class="text-xl font-bold text-blue-600">Rp {{ number_format($pesanan->total_harga, 0, ',', '.') }}</span>
+                                <span class="text-xl font-bold text-blue-600">Rp
+                                    {{ number_format($pesanan->total_harga, 0, ',', '.') }}</span>
                             </div>
 
                             <!-- Help Button -->
@@ -331,14 +334,18 @@
                                 Butuh Bantuan?
                             </button>
                             <form action="{{ route('pembeli.pembayaran.store') }}" method="POST" id="paymentForm">
-                                @csrf                            
+                                @csrf
                                 <input type="hidden" name="kode_pesanan" value="{{ $pesanan->kode_pesanan }}">
                                 @foreach ($pesanan->detailPesanan as $detail)
                                     <input type="hidden" name="id_detail_pesanan[]" value="{{ $detail->id }}">
-                                    <input type="hidden" name="nama_peserta[]" value="{{ $pesanan->nama_pemesan }}">
-                                    <input type="hidden" name="email_peserta[]" value="{{ $pesanan->email_pemesan }}">
+                                    <input type="hidden" name="nama_peserta[]"
+                                        value="{{ $pesanan->nama_pemesan }}">
+                                    <input type="hidden" name="email_peserta[]"
+                                        value="{{ $pesanan->email_pemesan }}">
+                                    <input type="hidden" name="no_telp_peserta[]"
+                                        value="{{ $pesanan->no_telp_peserta }}">
                                 @endforeach
-                                
+
                                 <button type="submit"
                                     class="w-full bg-blue-100 hover:bg-blue-700 hover:text-white text-blue-700 font-medium py-3 rounded-lg transition-colors flex items-center justify-center gap-2">
                                     Bayar
@@ -348,8 +355,11 @@
                                 <div class="bg-red-50 border border-red-200 rounded-lg p-4 mb-4">
                                     <div class="flex">
                                         <div class="flex-shrink-0">
-                                            <svg class="h-5 w-5 text-red-400" fill="currentColor" viewBox="0 0 20 20">
-                                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+                                            <svg class="h-5 w-5 text-red-400" fill="currentColor"
+                                                viewBox="0 0 20 20">
+                                                <path fill-rule="evenodd"
+                                                    d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                                                    clip-rule="evenodd" />
                                             </svg>
                                         </div>
                                         <div class="ml-3">

@@ -45,4 +45,14 @@ class Acara extends Model
     {
         return $this->hasMany(JenisTiket::class, 'id_acara');
     }
+
+    public function penyelenggara()
+    {
+        return $this->belongsTo(Penyelenggara::class, 'id_penyelenggara');
+    }
+
+    public function kreator()
+    {
+        return $this->belongsTo(Kreator::class, 'id_kreator');
+    }
 }

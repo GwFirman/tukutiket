@@ -12,7 +12,7 @@ class VerifikasiController extends Controller
      */
     public function index()
     {
-        return view('pembeli.verifikasi-data');
+        //
     }
 
     /**

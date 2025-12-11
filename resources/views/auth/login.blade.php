@@ -1,4 +1,4 @@
-<x-guest-layout>
+<x-guest-layout :showNavbar="false">
     <div class="flex h-screen w-screen  sm:justify-center items-center p-20">
         <div class="flex h-full bg-white shadow-md overflow-hidden sm:rounded-lg">
             <div class="w-full h-full sm:rounded-lg">
@@ -15,7 +15,8 @@
                     </div>
                     <div class="text-center">
                         <h1 class="text-2xl text-gray-800 font-bold">{{ __('Selamat datang') }}</h1>
-                        <p class="mt-2 text-sm text-gray-600"> Masuk ke akun <span class="font-medium text-gray-700"> tukutiket </span>dan lanjutkan petualangan event-mu bareng kami.</p>
+                        <p class="mt-2 text-sm text-gray-600"> Masuk ke akun <span class="font-medium text-gray-700">
+                                tukutiket </span>dan lanjutkan petualangan event-mu bareng kami.</p>
                     </div>
                 </div>
                 <!-- Session Status -->
@@ -59,7 +60,8 @@
                     </div>
 
                     <div class="w-full mt-10">
-                        <button type="submit" class="w-full text-center bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-6 rounded-lg transition duration-300">
+                        <button type="submit"
+                            class="w-full text-center bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-6 rounded-lg transition duration-300">
                             Log in
                         </button>
                         {{-- <x-primary-button
@@ -71,7 +73,7 @@
                     @if (Route::has('register'))
                         <div class="text-center mt-6 pt-4 border-t border-gray-200">
                             <p class="text-sm text-gray-600">
-                                {{ __("Belum punya akun?") }}
+                                {{ __('Belum punya akun?') }}
                                 <a href="{{ route('register') }}"
                                     class="text-indigo-600 hover:text-indigo-800 font-medium">
                                     {{ __('Daftar') }}

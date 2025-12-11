@@ -10,7 +10,7 @@
 
     <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
 
-    <div class="max-w-4xl mx-auto p-6">
+    <div class="max-w-7xl mx-auto p-6">
 
         <!-- Info Acara -->
         <div class="bg-gradient-to-r from-indigo-500 to-purple-600 rounded-xl p-6 mb-6 text-white shadow-lg">
@@ -27,9 +27,9 @@
             </div>
         </div>
 
-        <div class="space-y-6">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <!-- Scanner -->
-            <div class="rounded-xl shadow-lg p-4 max-w-xl mx-auto bg-white">
+            <div class="rounded-xl shadow-lg p-4 bg-white h-fit">
                 <h3 class="text-lg font-semibold mb-3 flex items-center gap-2">
                     <i data-lucide="camera" class="size-5 text-indigo-600"></i>
                     Scanner QR Code
@@ -38,7 +38,7 @@
             </div>
 
             <!-- Hasil Scan -->
-            <div id="scan-result" class="p-5 bg-white border-2 rounded-xl shadow-lg hidden transition-all">
+            <div id="scan-result" class="p-5 bg-white border-2 rounded-xl shadow-lg hidden transition-all h-fit">
                 <h3 class="text-lg font-bold mb-4 flex items-center gap-2">
                     <i data-lucide="clipboard-check" class="size-5 text-indigo-600"></i>
                     Hasil Scan

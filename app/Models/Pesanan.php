@@ -11,12 +11,36 @@ class Pesanan extends Model
 
     protected $table = 'pesanan';
 
-    protected $fillable = ['id', 'id_pembeli', 'kode_pesanan','total_harga','status_pembayaran','metode_pembayaran','nama_pemesan','email_pemesan','no_telp_peserta'];
+    protected $fillable = [
+        'id_pembeli',
+        'id_acara',
+        'nama_pemesan',
+        'email_pemesan',
+        'no_telp_pemesan',
+        'metode_pembayaran',
+        'total_harga',
+        'status',
+        'kode_pesanan',
+    ];
 
-    public function detailPesanan(){
-        
-        return $this->hasMany(DetailPesanan::class,'id_pesanan');
+    protected $casts = [
+        'total_harga' => 'decimal:2',
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
+    ];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'id_user');
     }
-    
 
+    public function acara()
+    {
+        return $this->belongsTo(Acara::class, 'id_acara');
+    }
+
+    public function detailPesanan()
+    {
+        return $this->hasMany(DetailPesanan::class, 'id_pesanan');
+    }
 }

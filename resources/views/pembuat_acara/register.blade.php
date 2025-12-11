@@ -1,4 +1,4 @@
-<x-guest-layout>
+<x-guest-layout :showNavbar="false">
     <div class="flex h-screen w-screen sm:justify-center items-center p-20">
         <div class="flex h-full bg-white shadow-md overflow-hidden sm:rounded-lg">
 

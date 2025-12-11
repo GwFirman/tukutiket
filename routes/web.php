@@ -7,7 +7,6 @@ use App\Http\Controllers\Pembeli\DashboardController as DashboardPembeliControll
 use App\Http\Controllers\Pembeli\ExportPDFController;
 use App\Http\Controllers\Pembeli\PesananController;
 use App\Http\Controllers\Pembeli\TiketController;
-use App\Http\Controllers\Pembeli\VerifikasiController;
 use App\Http\Controllers\PembeliController;
 use App\Http\Controllers\PembuatAcara\AcaraController as PembuatAcaraController;
 use App\Http\Controllers\PembuatAcara\DashboardController as DashboardPembuatController;
@@ -16,6 +15,7 @@ use App\Http\Controllers\PembuatAcara\LaporanPenjualanController;
 // use App\Http\Controllers\PembuatAcaraController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ScanController;
+use App\Http\Controllers\VerifikasiKreatorController;
 use App\Models\Kreator;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -41,35 +41,34 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
 });
 
-Route::middleware(['auth', 'role:kreator'])
+Route::middleware(['auth', 'role:kreator', 'kreator.verified'])
     ->prefix('kreator')
     ->name('pembuat.')
     ->group(function () {
+        // Route yang memerlukan verifikasi
         Route::get('/dashboard', [DashboardPembuatController::class, 'index'])->name('dashboard');
         Route::resource('/acara', PembuatAcaraController::class);
         Route::get('/acara/daftar-peserta/{acara}', [PembuatAcaraController::class, 'daftarPeserta'])->name('acara.daftar-peserta');
         Route::get('/acara/laporan-penjualan/{acara}', [LaporanPenjualanController::class, 'LaporanPenjualan'])->name('acara.laporan-penjualan');
         Route::get('/acara/scan/{acara}', [ScanController::class, 'index'])->name('scan.index');
-        Route::post('/acara/scan/check/{acara}', [ScanController::class, 'check'])
-            ->name('scan.check');
+        Route::post('/acara/scan/check/{acara}', [ScanController::class, 'check'])->name('scan.check');
         Route::get('/create2', function () {
             return view('pembuat_acara.acara.create2');
         });
 
-        // Tambah route untuk archive dan restore
         Route::patch('/acara/{acara}/archive', [PembuatAcaraController::class, 'archive'])->name('acara.archive');
         Route::patch('/acara/{acara}/restore', [PembuatAcaraController::class, 'restore'])->name('acara.restore');
         Route::patch('/acara/{acara}/publish', [PembuatAcaraController::class, 'publish'])->name('acara.publish');
+    });
 
-        Route::get('/profile', [KreatorController::class, 'index'])
-            ->name('profile');
-
-        Route::post('/profile/update', [KreatorController::class, 'update'])
-            ->name('profile.update');
-
-        Route::resource('verifikasi-data', VerifikasiController::class);
-
-        // Route::post('/scan/check')
+// Route yang TIDAK memerlukan verifikasi (tetap bisa diakses)
+Route::middleware(['auth', 'role:kreator'])
+    ->prefix('kreator')
+    ->name('pembuat.')
+    ->group(function () {
+        Route::get('/profile', [KreatorController::class, 'index'])->name('profile');
+        Route::post('/profile/update', [KreatorController::class, 'update'])->name('profile.update');
+        Route::resource('verifikasi-data', VerifikasiKreatorController::class);
     });
 
 Route::post('/user/assign-role-pembuat', [PembeliController::class, 'assignRolePembuat'])->middleware('auth')->name('user.assign-role-pembuat');

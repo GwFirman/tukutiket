@@ -1,7 +1,10 @@
 <x-app-layout>
     <form action="{{ route('pembeli.checkout.store') }}" method="POST">
         @csrf
-        <div class="py-12 px-12">
+        <!-- Hidden input untuk acara_id -->
+        <input type="hidden" name="acara_id" value="{{ $acara->id }}">
+
+        <div class="py-12 px-4 sm:px-6 lg:px-12">
             <div class="grid grid-cols-12 gap-2">
                 <div class="bg-white shadow-sm sm:rounded-lg col-span-8 p-4">
                     <div

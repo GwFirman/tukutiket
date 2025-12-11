@@ -51,24 +51,54 @@ class PesananController extends Controller
      */
     public function store(Request $request)
     {
-        dd($request);
         $pesanan = Pesanan::create([
             'id_pembeli' => Auth::id(),
+            // 'id_acara' => $request->acara_id,
             'kode_pesanan' => 'ORD-'.strtoupper(Str::random(8)),
             'total_harga' => $request->grand_total,
             'status_pembayaran' => 'pending',
             'metode_pembayaran' => $request->metode_pembayaran,
             'email_pemesan' => $request->email_pemesan,
             'nama_pemesan' => $request->nama_pemesan,
-            'no_telp_peserta' => $request->no_telp_peserta,
+            'no_telp_peserta' => $request->no_telp_pemesan,
         ]);
 
+        // Simpan detail pesanan dengan data peserta
         foreach ($request->tickets as $ticket) {
+            $ticketId = $ticket['id'];
+            $quantity = $ticket['quantity'];
+
+            // Ambil data peserta untuk ticket ini
+            $pesertaData = $request->input("peserta.{$ticketId}", []);
+
+            // Kumpulkan nama, email, dan telepon peserta
+            $namaPesertaList = [];
+            $emailPesertaList = [];
+            $telpPesertaList = [];
+
+            if (is_array($pesertaData)) {
+                foreach ($pesertaData as $index => $peserta) {
+                    if (isset($peserta['nama'])) {
+                        $namaPesertaList[] = $peserta['nama'];
+                    }
+                    if (isset($peserta['email']) && ! empty($peserta['email'])) {
+                        $emailPesertaList[] = $peserta['email'];
+                    }
+                    if (isset($peserta['telp']) && ! empty($peserta['telp'])) {
+                        $telpPesertaList[] = $peserta['telp'];
+                    }
+                }
+            }
+
+            // Simpan detail pesanan dengan data peserta yang digabung
             DetailPesanan::create([
                 'id_pesanan' => $pesanan->id,
-                'id_jenis_tiket' => $ticket['id'],
-                'jumlah' => $ticket['quantity'],
+                'id_jenis_tiket' => $ticketId,
+                'jumlah' => $quantity,
                 'harga_per_tiket' => $ticket['price'],
+                'nama_peserta' => implode('; ', $namaPesertaList), // Gabung dengan semicolon
+                'email_peserta' => implode('; ', $emailPesertaList) ?: null,
+                'no_telp_peserta' => implode('; ', $telpPesertaList) ?: null,
             ]);
         }
 
@@ -81,7 +111,8 @@ class PesananController extends Controller
             }
         }
 
-        return redirect()->route('pembeli.pembayaran.show', $pesanan->kode_pesanan);
+        return redirect()->route('pembeli.pembayaran.show', $pesanan->kode_pesanan)
+            ->with('success', 'Pesanan berhasil dibuat! Silakan lakukan pembayaran.');
     }
 
     /**

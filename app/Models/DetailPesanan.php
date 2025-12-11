@@ -17,6 +17,14 @@ class DetailPesanan extends Model
         'id_jenis_tiket',
         'jumlah',
         'harga_per_tiket',
+        'nama_peserta',
+        'email_peserta',
+        'no_telp_peserta',
+    ];
+
+    protected $casts = [
+        'jumlah' => 'integer',
+        'harga_per_tiket' => 'decimal:2',
     ];
 
     public function pesanan()

@@ -21,4 +21,9 @@ class Kreator extends Model
     {
         return $this->belongsTo(User::class, 'id_user');
     }
+
+    public function verifikasi()
+    {
+        return $this->hasOne(VerifikasiKreator::class, 'id_kreator');
+    }
 }

@@ -25,10 +25,6 @@
             {{ __('Profile') }}
         </x-nav-link>
 
-        <x-nav-link :href="route('profile.edit')" :active="request()->routeIs('profile.*')" class="mt-1 group">
-            <i data-lucide="Settings" class="size-5 mr-2"></i>
-            {{ __('Pengaturan') }}
-        </x-nav-link>
 
         @if (auth()->user()->hasRole('kreator'))
             <x-nav-link :href="route('pembuat.dashboard')" class="mt-1 group">
@@ -37,30 +33,62 @@
             </x-nav-link>
         @endif
     @else
+        @php
+            // Cek status verifikasi kreator
+            $kreator = auth()->user()->kreator;
+            $verifikasi = $kreator ? $kreator->verifikasi : null;
+            $isVerified = $verifikasi && $verifikasi->status === 'approved';
+        @endphp
+
+        {{-- Banner Peringatan jika belum terverifikasi --}}
+        @if (!$isVerified)
+            <div class="mx-2 mb-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                <div class="flex items-start gap-2">
+                    <i data-lucide="alert-triangle" class="size-5 text-yellow-600 flex-shrink-0 mt-0.5"></i>
+                    <div>
+                        <p class="text-xs text-yellow-800 font-medium">Akun Belum Terverifikasi</p>
+                        <p class="text-xs text-yellow-600 mt-1">Lengkapi verifikasi untuk mengakses semua fitur.</p>
+                    </div>
+                </div>
+            </div>
+        @endif
+
         <div class="border-t border-gray-200 dark:border-gray-200 my-3 mx-2"></div>
         <h3 class="mx-3 text-gray-500 font-medium">Acara</h3>
+
         <!-- Menu default/pembuat -->
-        <x-nav-link :href="route('pembuat.dashboard')" :active="request()->routeIs('pembuat.dashboard')" class="group">
-            <i data-lucide="home" class="size-5 mr-2"></i>
-            {{ __('Dashboard') }}
-        </x-nav-link>
+        @if ($isVerified)
+            <x-nav-link :href="route('pembuat.dashboard')" :active="request()->routeIs('pembuat.dashboard')" class="group">
+                <i data-lucide="home" class="size-5 mr-2"></i>
+                {{ __('Dashboard') }}
+            </x-nav-link>
 
-        <x-nav-link :href="route('pembuat.acara.index')" :active="request()->routeIs('pembuat.acara.*')" class="mt-1 group">
-            <i data-lucide="calendar" class="size-5 mr-2"></i>
-            {{ __('Events') }}
-        </x-nav-link>
+            <x-nav-link :href="route('pembuat.acara.index')" :active="request()->routeIs('pembuat.acara.*')" class="mt-1 group">
+                <i data-lucide="calendar" class="size-5 mr-2"></i>
+                {{ __('Events') }}
+            </x-nav-link>
+        @else
+            {{-- Menu Disabled --}}
+            <div class="flex items-center px-3 py-2 text-gray-400 cursor-not-allowed opacity-50"
+                title="Verifikasi akun untuk mengakses">
+                <i data-lucide="home" class="size-5 mr-2"></i>
+                <span>{{ __('Dashboard') }}</span>
+                <i data-lucide="lock" class="size-3 ml-auto"></i>
+            </div>
 
-        @if (request()->is('kreator/acara/*') && !request()->routeIs('pembuat.acara.create'))
+            <div class="flex items-center px-3 py-2 text-gray-400 cursor-not-allowed opacity-50 mt-1"
+                title="Verifikasi akun untuk mengakses">
+                <i data-lucide="calendar" class="size-5 mr-2"></i>
+                <span>{{ __('Events') }}</span>
+                <i data-lucide="lock" class="size-3 ml-auto"></i>
+            </div>
+        @endif
+
+        @if (request()->is('kreator/acara/*') && !request()->routeIs('pembuat.acara.create') && $isVerified)
             <div class="ml-4 mt-1 space-y-1">
-                {{-- <x-nav-link :href="route('dashboard', request()->route('acara'))" class="group pl-4">
-                <i data-lucide="eye" class="size-4 mr-2"></i>
-                {{ __('Detail Acara') }}
-            </x-nav-link> --}}
-
                 @php
                     // Ambil parameter 'acara' dari route saat ini
                     $routeAcara = request()->route('acara');
-                    // dd($routeAcara);
 
                     // Cek apakah parameter berupa Model atau ID
                     if (is_object($routeAcara)) {
@@ -112,39 +140,44 @@
                     <i data-lucide="chart-no-axes-combined" class="size-4 mr-2"></i>
                     {{ __('Transaksi') }}
                 </x-nav-link>
-
-
             </div>
         @endif
 
         <div class="border-t border-gray-200 dark:border-gray-200 my-3 mx-2"></div>
         <h3 class="mx-3 text-gray-500 font-medium">Lainnya</h3>
-        <!-- Menu default/pembuat -->
 
+        <!-- Menu Lainnya -->
         <x-nav-link :href="route('pembuat.profile')" :active="request()->routeIs('pembuat.profile')" class="mt-1 group">
             <i data-lucide="user" class="size-5 mr-2"></i>
             {{ __('Profile Kreator') }}
         </x-nav-link>
 
-        <x-nav-link :href="route('pembuat.dashboard')" :active="request()->routeIs('dashboard')" class="group">
-            <i data-lucide="settings" class="size-5 mr-2"></i>
-            {{ __('Pengaturan') }}
-        </x-nav-link>
+        @if ($isVerified)
+            <div class="flex items-center px-3 py-2 text-gray-400 cursor-not-allowed opacity-50"
+                title="Verifikasi akun untuk mengakses">
+                <i data-lucide="settings" class="size-5 mr-2"></i>
+                <span>{{ __('Pengaturan') }}</span>
+                <i data-lucide="lock" class="size-3 ml-auto"></i>
+            </div>
+        @endif
 
-
+        {{-- Verifikasi Data selalu aktif --}}
         <x-nav-link :href="route('pembuat.verifikasi-data.index')" :active="request()->routeIs('pembuat.verifikasi-data.index')" class="group">
             <i data-lucide="shield-check" class="size-5 mr-2"></i>
             {{ __('Verifikasi Data') }}
+            @if (!$isVerified)
+                <span class="ml-auto px-2 py-0.5 text-xs bg-yellow-100 text-yellow-700 rounded-full">Pending</span>
+            @else
+                <span class="ml-auto px-2 py-0.5 text-xs bg-green-100 text-green-700 rounded-full">✓</span>
+            @endif
         </x-nav-link>
 
-        <x-nav-link :href="route('pembeli.tiket-saya')" :active="request()->routeIs('pembeli.tiket-saya')" class="mt-1 group">
+        <x-nav-link :href="route('pembeli.tiket-saya')" :active="request()->routeIs('pembeli.tiket-saya')" class=" group">
             <i data-lucide="ticket" class="size-5 mr-2"></i>
             {{ __('Mode Pembeli') }}
         </x-nav-link>
-
-
-
     @endif
+
     <div class="border-t border-gray-200 dark:border-gray-200 my-3 mx-2"></div>
     <form method="POST" action="{{ route('logout') }}">
         @csrf

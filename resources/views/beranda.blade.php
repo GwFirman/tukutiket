@@ -125,20 +125,20 @@
                 <div
                     class="inline-flex items-center bg-indigo-100 text-indigo-800 px-3 py-1.5 sm:px-4 sm:py-2 rounded-full mb-3 sm:mb-4">
                     <i data-lucide="calendar-check" class="w-3 h-3 sm:w-4 sm:h-4 mr-1.5 sm:mr-2"></i>
-                    <span class="text-xs sm:text-sm font-semibold">Hot Events</span>
+                    <span class="text-xs sm:text-sm font-semibold">Hot event</span>
                 </div>
-                <h2 class="text-2xl sm:text-3xl md:text-4xl font-extrabold text-gray-900 mb-3 sm:mb-4">Upcoming Events
+                <h2 class="text-2xl sm:text-3xl md:text-4xl font-extrabold text-gray-900 mb-3 sm:mb-4">Acara Mendatang
                 </h2>
                 <p class="text-gray-600 text-sm sm:text-base md:text-lg max-w-2xl mx-auto px-4">
-                    Discover and book tickets for amazing events happening near you
+                    Temukan dan pesan tiket untuk acara-acara menakjubkan di sekitar Anda
                 </p>
             </div>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
                 <!-- Event cards will be looped here -->
                 @forelse($acaras ?? [] as $acara)
-                    <div
-                        class="group bg-white rounded-xl sm:rounded-2xl overflow-hidden shadow-lg transition-all duration-500 hover:shadow-2xl hover:-translate-y-2">
+                    <a href="{{ route('beranda.acara', $acara->slug) }}"
+                        class="group bg-white rounded-xl sm:rounded-2xl overflow-hidden transition-all duration-500 hover:shadow-md hover:-translate-y-2 block">
                         <div class="relative overflow-hidden">
                             @if ($acara->banner_acara && file_exists(storage_path('app/public/' . $acara->banner_acara)))
                                 <img src="{{ asset('storage/' . $acara->banner_acara) }}"
@@ -166,24 +166,14 @@
                             </h3>
                             <div class="space-y-2 sm:space-y-3 mb-4 sm:mb-6">
                                 <div class="flex items-center text-gray-600">
-                                    <div
-                                        class="flex items-center justify-center w-7 h-7 sm:w-8 sm:h-8 bg-green-100 rounded-lg mr-2 sm:mr-3">
-                                        <i data-lucide="calendar"
-                                            class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-green-600"></i>
+                                    <div class="flex items-center text-gray-600">
+                                        <span class="text-lg">
+                                            {{ $acara->waktu_mulai ? \Carbon\Carbon::parse($acara->waktu_mulai)->locale('id')->format('d F Y') : 'Tanggal TBD' }}
+                                        </span>
                                     </div>
-                                    <span class="text-xs sm:text-sm">{{ $acara->waktu_mulai ?? 'Date TBD' }}</span>
-                                </div>
-                                <div class="flex items-center text-gray-600">
-                                    <div
-                                        class="flex items-center justify-center w-7 h-7 sm:w-8 sm:h-8 bg-amber-100 rounded-lg mr-2 sm:mr-3">
-                                        <i data-lucide="map-pin" class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-600"></i>
-                                    </div>
-                                    <span
-                                        class="text-xs sm:text-sm line-clamp-1">{{ $acara->lokasi ?? 'Location' }}</span>
                                 </div>
                             </div>
                             <div class="flex items-center gap-2 mt-2">
-                                {{-- Logo --}}
                                 @if ($acara->kreator && $acara->kreator->logo)
                                     <img src="{{ Storage::url($acara->kreator->logo) }}"
                                         class="h-8 w-8 sm:h-10 sm:w-10 rounded-full object-cover border border-gray-300 shadow-sm">
@@ -193,10 +183,7 @@
                                         <i data-lucide="user" class="w-4 h-4 sm:w-6 sm:h-6"></i>
                                     </div>
                                 @endif
-
-                                {{-- Nama Kreator --}}
                                 <div class="min-w-0 flex-1">
-                                    <p class="text-xs sm:text-sm text-gray-500">Diselenggarakan oleh</p>
                                     <h3 class="font-semibold text-gray-900 text-sm sm:text-base truncate">
                                         {{ $acara->kreator->nama_kreator ?? 'Penyelenggara Tidak Ditemukan' }}
                                     </h3>
@@ -218,17 +205,9 @@
                                         @endif
                                     </span>
                                 </div>
-                                <a href="{{ route('beranda.acara', $acara->slug ?? 1) }}"
-                                    class="w-full sm:w-auto group/btn bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-semibold py-2.5 sm:py-3 px-4 sm:px-6 rounded-lg sm:rounded-xl transition-all duration-300 shadow-md hover:shadow-lg transform hover:-translate-y-0.5 text-center">
-                                    <span class="flex items-center justify-center">
-                                        <span class="text-sm sm:text-base">Book Now</span>
-                                        <i data-lucide="arrow-right"
-                                            class="w-3.5 h-3.5 sm:w-4 sm:h-4 ml-1.5 sm:ml-2 transition-transform group-hover/btn:translate-x-1"></i>
-                                    </span>
-                                </a>
                             </div>
                         </div>
-                    </div>
+                    </a>
                 @empty
                     <div class="col-span-full text-center py-10 sm:py-16">
                         <div

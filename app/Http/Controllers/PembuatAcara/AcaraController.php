@@ -108,11 +108,12 @@ class AcaraController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $acara)
+    public function edit(Acara $acara)
     {
-        $acara = Acara::with('jenisTiket')->findOrFail($acara);
+        // $acara->with('jenisTiket')->findOrFail($acara);
+        $kreator = Auth::user()->kreator;
 
-        return view('pembuat_acara.acara.edit', compact('acara'));
+        return view('pembuat_acara.acara.edit', compact('acara', 'kreator'));
     }
 
     /**

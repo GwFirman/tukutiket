@@ -1,15 +1,17 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Dashboard') }}
-        </h2>
+        <div class="flex items-center gap-2 mb-4 max-w-5xl mx-auto">
+            <i data-lucide="calendar" class="size-5 text-gray-600"></i>
+            <i data-lucide="chevron-right" class="size-4 font-medium text-gray-400"></i>
+            <p class="font-medium">Edit Acara</p>
+        </div>
     </x-slot>
 
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white shadow-sm sm:rounded-lg">
-                <form method="POST" action="{{ route('pembuat.acara.update', $acara->id) }}" enctype="multipart/form-data"
-                    class="p-6 space-y-6">
+    <div class="">
+        <div class="mx-auto w-5xl">
+            <div class="">
+                <form method="POST" action="{{ route('pembuat.acara.update', $acara->id) }}"
+                    enctype="multipart/form-data" class="">
                     @csrf
                     @method('PUT')
                     @if ($errors->any())
@@ -114,9 +116,38 @@
                         <label for="nama_acara" class="block text-sm font-medium text-gray-700">Nama Acara</label>
                         <input type="text" name="nama_acara" id="nama_acara"
                             value="{{ old('nama_acara', $acara->nama_acara) }}" required
-                            class="mt-1 h-10 block w-full rounded-md border border-gray-100 shadow-sm focus:border-sky-500">
+                            class="mt-1 h-10 block w-full border-b-2 outline-0 border-gray-100 text-xl focus:border-sky-500">
                     </div>
                     <div class="flex gap-5 mt-5">
+                        <div class="w-full mb-6">
+                            <label class="mb-4 block text-sm font-medium text-gray-700">
+                                Diselenggarakan oleh
+                            </label>
+
+                            <div class="flex items-center gap-3 ">
+                                <!-- Foto Kreator -->
+                                @if ($kreator && $kreator->logo)
+                                    <img src="{{ Storage::url($kreator->logo) }}" alt="{{ $kreator->nama_kreator }}"
+                                        class="h-20 w-20 rounded-full object-cover border border-gray-300 shadow-sm">
+                                @else
+                                    <div
+                                        class="h-20 w-20 rounded-full bg-gray-300 flex items-center justify-center text-gray-600">
+                                        <i data-lucide="user" class="size-6"></i>
+                                    </div>
+                                @endif
+
+                                <!-- Nama Kreator -->
+                                <div>
+                                    <p class="font-semibold text-gray-900 text-md">
+                                        {{ $kreator->nama_kreator ?? 'Belum Ada Profil Kreator' }}
+                                    </p>
+                                    <input type="hidden" name="id_kreator" id="id_kreator" value={{ $kreator->id }}>
+                                    <p class="text-xs text-gray-500">
+                                        Profil kreator akan tampil di halaman event Anda.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
                         <div class="w-full" x-data="{
                             showModal: false,
                             startDate: '{{ old('waktu_mulai', $acara->waktu_mulai ? \Carbon\Carbon::parse($acara->waktu_mulai)->format('Y-m-d') : '') }}',
@@ -133,7 +164,7 @@
                                 return date.toLocaleDateString('id-ID', options);
                             }
                         }">
-                            <label class="mb-1.5 block text-sm font-medium text-gray-700 ">
+                            <label class="mb-4 block text-sm font-medium text-gray-700 ">
                                 Tanggal Acara
                             </label>
                             <div class="flex items-center h-11 pl-4 rounded-lg cursor-pointer border border-gray-300"
@@ -180,7 +211,8 @@
                                             </div>
                                         </div>
                                         <div class="flex justify-end gap-2">
-                                            <button type="button" class="px-4 py-2 rounded bg-gray-200 text-gray-700 "
+                                            <button type="button"
+                                                class="px-4 py-2 rounded bg-gray-200 text-gray-700 "
                                                 @click="showModal = false">Batal</button>
                                             <button type="button" class="px-4 py-2 rounded bg-blue-500 text-white"
                                                 @click="showModal = false">Simpan</button>
@@ -190,7 +222,7 @@
                             </div>
                         </div>
                         <div class="w-full">
-                            <label class="mb-1.5 block text-sm font-medium text-gray-700 ">
+                            <label class="mb-4 block text-sm font-medium text-gray-700 ">
                                 Lokasi
                             </label>
                             <input type="text" name="lokasi" id="lokasi"
@@ -214,7 +246,7 @@
                         <textarea name="deskripsi_acara" id="deskripsi" rows="3"
                             class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">{{ old('deskripsi_acara', $acara->deskripsi) }}</textarea>
                     </div> --}}
-                    <div class="w-full">
+                    <div class="w-full mt-4">
                         <label class="mb-1.5 block text-sm font-medium text-gray-700 ">
                             Info Kontak
                         </label>
@@ -826,25 +858,19 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="flex justify-end gap-3 w-full mt-4">
-                            <button type="submit" name="status" value="draft"
-                                class="bg-gray-200 text-gray-800 px-4 py-2 rounded-lg hover:bg-gray-300 transition">
-                                Simpan Draft
-                            </button>
-                            <button type="submit" name="status" value="published"
-                                class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition">
-                                Simpan & Publish
-                            </button>
+                        <div class="flex justify-between mt-4">
+                            <div class="flex gap-3 justify-end w-full">
+                                <button type="submit" name="status" value="draft"
+                                    class="bg-gray-200 text-gray-800 px-4 py-2 rounded-lg hover:bg-gray-300 transition">
+                                    Simpan Draft
+                                </button>
+                                <button type="submit" name="status" value="published"
+                                    class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition">
+                                    Publish
+                                </button>
+                            </div>
                         </div>
                     </div>
-                    {{-- <div class="flex justify-end">
-                        <button type="submit"
-                            class="inline-flex items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-md font-semibold text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                            Simpan
-                        </button>
-                    </div> --}}
-                </form>
             </div>
         </div>
-    </div>
 </x-app-layout>

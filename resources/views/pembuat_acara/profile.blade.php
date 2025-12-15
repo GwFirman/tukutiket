@@ -44,7 +44,7 @@
                     </h3>
                     <div class="">
                         <!-- Logo Section -->
-                        <div class="p-6 border-b border-gray-100">
+                        <div class="border-b border-gray-100">
                             <div class="flex items-center gap-6">
                                 <!-- Preview Foto -->
                                 <div class="relative group">

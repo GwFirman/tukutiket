@@ -1,6 +1,6 @@
 <x-app-layout>
     <x-slot name="header">
-        <div class="flex items-center gap-2 mb-4">
+        <div class="flex items-center gap-2 mb-4 max-w-5xl mx-auto">
             <i data-lucide="calendar" class="size-5 text-gray-600"></i>
             <i data-lucide="chevron-right" class="size-4 font-medium text-gray-400"></i>
             <p class="font-medium">Buat Acara</p>
@@ -8,7 +8,7 @@
     </x-slot>
 
     <div class="">
-        <div class="mx-auto px-24">
+        <div class="mx-auto max-w-5xl">
             <div class="">
                 <form method="POST" action="{{ route('pembuat.acara.store') }}" enctype="multipart/form-data"
                     class="">
@@ -214,15 +214,185 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="w-full">
-                            <label class="mb-4  block text-sm font-medium text-gray-700 ">
+                        <div class="w-full" x-data="{ showLocationModal: false }">
+                            <label class="mb-4 block text-sm font-medium text-gray-700">
                                 Lokasi
                             </label>
-                            <input type="text" name="lokasi" id="lokasi" name="lokasi"
-                                class=" shadow-theme-xs font-normal focus:border-blue-300 focus:ring-blue-500/10 h-11 w-full  border border-gray-300 rounded-lg bg-transparent px-4 py-2.5 text-lg text-gray-800 placeholder:text-gray-400 focus:ring-3 focus:outline-hidden ">
+                            <input type="text" name="lokasi" id="lokasi"
+                                class="shadow-theme-xs font-normal focus:border-blue-300 focus:ring-blue-500/10 h-11 w-full border border-gray-300 rounded-lg bg-transparent px-4 py-2.5 text-lg text-gray-800 placeholder:text-gray-400 focus:ring-3 focus:outline-hidden"
+                                @click="showLocationModal = true" readonly>
+
+                            <!-- Modal Lokasi -->
+                            <div x-show="showLocationModal" x-cloak
+                                class="fixed inset-0 z-50 flex items-center justify-center bg-black/80">
+                                <div
+                                    class="bg-white rounded-xl shadow-xl p-6 w-full max-w-2xl mx-4 max-h-[90vh] overflow-y-auto">
+                                    <!-- Header -->
+                                    <div class="flex justify-between items-center mb-4">
+                                        <h3 class="text-xl font-semibold text-gray-900">Pilih Lokasi</h3>
+                                        <button type="button" @click="showLocationModal = false"
+                                            class="text-gray-400 hover:text-gray-500">
+                                            <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                                                stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M6 18L18 6M6 6l12 12" />
+                                            </svg>
+                                        </button>
+                                    </div>
+
+                                    <!-- Map -->
+                                    <div id="map" class="w-full h-96 rounded-lg border border-gray-300 mb-4">
+                                    </div>
+
+                                    <!-- Nama Lokasi -->
+                                    <div class="mb-4">
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">Alamat
+                                            Lokasi</label>
+                                        <textarea id="lokasi-display" readonly rows="3"
+                                            class="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-50 text-sm resize-none"
+                                            placeholder="Pilih lokasi di peta..."></textarea>
+                                    </div>
+
+                                    <!-- Koordinat Info (Hidden) -->
+                                    <input type="hidden" id="latitude" name="latitude">
+                                    <input type="hidden" id="longitude" name="longitude">
+
+                                    <!-- Buttons -->
+                                    <div class="flex justify-end gap-3">
+                                        <button type="button" @click="showLocationModal = false"
+                                            class="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50">
+                                            Batal
+                                        </button>
+                                        <button type="button" @click="showLocationModal = false"
+                                            class="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg text-sm font-medium">
+                                            Simpan Lokasi
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <script>
+                                let map;
+                                let marker;
+                                let geocodeTimeout;
+                                const defaultLat = -6.200000;
+                                const defaultLng = 106.816666;
+
+                                function initMap() {
+                                    map = L.map('map').setView([defaultLat, defaultLng], 13);
+
+                                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                                        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+                                    }).addTo(map);
+
+                                    marker = L.marker([defaultLat, defaultLng], {
+                                        draggable: true
+                                    }).addTo(map);
+
+                                    updateCoordinates(defaultLat, defaultLng);
+
+                                    marker.on('dragend', function(e) {
+                                        const position = marker.getLatLng();
+                                        updateCoordinates(position.lat, position.lng);
+                                    });
+
+                                    // Klik pada peta untuk memindahkan marker
+                                    map.on('click', function(e) {
+                                        marker.setLatLng(e.latlng);
+                                        updateCoordinates(e.latlng.lat, e.latlng.lng);
+                                    });
+                                }
+
+                                function updateCoordinates(lat, lng) {
+                                    document.getElementById('latitude').value = lat;
+                                    document.getElementById('longitude').value = lng;
+
+                                    // Tampilkan loading sementara
+                                    document.getElementById('lokasi').value = 'Mencari lokasi...';
+                                    document.getElementById('lokasi-display').value = 'Mencari alamat lokasi...';
+
+                                    // Debounce reverse geocoding
+                                    clearTimeout(geocodeTimeout);
+                                    geocodeTimeout = setTimeout(() => {
+                                        reverseGeocode(lat, lng);
+                                    }, 500);
+                                }
+
+                                async function reverseGeocode(lat, lng) {
+                                    try {
+                                        const response = await fetch(
+                                            `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`, {
+                                                headers: {
+                                                    'Accept-Language': 'id'
+                                                }
+                                            }
+                                        );
+
+                                        if (!response.ok) {
+                                            throw new Error('Reverse geocoding failed');
+                                        }
+
+                                        const data = await response.json();
+
+                                        let shortName = '';
+                                        let fullAddress = '';
+
+                                        if (data && data.address) {
+                                            const address = data.address;
+                                            const shortParts = [];
+                                            const fullParts = [];
+
+                                            // Untuk nama pendek (input lokasi)
+                                            if (address.road) shortParts.push(address.road);
+                                            if (address.village || address.suburb) shortParts.push(address.village || address.suburb);
+                                            if (address.city || address.town || address.municipality) {
+                                                shortParts.push(address.city || address.town || address.municipality);
+                                            }
+
+                                            // Untuk alamat lengkap (textarea)
+                                            if (address.road) fullParts.push(address.road);
+                                            if (address.house_number) fullParts[0] = `${address.road} No. ${address.house_number}`;
+                                            if (address.neighbourhood) fullParts.push(address.neighbourhood);
+                                            if (address.suburb) fullParts.push(address.suburb);
+                                            if (address.village) fullParts.push(address.village);
+                                            if (address.city || address.town || address.municipality) {
+                                                fullParts.push(address.city || address.town || address.municipality);
+                                            }
+                                            if (address.state) fullParts.push(address.state);
+                                            if (address.postcode) fullParts.push(address.postcode);
+                                            if (address.country) fullParts.push(address.country);
+
+                                            shortName = [...new Set(shortParts)].slice(0, 3).join(', ');
+                                            fullAddress = [...new Set(fullParts)].join(', ');
+                                        }
+
+                                        // Fallback ke display_name jika tidak ada detail
+                                        if (!shortName && data.display_name) {
+                                            shortName = data.display_name.split(', ').slice(0, 3).join(', ');
+                                        }
+                                        if (!fullAddress && data.display_name) {
+                                            fullAddress = data.display_name;
+                                        }
+
+                                        // Update input lokasi (pendek) dan textarea (lengkap)
+                                        document.getElementById('lokasi').value = shortName || `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
+                                        document.getElementById('lokasi-display').value = fullAddress ||
+                                            `Koordinat: ${lat.toFixed(6)}, ${lng.toFixed(6)}`;
+
+                                    } catch (error) {
+                                        console.error('Error during reverse geocoding:', error);
+                                        document.getElementById('lokasi').value = `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
+                                        document.getElementById('lokasi-display').value = `Koordinat: ${lat.toFixed(6)}, ${lng.toFixed(6)}`;
+                                    }
+                                }
+
+                                // Inisialisasi peta saat modal dibuka
+                                document.addEventListener('DOMContentLoaded', function() {
+                                    setTimeout(initMap, 100);
+                                });
+                            </script>
                         </div>
                     </div>
-
                     <div class="mt-4">
                         <label for="deskripsi_acara" class="block text-sm font-medium text-gray-700">Deskripsi</label>
                         <div>

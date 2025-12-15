@@ -139,7 +139,7 @@
                                             <i data-lucide="eye" class="size-5"></i>
                                         </a>
 
-                                        <a href="{{ route('pembuat.acara.edit', $acara->id) }}"
+                                        <a href="{{ route('pembuat.acara.edit', $acara->slug) }}"
                                             class="text-yellow-600 hover:text-yellow-800">
                                             <i data-lucide="edit-3" class="size-5"></i>
                                         </a>

@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\Admin\AdminController;
+use App\Http\Controllers\Admin\ModKretorController;
 use App\Http\Controllers\All\BerandaController;
 use App\Http\Controllers\PembayaranController;
 use App\Http\Controllers\Pembeli\AcaraController as PembeliAcaraController;
@@ -40,6 +42,18 @@ Route::middleware(['auth', 'verified'])->group(function () {
     });
 
 });
+
+Route::middleware(['auth', 'role:admin'])
+    ->prefix('admin')
+    ->name('admin.')
+    ->group(function () {
+        Route::get('/dashboard', [AdminController::class, 'index'])->name('dashboard');
+        Route::get('/mod-kreator', [ModKretorController::class, 'index'])->name('mod-kreator');
+        Route::get('/mod-kreator/{vc}', [ModKretorController::class, 'show'])->name('mod-kreator.show');
+        Route::post('/mod-kreator/{id}/approve', [ModKretorController::class, 'approve'])->name('mod-kreator.approve');
+        Route::post('/mod-kreator/{id}/reject', [ModKretorController::class, 'reject'])->name('mod-kreator.reject');
+
+    });
 
 Route::middleware(['auth', 'role:kreator'])
     ->prefix('kreator')

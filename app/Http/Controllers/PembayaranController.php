@@ -48,6 +48,7 @@ class PembayaranController extends Controller
             for ($i = 0; $i < $jumlahTiket; $i++) {
                 TiketPeserta::create([
                     'id_detail_pesanan' => $idDetail,
+                    'nomor_tiket' => strtoupper(Str::random(10)),
                     'nama_peserta' => $validated['nama_peserta'][$index],
                     'email_peserta' => $validated['email_peserta'][$index] ?? null,
                     'no_telp_peserta' => $validated['no_telp_peserta'][$index] ?? null,

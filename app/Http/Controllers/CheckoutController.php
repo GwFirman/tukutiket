@@ -102,7 +102,7 @@ class CheckoutController extends Controller
 
             DB::commit();
 
-            return redirect()->route('pembeli.pesanan.show', $pesanan->id)
+            return redirect()->route('pembeli.pesanan-saya')
                 ->with('success', 'Pesanan berhasil dibuat! Silakan lakukan pembayaran.');
 
         } catch (\Exception $e) {

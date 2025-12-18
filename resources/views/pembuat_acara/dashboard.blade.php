@@ -1,231 +1,263 @@
 <x-app-layout>
     <x-slot name="header">
         <div class="flex items-center gap-2 mb-4">
-            <i data-lucide="home" class="size-5 text-gray-600"></i>
+            <i data-lucide="home" class="size-5 text-indigo-600"></i>
             <i data-lucide="chevron-right" class="size-4 font-medium text-gray-400"></i>
-            <p class="font-medium">Dashboard</p>
+            <p class="font-medium text-gray-700">Dashboard</p>
         </div>
     </x-slot>
-    <div class="">
-        <div class="px-24">
+    <div class="bg-transparent">
+        <div class="px-6 lg:px-24 py-6">
             <!-- Dashboard Header -->
-            <div class="mb-6 flex justify-between items-center">
-                <h1 class="text-2xl font-semibold text-gray-800">Dashboard Pembuat Acara</h1>
-                <a href="{{ route('pembuat.acara.create') }}"
-                    class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105">
-                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                    </svg>
-                    Buat Acara Baru
-                </a>
+            <div class="mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                <div>
+                    <h1 class="text-3xl font-extrabold text-indigo-800">Dashboard Pembuat Acara</h1>
+                    <p class="text-gray-600 mt-2 flex items-center gap-2">
+                        <i data-lucide="sparkles" class="w-4 h-4 text-indigo-500"></i>
+                        Kelola dan monitor acara Anda
+                    </p>
+                </div>
+
+                <div class="flex items-center gap-3">
+                    <div class="hidden sm:block text-sm text-gray-500">Terakhir diperbarui: {{ now()->format('d M Y') }}
+                    </div>
+                    <a href="{{ route('pembuat.acara.create') }}"
+                        class="inline-flex items-center px-5 py-2.5 bg-gradient-to-r from-indigo-600 to-indigo-700 text-white font-semibold rounded-xl shadow-md hover:shadow-lg transition-transform transform hover:scale-105">
+                        <i data-lucide="plus-circle" class="w-5 h-5 mr-2"></i>
+                        Buat Acara Baru
+                    </a>
+                </div>
             </div>
+
+            <!-- Flash Messages -->
+            @if (session('success'))
+                <div
+                    class="mb-4 p-4 bg-green-50 border border-green-200 text-green-800 rounded-lg flex items-center gap-3">
+                    <i data-lucide="check-circle" class="w-5 h-5 text-green-600"></i>
+                    {{ session('success') }}
+                </div>
+            @endif
+            @if (session('error'))
+                <div
+                    class="mb-4 p-4 bg-rose-50 border border-rose-200 text-rose-800 rounded-lg flex items-center gap-3">
+                    <i data-lucide="alert-circle" class="w-5 h-5 text-rose-600"></i>
+                    {{ session('error') }}
+                </div>
+            @endif
 
             <!-- Stats Cards -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
-                <div class="bg-white rounded-lg shadow p-5">
-                    <div class="flex justify-between">
-                        <div>
-                            <h2 class="text-gray-500 text-sm">Total Acara</h2>
-                            <p class="text-xl font-bold">{{ $totalAcara }}</p>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                <div
+                    class="bg-white rounded-2xl shadow-md hover:shadow-xl transition-all border border-indigo-100 p-6 group relative overflow-hidden">
+                    <div
+                        class="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-indigo-50 to-transparent rounded-full -mr-16 -mt-16 opacity-50">
+                    </div>
+                    <div class="relative flex justify-between items-start">
+                        <div class="flex-1">
+                            <p class="text-sm text-indigo-600 font-semibold mb-1">Total Acara</p>
+                            <p class="text-4xl font-bold text-gray-900 mb-1">{{ $totalAcara }}</p>
+                            <p class="text-xs text-gray-500"><i data-lucide="calendar"
+                                    class="w-3 h-3 inline text-indigo-500"></i> Acara aktif</p>
                         </div>
-                        <div class="bg-indigo-400 p-3 rounded-full">
-                            <i data-lucide="calendar" class="size-6 font-medium text-white"></i>
+                        <div
+                            class="bg-gradient-to-br from-indigo-500 to-purple-600 p-3 rounded-xl text-white shadow-lg">
+                            <i data-lucide="calendar" class="w-6 h-6"></i>
                         </div>
                     </div>
                 </div>
 
-                <div class="bg-white rounded-lg shadow p-5">
-                    <div class="flex justify-between">
-                        <div>
-                            <h2 class="text-gray-500 text-sm">Tiket Terjual</h2>
-                            <p class="text-xl font-bold">{{ $totalTiketTerjual }}</p>
+                <div
+                    class="bg-white rounded-2xl shadow-md hover:shadow-xl transition-all border border-indigo-100 p-6 group relative overflow-hidden">
+                    <div
+                        class="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-indigo-50 to-transparent rounded-full -mr-16 -mt-16 opacity-50">
+                    </div>
+                    <div class="relative flex justify-between items-start">
+                        <div class="flex-1">
+                            <p class="text-sm text-indigo-600 font-semibold mb-1">Tiket Terjual</p>
+                            <p class="text-4xl font-bold text-gray-900 mb-1">{{ $totalTiketTerjual }}</p>
+                            <p class="text-xs text-gray-500"><i data-lucide="ticket"
+                                    class="w-3 h-3 inline text-indigo-500"></i> Total penjualan</p>
                         </div>
-                        <div class="bg-purple-400 p-3 rounded-full">
-                            <i data-lucide="ticket" class="size-6 font-medium text-white"></i>
+                        <div
+                            class="bg-gradient-to-br from-indigo-500 to-purple-600 p-3 rounded-xl text-white shadow-lg">
+                            <i data-lucide="ticket" class="w-6 h-6"></i>
                         </div>
                     </div>
                 </div>
 
-                <div class="bg-white rounded-lg shadow p-5">
-                    <div class="flex justify-between">
-                        <div>
-                            <h2 class="text-gray-500 text-sm">Pendapatan</h2>
-                            <p class="text-xl font-bold">Rp {{ number_format($totalPendapatan, 0, ',', '.') }}</p>
+                <div
+                    class="bg-white rounded-2xl shadow-md hover:shadow-xl transition-all border border-indigo-100 p-6 group relative overflow-hidden">
+                    <div
+                        class="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-indigo-50 to-transparent rounded-full -mr-16 -mt-16 opacity-50">
+                    </div>
+                    <div class="relative flex justify-between items-start">
+                        <div class="flex-1">
+                            <p class="text-sm text-indigo-600 font-semibold mb-1">Pendapatan</p>
+                            <p class="text-3xl font-bold text-gray-900 mb-1">Rp
+                                {{ number_format($totalPendapatan, 0, ',', '.') }}</p>
+                            <p class="text-xs text-gray-500"><i data-lucide="banknote"
+                                    class="w-3 h-3 inline text-indigo-500"></i> Total pendapatan</p>
                         </div>
-                        <div class="bg-green-400 p-3 rounded-full">
-                            <i data-lucide="banknote-arrow-down" class="size-6 font-medium text-white"></i>
+                        <div
+                            class="bg-gradient-to-br from-indigo-500 to-purple-600 p-3 rounded-xl text-white shadow-lg">
+                            <i data-lucide="banknote" class="w-6 h-6"></i>
                         </div>
                     </div>
                 </div>
 
-                <div class="bg-white rounded-lg shadow p-5">
-                    <div class="flex justify-between">
-                        <div>
-                            <h2 class="text-gray-500 text-sm">Pengunjung</h2>
-                            <p class="text-xl font-bold">{{ $totalPeserta }}</p>
+                <div
+                    class="bg-white rounded-2xl shadow-md hover:shadow-xl transition-all border border-indigo-100 p-6 group relative overflow-hidden">
+                    <div
+                        class="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-indigo-50 to-transparent rounded-full -mr-16 -mt-16 opacity-50">
+                    </div>
+                    <div class="relative flex justify-between items-start">
+                        <div class="flex-1">
+                            <p class="text-sm text-indigo-600 font-semibold mb-1">Pengunjung</p>
+                            <p class="text-4xl font-bold text-gray-900 mb-1">{{ $totalPeserta }}</p>
+                            <p class="text-xs text-gray-500"><i data-lucide="users"
+                                    class="w-3 h-3 inline text-indigo-500"></i> Total peserta</p>
                         </div>
-                        <div class="bg-amber-400 p-3 rounded-full">
-                            <i data-lucide="users" class="size-6 font-medium text-white"></i>
+                        <div
+                            class="bg-gradient-to-br from-indigo-500 to-purple-600 p-3 rounded-xl text-white shadow-lg">
+                            <i data-lucide="users" class="w-6 h-6"></i>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Events Table -->
-            {{-- <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg mb-6">
-                <div class="p-6">
-                    <h2 class="text-lg font-semibold mb-4 text-gray-700">Acara Terbaru</h2>
-                    <div class="overflow-x-auto rounded-lg border-gray-300 border">
-                        <table class="min-w-full divide-y divide-gray-200">
-                            <thead class="bg-gray-50">
-                                <tr>
-                                    <th
-                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Nama Acara</th>
-                                    <th
-                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Tanggal</th>
-                                    <th
-                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Status</th>
-                                    <th
-                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Tiket Terjual</th>
-                                    <th
-                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Aksi</th>
-                                </tr>
-                            </thead>
-                            <tbody class="bg-white divide-y divide-gray-200">
-                                <tr>
-                                    <td class="px-6 py-4 whitespace-nowrap">Konser Musik Jazz</td>
-                                    <td class="px-6 py-4 whitespace-nowrap">24 Mei 2024</td>
-                                    <td class="px-6 py-4 whitespace-nowrap"><span
-                                            class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Aktif</span>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap">128/200</td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <a href="#" class="text-indigo-600 hover:text-indigo-900">Edit</a>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="px-6 py-4 whitespace-nowrap">Workshop Design</td>
-                                    <td class="px-6 py-4 whitespace-nowrap">12 Juni 2024</td>
-                                    <td class="px-6 py-4 whitespace-nowrap"><span
-                                            class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">Akan
-                                            Datang</span></td>
-                                    <td class="px-6 py-4 whitespace-nowrap">45/100</td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <a href="#" class="text-indigo-600 hover:text-indigo-900">Edit</a>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="px-6 py-4 whitespace-nowrap">Seminar Teknologi</td>
-                                    <td class="px-6 py-4 whitespace-nowrap">3 April 2024</td>
-                                    <td class="px-6 py-4 whitespace-nowrap"><span
-                                            class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">Selesai</span>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap">200/200</td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <a href="#" class="text-indigo-600 hover:text-indigo-900">Lihat
-                                            Laporan</a>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div> --}}
-
-            <!-- Quick Links -->
-            {{-- <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                    <div class="p-6">
-                        <h3 class="font-semibold text-lg mb-4">Menu Cepat</h3>
-                        <div class="space-y-3">
-                            <a href="#" class="flex items-center text-gray-700 hover:text-indigo-600">
-                                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-                                </svg>
-                                Buat Acara Baru
-                            </a>
-                            <a href="#" class="flex items-center text-gray-700 hover:text-indigo-600">
-                                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z">
-                                    </path>
-                                </svg>
-                                Laporan Keuangan
-                            </a>
-                            <a href="#" class="flex items-center text-gray-700 hover:text-indigo-600">
-                                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z">
-                                    </path>
-                                </svg>
-                                Kelola Pengguna
-                            </a>
+            <!-- Quick Actions & Info -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Quick Actions -->
+                <div class="bg-white rounded-2xl shadow-md border border-indigo-100 p-7 hover:shadow-xl transition-all">
+                    <h3 class="font-bold text-lg text-gray-900 mb-5 flex items-center gap-3">
+                        <div class="bg-gradient-to-br from-indigo-500 to-purple-600 p-2.5 rounded-xl shadow-sm">
+                            <i data-lucide="zap" class="w-5 h-5 text-white"></i>
                         </div>
-                    </div>
-                </div>
-
-                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                    <div class="p-6">
-                        <h3 class="font-semibold text-lg mb-4">Penjualan per Bulan</h3>
-                        <div class="h-48 flex items-end space-x-2">
-                            <div class="bg-indigo-500 w-6 rounded-t" style="height: 30%"></div>
-                            <div class="bg-indigo-500 w-6 rounded-t" style="height: 45%"></div>
-                            <div class="bg-indigo-500 w-6 rounded-t" style="height: 70%"></div>
-                            <div class="bg-indigo-500 w-6 rounded-t" style="height: 90%"></div>
-                            <div class="bg-indigo-500 w-6 rounded-t" style="height: 60%"></div>
-                            <div class="bg-indigo-500 w-6 rounded-t" style="height: 75%"></div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                    <div class="p-6">
-                        <h3 class="font-semibold text-lg mb-4">Notifikasi Terbaru</h3>
-                        <div class="space-y-4">
-                            <div class="flex items-start">
-                                <div class="flex-shrink-0">
-                                    <span class="h-8 w-8 rounded-full bg-green-200 flex items-center justify-center">
-                                        <svg class="h-5 w-5 text-green-500" fill="none" stroke="currentColor"
-                                            viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M5 13l4 4L19 7"></path>
-                                        </svg>
-                                    </span>
-                                </div>
-                                <div class="ml-3">
-                                    <p class="text-sm font-medium text-gray-900">5 tiket baru terjual untuk "Workshop
-                                        Design"</p>
-                                    <p class="text-xs text-gray-500">20 menit yang lalu</p>
-                                </div>
+                        Aksi Cepat
+                    </h3>
+                    <div class="space-y-3">
+                        <a href="{{ route('pembuat.acara.create') }}"
+                            class="flex items-center px-4 py-3.5 text-gray-700 hover:bg-indigo-50 hover:text-indigo-700 rounded-xl transition-all border border-gray-200 hover:border-indigo-200">
+                            <div class="bg-indigo-100 p-2 rounded-lg mr-3">
+                                <i data-lucide="plus-circle" class="w-5 h-5 text-indigo-600"></i>
                             </div>
-                            <div class="flex items-start">
-                                <div class="flex-shrink-0">
-                                    <span class="h-8 w-8 rounded-full bg-yellow-200 flex items-center justify-center">
-                                        <svg class="h-5 w-5 text-yellow-500" fill="none" stroke="currentColor"
-                                            viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z">
-                                            </path>
-                                        </svg>
-                                    </span>
-                                </div>
-                                <div class="ml-3">
-                                    <p class="text-sm font-medium text-gray-900">Pembayaran untuk "Seminar Teknologi"
-                                        berhasil</p>
-                                    <p class="text-xs text-gray-500">1 jam yang lalu</p>
-                                </div>
+                            <span class="font-medium">Buat Acara Baru</span>
+                        </a>
+                        <a href="{{ route('pembuat.acara.index') }}"
+                            class="flex items-center px-4 py-3.5 text-gray-700 hover:bg-indigo-50 hover:text-indigo-700 rounded-xl transition-all border border-gray-200 hover:border-indigo-200">
+                            <div class="bg-indigo-100 p-2 rounded-lg mr-3">
+                                <i data-lucide="list" class="w-5 h-5 text-indigo-600"></i>
+                            </div>
+                            <span class="font-medium">Lihat Semua Acara</span>
+                        </a>
+                        <a href="{{ route('pembuat.profile') }}"
+                            class="flex items-center px-4 py-3.5 text-gray-700 hover:bg-indigo-50 hover:text-indigo-700 rounded-xl transition-all border border-gray-200 hover:border-indigo-200">
+                            <div class="bg-indigo-100 p-2 rounded-lg mr-3">
+                                <i data-lucide="user-cog" class="w-5 h-5 text-indigo-600"></i>
+                            </div>
+                            <span class="font-medium">Pengaturan Profil</span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Statistics Overview -->
+                <div
+                    class="bg-white rounded-2xl shadow-md border border-indigo-100 p-7 hover:shadow-xl transition-all">
+                    <h3 class="font-bold text-lg text-gray-900 mb-5 flex items-center gap-3">
+                        <div class="bg-gradient-to-br from-indigo-500 to-purple-600 p-2.5 rounded-xl shadow-sm">
+                            <i data-lucide="bar-chart-3" class="w-5 h-5 text-white"></i>
+                        </div>
+                        Ringkasan Penjualan
+                    </h3>
+                    <div class="space-y-5">
+                        <div>
+                            <div class="flex justify-between mb-2">
+                                <span class="text-sm text-gray-600 font-medium">Tiket Terjual</span>
+                                <span class="text-sm font-bold text-indigo-600">{{ $totalTiketTerjual }}</span>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-2.5 overflow-hidden">
+                                <div class="bg-gradient-to-r from-indigo-500 to-purple-600 h-2.5 rounded-full transition-all duration-500 shadow-lg shadow-indigo-500/30"
+                                    style="width: 65%"></div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="flex justify-between mb-2">
+                                <span class="text-sm text-gray-600 font-medium">Acara Aktif</span>
+                                <span class="text-sm font-bold text-indigo-600">{{ $totalAcara }}</span>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-2.5 overflow-hidden">
+                                <div class="bg-gradient-to-r from-indigo-500 to-purple-600 h-2.5 rounded-full transition-all duration-500 shadow-lg shadow-indigo-500/30"
+                                    style="width: 75%"></div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="flex justify-between mb-2">
+                                <span class="text-sm text-gray-600 font-medium">Tingkat Konversi</span>
+                                <span class="text-sm font-bold text-indigo-600">42%</span>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-2.5 overflow-hidden">
+                                <div class="bg-gradient-to-r from-indigo-500 to-purple-600 h-2.5 rounded-full transition-all duration-500 shadow-lg shadow-indigo-500/30"
+                                    style="width: 42%"></div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div> --}}
+
+                <!-- Recent Activity -->
+                <div
+                    class="bg-white rounded-2xl shadow-md border border-indigo-100 p-7 hover:shadow-xl transition-all">
+                    <h3 class="font-bold text-lg text-gray-900 mb-5 flex items-center gap-3">
+                        <div class="bg-gradient-to-br from-indigo-500 to-purple-600 p-2.5 rounded-xl shadow-sm">
+                            <i data-lucide="activity" class="w-5 h-5 text-white"></i>
+                        </div>
+                        Aktivitas Terbaru
+                    </h3>
+                    <div class="space-y-4">
+                        <div
+                            class="flex items-start group cursor-pointer p-3 -mx-3 rounded-xl hover:bg-indigo-50 transition-colors">
+                            <div
+                                class="bg-gradient-to-br from-indigo-100 to-purple-100 p-2.5 rounded-xl mr-3 flex-shrink-0 group-hover:scale-110 transition-transform">
+                                <i data-lucide="check-circle-2" class="w-4 h-4 text-indigo-600"></i>
+                            </div>
+                            <div>
+                                <p class="text-sm font-semibold text-gray-900">Tiket baru terjual</p>
+                                <p class="text-xs text-gray-500 flex items-center gap-1 mt-1">
+                                    <i data-lucide="clock" class="w-3 h-3"></i>
+                                    5 menit lalu
+                                </p>
+                            </div>
+                        </div>
+                        <div
+                            class="flex items-start group cursor-pointer p-3 -mx-3 rounded-xl hover:bg-indigo-50 transition-colors">
+                            <div
+                                class="bg-gradient-to-br from-indigo-100 to-purple-100 p-2.5 rounded-xl mr-3 flex-shrink-0 group-hover:scale-110 transition-transform">
+                                <i data-lucide="user-plus" class="w-4 h-4 text-indigo-600"></i>
+                            </div>
+                            <div>
+                                <p class="text-sm font-semibold text-gray-900">Pendaftar baru</p>
+                                <p class="text-xs text-gray-500 flex items-center gap-1 mt-1">
+                                    <i data-lucide="clock" class="w-3 h-3"></i>
+                                    15 menit lalu
+                                </p>
+                            </div>
+                        </div>
+                        <div
+                            class="flex items-start group cursor-pointer p-3 -mx-3 rounded-xl hover:bg-indigo-50 transition-colors">
+                            <div
+                                class="bg-gradient-to-br from-indigo-100 to-purple-100 p-2.5 rounded-xl mr-3 flex-shrink-0 group-hover:scale-110 transition-transform">
+                                <i data-lucide="credit-card" class="w-4 h-4 text-indigo-600"></i>
+                            </div>
+                            <div>
+                                <p class="text-sm font-semibold text-gray-900">Pembayaran diterima</p>
+                                <p class="text-xs text-gray-500 flex items-center gap-1 mt-1">
+                                    <i data-lucide="clock" class="w-3 h-3"></i>
+                                    1 jam lalu
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </x-app-layout>

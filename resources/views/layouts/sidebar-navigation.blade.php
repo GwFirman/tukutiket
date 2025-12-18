@@ -113,7 +113,7 @@
                             </x-nav-link>
                         @endif
 
-                        <x-nav-link :href="route('pembuat.acara.edit', $acaraId)" :active="request()->routeIs('pembuat.acara.edit')" class="mt-1 group">
+                        <x-nav-link :href="route('pembuat.acara.edit', $acaraSlug)" :active="request()->routeIs('pembuat.acara.edit')" class="mt-1 group">
                             <i data-lucide="edit" class="size-4 mr-2"></i>
                             {{ __('Edit Acara') }}
                         </x-nav-link>
@@ -131,9 +131,14 @@
                     {{ __('Daftar Peserta') }}
                 </x-nav-link>
 
-                <x-nav-link :href="route('pembuat.scan.index', $acaraSlug)" class="group pl-4">
+                <x-nav-link :href="route('pembuat.checkin.index', $acaraSlug)" :active="request()->routeIs('pembuat.checkin.index')" class="group pl-4">
                     <i data-lucide="user-round-check" class="size-4 mr-2"></i>
                     {{ __('Check in peserta') }}
+                </x-nav-link>
+
+                <x-nav-link :href="route('pembuat.checkout.index', $acaraSlug)" :active="request()->routeIs('pembuat.checkout.index')" class="group pl-4">
+                    <i data-lucide="user-round-minus" class="size-4 mr-2"></i>
+                    {{ __('Check out peserta') }}
                 </x-nav-link>
 
                 <x-nav-link :href="route('dashboard', request()->route('acara'))" class="group pl-4">
@@ -152,14 +157,6 @@
             {{ __('Profile Kreator') }}
         </x-nav-link>
 
-        @if ($isVerified)
-            <div class="flex items-center px-3 py-2 text-gray-400 cursor-not-allowed opacity-50"
-                title="Verifikasi akun untuk mengakses">
-                <i data-lucide="settings" class="size-5 mr-2"></i>
-                <span>{{ __('Pengaturan') }}</span>
-                <i data-lucide="lock" class="size-3 ml-auto"></i>
-            </div>
-        @endif
 
         {{-- Verifikasi Data selalu aktif --}}
         <x-nav-link :href="route('pembuat.verifikasi-data.index')" :active="request()->routeIs('pembuat.verifikasi-data.index')" class="group">

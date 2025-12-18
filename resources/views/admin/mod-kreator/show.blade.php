@@ -1,15 +1,12 @@
 <x-admin>
     <x-slot:header>
         <div class="flex items-center justify-between">
-            <div class="flex items-center gap-4">
-                <a href="{{ route('admin.mod-kreator') }}"
-                    class="p-2 bg-gray-100 text-gray-600 rounded-lg hover:bg-gray-200 transition-colors">
-                    <i data-lucide="arrow-left" class="w-5 h-5"></i>
-                </a>
-                <div>
-                    <h2 class="text-2xl font-bold text-gray-900">Detail Verifikasi Kreator</h2>
-                    <p class="text-gray-600 text-sm mt-1">Review dokumen verifikasi kreator</p>
-                </div>
+            <div class="flex items-center gap-2 ">
+                <i data-lucide="shield" class="size-5 text-gray-600"></i>
+                <i data-lucide="chevron-right" class="size-4 font-medium text-gray-400"></i>
+                <p class="font-medium">Moderasi Kreator</p>
+                <i data-lucide="chevron-right" class="size-4 font-medium text-gray-400"></i>
+                <p class="font-medium">Detail Verifikasi</p>
             </div>
             <div>
                 @if ($verifikasi->status === 'pending')
@@ -122,8 +119,7 @@
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <!-- Foto KTP -->
                             <div class="group h-full">
-                                <div
-                                    class="border-2 border-gray-200 rounded-xl p-4 hover:border-indigo-300 transition-colors h-full flex flex-col">
+                                <div class=" rounded-xl p-4 bg-indigo-50 transition-colors h-full flex flex-col">
                                     <div class="flex items-center justify-between mb-3">
                                         <h4 class="text-sm font-semibold text-gray-900 flex items-center gap-2">
                                             <span
@@ -154,11 +150,6 @@
                                                     </a>
                                                 </div>
                                             </div>
-                                            <a href="{{ asset('storage/' . $verifikasi->foto_ktp) }}" download
-                                                class="inline-flex items-center gap-2 text-indigo-600 hover:text-indigo-700 font-medium text-sm transition-colors">
-                                                <i data-lucide="download" class="w-4 h-4"></i>
-                                                Download KTP
-                                            </a>
                                         @else
                                             <div
                                                 class="bg-gray-50 rounded-lg text-center border-2 border-dashed border-gray-200 flex-1 min-h-[200px] flex flex-col items-center justify-center">
@@ -174,8 +165,7 @@
 
                             <!-- Foto NPWP -->
                             <div class="group h-full">
-                                <div
-                                    class="border-2 border-gray-200 rounded-xl p-4 hover:border-indigo-300 transition-colors h-full flex flex-col">
+                                <div class="rounded-xl p-4 bg-indigo-50 transition-colors h-full flex flex-col">
                                     <div class="flex items-center justify-between mb-3">
                                         <h4 class="text-sm font-semibold text-gray-900 flex items-center gap-2">
                                             <span

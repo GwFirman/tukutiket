@@ -4,6 +4,8 @@ namespace App\Http\Controllers\PembuatAcara;
 
 use App\Http\Controllers\Controller;
 use App\Models\Acara;
+use App\Models\EventKategori;
+use App\Models\kategori;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -30,8 +32,9 @@ class AcaraController extends Controller
     public function create()
     {
         $kreator = Auth::user()->kreator;
+        $kategori = kategori::all();
 
-        return view('pembuat_acara.acara.create', compact('kreator'));
+        return view('pembuat_acara.acara.create', compact('kreator', 'kategori'));
     }
 
     /**
@@ -43,6 +46,7 @@ class AcaraController extends Controller
             'banner_acara' => 'nullable|image|mimes:jpg,jpeg,png',
             'nama_acara' => 'required|string|max:255',
             'id_kreator' => 'required|string',
+            'id_kategori' => 'required|exists:kategori,id',
             'waktu_mulai' => 'required|date',
             'waktu_selesai' => 'required|date',
             'lokasi' => 'required|string',
@@ -70,6 +74,12 @@ class AcaraController extends Controller
         }
 
         $acara->save();
+
+        // Simpan relasi acara dengan kategori
+        \App\Models\EventKategori::create([
+            'id_acara' => $acara->id,
+            'id_kategori' => $request->id_kategori,
+        ]);
 
         // Simpan kategori tiket gratis
         if ($request->has('kategori_tiket') && is_array($request->kategori_tiket)) {
@@ -125,6 +135,7 @@ class AcaraController extends Controller
         $validated = $request->validate([
             'banner_acara' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
             'nama_acara' => 'required|string|max:255',
+            'id_kategori' => 'nullable|exists:kategori,id',
             'waktu_mulai' => 'required|date',
             'waktu_selesai' => 'required|date|after_or_equal:waktu_mulai',
             'lokasi' => 'required|string',
@@ -171,6 +182,18 @@ class AcaraController extends Controller
         }
 
         $acara->save();
+
+        // ✅ Update relasi kategori acara jika ada perubahan
+        if ($request->has('id_kategori') && $request->id_kategori) {
+            // Hapus relasi lama
+            EventKategori::where('id_acara', $acara->id)->delete();
+
+            // Buat relasi baru
+            EventKategori::create([
+                'id_acara' => $acara->id,
+                'id_kategori' => $request->id_kategori,
+            ]);
+        }
 
         // ✅ Kelola jenis tiket (gratis dan berbayar)
         if ($request->has('kategori_tiket') && is_array($request->kategori_tiket)) {
@@ -243,6 +266,9 @@ class AcaraController extends Controller
 
         // Hapus jenis tiket terkait
         $acara->jenisTiket()->delete();
+
+        // Hapus relasi kategori acara
+        EventKategori::where('id_acara', $acara->id)->delete();
 
         // Hapus acara
         $acara->delete();

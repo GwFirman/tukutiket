@@ -121,10 +121,10 @@ class PesananController extends Controller
     public function show(Acara $checkout)
     {
         $checkout->load('jenisTiket');
-        // dd($checkout);
 
-        // dd($acara);
-        return view('pembeli.acara.checkout', ['acara' => $checkout]);
+        $user = Auth::user();
+
+        return view('pembeli.acara.checkout', ['acara' => $checkout, 'user' => $user]);
 
     }
 

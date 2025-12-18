@@ -15,7 +15,7 @@
     </x-nav-link>
 
     <!-- Moderasi Kreator -->
-    <x-nav-link :href="route('admin.mod-kreator')" :active="request()->routeIs('admin.moderasi.kreator.*')" class="mt-1 group">
+    <x-nav-link :href="route('admin.mod-kreator')" :active="request()->routeIs('admin.mod-kreator')" class="mt-1 group">
         <i data-lucide="users" class="size-5 mr-2"></i>
         {{ __('Moderasi Kreator') }}
     </x-nav-link>

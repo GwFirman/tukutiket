@@ -1,9 +1,10 @@
 <x-admin>
     <x-slot:header>
-        <div class="flex items-center justify-between">
-            <div>
-                <h2 class="text-2xl font-bold text-gray-900">Moderasi Verifikasi Kreator</h2>
-                <p class="text-gray-600 text-sm mt-1">Kelola dan review dokumen verifikasi kreator</p>
+        <div class="flex items-center justify-between mx-2">
+            <div class="flex items-center gap-2 mb-4">
+                <i data-lucide="shield" class="size-5 text-gray-600"></i>
+                <i data-lucide="chevron-right" class="size-4 font-medium text-gray-400"></i>
+                <p class="font-medium">Moderasi Kreator</p>
             </div>
             <div class="flex items-center gap-2">
                 <span class="px-3 py-1 bg-indigo-100 text-indigo-700 rounded-full text-sm font-medium">
@@ -16,7 +17,8 @@
     <div class="p-6 space-y-6 max-w-7xl mx-auto">
         <!-- Flash Message -->
         @if (session('success'))
-            <div class="bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded-lg flex items-center gap-2">
+            <div
+                class="bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded-lg flex items-center gap-2">
                 <i data-lucide="check-circle" class="w-5 h-5"></i>
                 {{ session('success') }}
             </div>
@@ -30,7 +32,7 @@
         @endif
 
         <!-- Filter dan Search -->
-        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <div class="bg-white rounded-xl border border-gray-200 p-6">
             <form method="GET" action="{{ route('admin.mod-kreator') }}">
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
                     <div>
@@ -73,8 +75,7 @@
 
         <!-- Status Summary -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div
-                class="bg-gradient-to-br from-amber-50 to-white rounded-xl shadow-sm border border-amber-100 p-5 hover:shadow-md transition-shadow">
+            <div class="bg-gradient-to-br from-amber-50 to-white rounded-xl  border border-amber-100 p-5 ">
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-amber-700 text-sm font-medium">Pending Review</p>
@@ -85,8 +86,7 @@
                     </div>
                 </div>
             </div>
-            <div
-                class="bg-gradient-to-br from-emerald-50 to-white rounded-xl shadow-sm border border-emerald-100 p-5 hover:shadow-md transition-shadow">
+            <div class="bg-gradient-to-br from-emerald-50 to-white rounded-xl  border border-emerald-100 p-5 ">
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-emerald-700 text-sm font-medium">Disetujui</p>
@@ -97,8 +97,7 @@
                     </div>
                 </div>
             </div>
-            <div
-                class="bg-gradient-to-br from-rose-50 to-white rounded-xl shadow-sm border border-rose-100 p-5 hover:shadow-md transition-shadow">
+            <div class="bg-gradient-to-br from-rose-50 to-white rounded-xl  border border-rose-100 p-5 ">
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-rose-700 text-sm font-medium">Ditolak</p>
@@ -112,7 +111,7 @@
         </div>
 
         <!-- Tabel Verifikasi -->
-        <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+        <div class="bg-white rounded-xl  border border-gray-200 overflow-hidden">
             <div class="px-6 py-4 border-b border-gray-200 bg-gradient-to-r from-indigo-50 to-white">
                 <h3 class="text-lg font-semibold text-gray-900">Daftar Verifikasi Kreator</h3>
             </div>

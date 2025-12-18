@@ -14,6 +14,7 @@ class TiketPeserta extends Model
     protected $fillable = [
         'id_detail_pesanan',
         'kode_tiket',
+        'nomor_tiket',
         'nama_peserta',
         'email_peserta',
         'no_telp_peserta',

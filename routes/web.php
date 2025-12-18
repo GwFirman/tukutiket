@@ -11,6 +11,8 @@ use App\Http\Controllers\Pembeli\PesananController;
 use App\Http\Controllers\Pembeli\TiketController;
 use App\Http\Controllers\PembeliController;
 use App\Http\Controllers\PembuatAcara\AcaraController as PembuatAcaraController;
+use App\Http\Controllers\PembuatAcara\CheckinController;
+use App\Http\Controllers\PembuatAcara\ChekoutController as ScanCheckoutController;
 use App\Http\Controllers\PembuatAcara\DashboardController as DashboardPembuatController;
 use App\Http\Controllers\PembuatAcara\KreatorController;
 use App\Http\Controllers\PembuatAcara\LaporanPenjualanController;
@@ -63,9 +65,19 @@ Route::middleware(['auth', 'role:kreator'])
         Route::resource('/acara', PembuatAcaraController::class);
         Route::get('/acara/daftar-peserta/{acara}', [PembuatAcaraController::class, 'daftarPeserta'])->name('acara.daftar-peserta');
         Route::get('/acara/laporan-penjualan/{acara}', [LaporanPenjualanController::class, 'LaporanPenjualan'])->name('acara.laporan-penjualan');
+
         Route::get('/acara/scan/{acara}', [ScanController::class, 'index'])->name('scan.index');
         Route::post('/acara/scan/check/{acara}', [ScanController::class, 'check'])
             ->name('scan.check');
+
+        Route::get('/acara/checkin/{acara}', [CheckinController::class, 'index'])->name('checkin.index');
+        Route::post('/acara/checkin/check/{acara}', [CheckinController::class, 'checkIn'])
+            ->name('scan.checkin');
+
+        Route::get('/acara/checkout/{acara}', [ScanCheckoutController::class, 'index'])->name('checkout.index');
+        Route::post('/acara/checkout/check/{acara}', [ScanCheckoutController::class, 'checkOut'])
+            ->name('scan.checkout');
+
         Route::get('/create2', function () {
             return view('pembuat_acara.acara.create2');
         });

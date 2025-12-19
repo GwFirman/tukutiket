@@ -4,7 +4,9 @@ namespace App\Http\Controllers\All;
 
 use App\Http\Controllers\Controller;
 use App\Models\Acara;
+use App\Models\Pesanan;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class BerandaController extends Controller
 {
@@ -44,7 +46,14 @@ class BerandaController extends Controller
         $acara->load('jenisTiket');
 
         // dd($acara);
-        return view('pembeli.acara.show', compact('acara'));
+
+        $alreadyBought = $acara->satu_transaksi_per_akun && Pesanan::where('id_pembeli', Auth::id())
+            ->whereHas('detailPesanan.jenisTiket', fn ($q) => $q->where('id_acara', $acara->id)
+            )
+            ->whereIn('status_pembayaran', ['paid', 'pending'])
+            ->exists();
+
+        return view('pembeli.acara.show', compact('acara', 'alreadyBought'));
     }
 
     /**

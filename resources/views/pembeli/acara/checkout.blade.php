@@ -70,7 +70,7 @@
                                                 </button>
                                             </div>
                                             <div>
-                                                <div x-data="ticketCounter({{ $tiket->id }}, '{{ $tiket->nama_jenis }}', {{ $tiket->harga }}, {{ $acara->maks_tiket_per_transaksi ?? 5 }})"
+                                                <div x-data="ticketCounter({{ $tiket->id }}, '{{ $tiket->nama_jenis }}', {{ $tiket->harga }}, {{ $maksTiket ?? ($acara->maks_tiket_per_transaksi ?? 5) }})"
                                                     class="flex items-center gap-3 bg-gray-100 rounded-full px-3 py-2 w-fit">
                                                     <!-- Tombol Minus -->
                                                     <button type="button" @click="decrementTicket()"
@@ -167,7 +167,7 @@
 
                     <script>
                         const cart = {};
-                        const MAX_TICKETS = {{ $acara->maks_tiket_per_transaksi ?? 5 }};
+                        const MAX_TICKETS = @json($maksTiket ?? ($acara->maks_tiket_per_transaksi ?? 5));
                         let savedPesertaData = {}; // Menyimpan data peserta yang sudah diisi
 
                         function getTotalTickets() {
@@ -416,7 +416,7 @@
                     <div class="flex items-center justify-between mb-4">
                         <p class="text-gray-800 font-medium">Informasi Pemesan</p>
                         <span id="ticket_count"
-                            class="text-xs px-2 py-1 rounded-full bg-indigo-100 text-indigo-600">0/{{ $acara->maks_tiket_per_transaksi ?? 5 }}
+                            class="text-xs px-2 py-1 rounded-full bg-indigo-100 text-indigo-600">0/{{ $maksTiket ?? ($acara->maks_tiket_per_transaksi ?? 5) }}
                             tiket</span>
                     </div>
                     <div class="border-t border-gray-200 mb-4"></div>
@@ -469,7 +469,8 @@
                     <!-- Data Peserta Dinamis -->
                     <div class="flex items-center justify-between mb-4">
                         <p class="text-gray-800 font-medium">Data Peserta</p>
-                        <span class="text-xs text-gray-500">Maks {{ $acara->maks_tiket_per_transaksi ?? 5 }}
+                        <span class="text-xs text-gray-500">Maks
+                            {{ $maksTiket ?? ($acara->maks_tiket_per_transaksi ?? 5) }}
                             peserta</span>
                     </div>
                     <div class="border-t border-gray-200 mb-4"></div>

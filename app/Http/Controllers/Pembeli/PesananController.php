@@ -124,7 +124,9 @@ class PesananController extends Controller
 
         $user = Auth::user();
 
-        return view('pembeli.acara.checkout', ['acara' => $checkout, 'user' => $user]);
+        $maksTiket = $checkout->maks_tiket_per_transaksi;
+
+        return view('pembeli.acara.checkout', ['acara' => $checkout, 'user' => $user, 'maksTiket' => $maksTiket]);
 
     }
 

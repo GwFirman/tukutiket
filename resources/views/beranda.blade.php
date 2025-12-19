@@ -33,7 +33,7 @@
                     <!-- Search Bar with Filters -->
                     <form action="{{ route('beranda') }}" method="GET"
                         class="animate-fade-in-up animation-delay-300 px-2 sm:px-0">
-                        <div class="bg-white rounded-xl sm:rounded-2xl shadow-xl p-2 sm:p-3 flex flex-col gap-2">
+                        <div class="bg-white rounded-xl sm:rounded-2xl shadow-xl p-2  flex gap-2">
                             <!-- Search Input -->
                             <div class="flex-1 relative">
                                 <div class="absolute inset-y-0 left-3 sm:left-4 flex items-center pointer-events-none">
@@ -82,7 +82,7 @@
 
                                 <!-- Search Button -->
                                 <button type="submit"
-                                    class="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-semibold py-3 sm:py-4 px-6 sm:px-8 rounded-lg sm:rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl flex items-center justify-center gap-2 text-sm sm:text-base">
+                                    class="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-semibold py-2 sm:py-2 px-6 sm:px-8 rounded-lg sm:rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl flex items-center justify-center gap-2 text-sm sm:text-base">
                                     <i data-lucide="search" class="w-4 h-4 sm:w-5 sm:h-5"></i>
                                     <span>Cari</span>
                                 </button>
@@ -125,7 +125,7 @@
                 <div
                     class="inline-flex items-center bg-indigo-100 text-indigo-800 px-3 py-1.5 sm:px-4 sm:py-2 rounded-full mb-3 sm:mb-4">
                     <i data-lucide="calendar-check" class="w-3 h-3 sm:w-4 sm:h-4 mr-1.5 sm:mr-2"></i>
-                    <span class="text-xs sm:text-sm font-semibold">Hot event</span>
+                    <span class="text-xs sm:text-sm font-semibold">Hot event </span>
                 </div>
                 <h2 class="text-2xl sm:text-3xl md:text-4xl font-extrabold text-gray-900 mb-3 sm:mb-4">Acara Mendatang
                 </h2>

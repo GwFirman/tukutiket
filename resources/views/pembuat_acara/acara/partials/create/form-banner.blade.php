@@ -5,21 +5,34 @@
         <!-- Dropzone -->
         <div id="bannerPreview"
             class="flex items-center justify-center w-full h-64 border-2 border-dashed border-gray-300 rounded-lg bg-gray-50 cursor-pointer hover:bg-gray-100 transition">
-            <span class="text-gray-500 text-sm text-center">
+            <span class="text-gray-500 text-sm text-center" id="dropzoneText">
                 <strong>Seret dan letakkan gambar di sini</strong><br>
                 atau klik untuk memilih file
             </span>
-            <img id="previewImage" class="hidden w-full h-full object-cover rounded-lg" alt="Preview Banner">
+            <img id="previewImage"
+                src="{{ old('banner_acara') ?? (isset($acara) && $acara->banner_acara ? asset('storage/' . $acara->banner_acara) : '') }}"
+                class="{{ old('banner_acara') || (isset($acara) && $acara->banner_acara) ? '' : 'hidden' }} w-full h-full object-cover rounded-lg"
+                alt="Preview Banner">
         </div>
 
         <!-- Input tersembunyi -->
         <input type="file" name="banner_acara" id="banner_acara" accept="image/*" class="hidden" />
+
+        @error('banner_acara')
+            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+        @enderror
     </div>
 
     <script>
         const dropzone = document.getElementById('bannerPreview');
         const input = document.getElementById('banner_acara');
         const previewImg = document.getElementById('previewImage');
+        const dropzoneText = document.getElementById('dropzoneText');
+
+        // Cek jika sudah ada gambar preview saat halaman load
+        if (previewImg.src && !previewImg.classList.contains('hidden')) {
+            dropzoneText.classList.add('hidden');
+        }
 
         // Klik area dropzone untuk membuka file dialog
         dropzone.addEventListener('click', () => input.click());
@@ -57,7 +70,7 @@
                 reader.onload = (e) => {
                     previewImg.src = e.target.result;
                     previewImg.classList.remove('hidden');
-                    dropzone.querySelector('span').classList.add('hidden');
+                    dropzoneText.classList.add('hidden');
                 };
                 reader.readAsDataURL(file);
             }

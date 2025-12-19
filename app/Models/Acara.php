@@ -23,7 +23,7 @@ class Acara extends Model
         'banner_tiket',
         'waktu_mulai',
         'waktu_selesai',
-        'info_kontak',
+        'no_telp_narahubung',
         'status',
         'maks_pembelian_per_akun',
         'maks_tiket_per_transaksi',

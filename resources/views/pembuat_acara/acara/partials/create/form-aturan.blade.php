@@ -1,7 +1,7 @@
 <div class="mt-4 rounded-2xl border border-gray-200 bg-white">
     <div class="px-5 py-4 sm:px-6 sm:py-5">
         <h3 class="text-base font-medium text-gray-800">
-            Tambah Aturan
+            Aturan Pembelian
         </h3>
     </div>
     <div class="space-y-6 border-t border-gray-100 p-5 sm:p-6">
@@ -22,7 +22,7 @@
                     <option value="1">1 tiket</option>
                 </select>
             </div>
-            <div class="flex items-center justify-between gap-4" x-data="{ switchToggle: false }">
+            <div class="flex items-center justify-between gap-4" x-data="{ switchToggle: @json((bool) old('satu_transaksi_per_akun', isset($acara) ? $acara->satu_transaksi_per_akun : false)) }">
                 <div class="">
                     <label for="">1 Tiket per Akun</label>
                     <p class="text-sm text-gray-400">1 Akun hanya dapat membeli 1 tiket</p>
@@ -30,17 +30,17 @@
                 <div class="flex items-center">
                     <label for="switchToggle" class="flex cursor-pointer items-center">
                         <div class="relative">
-                            <input type="checkbox" id="switchToggle" class="sr-only" name="satu_tiket_per_akun"
-                                @change="switchToggle = !switchToggle" />
+                            <!-- selalu kirim 0 saat tidak dicentang -->
+                            <input type="hidden" name="satu_transaksi_per_akun" value="0" />
+                            <input type="checkbox" id="switchToggle" class="sr-only" name="satu_transaksi_per_akun"
+                                value="1" x-model="switchToggle" />
                             <div :class="switchToggle ? 'bg-blue-500' : 'bg-gray-300'"
-                                class="block h-6 w-11 rounded-full transition-colors duration-200 ease-in-out">
-                            </div>
+                                class="block h-6 w-11 rounded-full transition-colors duration-200 ease-in-out"></div>
                             <div :class="switchToggle ? 'translate-x-5' : 'translate-x-0'"
                                 class="absolute left-1 top-1 h-4 w-4 rounded-full bg-white transition-transform duration-200 ease-in-out">
                             </div>
                         </div>
                     </label>
-                    <input type="hidden" name="maks_pembelian_per_akun" :value="switchToggle ? 1 : 0" />
                 </div>
             </div>
 

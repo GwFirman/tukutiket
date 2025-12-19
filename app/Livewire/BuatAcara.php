@@ -14,7 +14,7 @@ class BuatAcara extends Component
 
     public $lokasi;
 
-    public $info_kontak;
+    public $no_telp_narahubung;
 
     public $waktu_mulai = '';
 

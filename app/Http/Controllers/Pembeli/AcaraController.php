@@ -11,10 +11,7 @@ class AcaraController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
-    {
-        
-    }
+    public function index() {}
 
     /**
      * Show the form for creating a new resource.
@@ -35,13 +32,7 @@ class AcaraController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Acara $acara)
-    {
-        $acara->load('jenisTiket');
-
-        // dd($acara);
-        return view('pembeli.acara.show',compact('acara'));   
-    }
+    public function show(Acara $acara) {}
 
     /**
      * Show the form for editing the specified resource.

@@ -271,7 +271,7 @@
                                 <i data-lucide="phone" class="size-4 text-indigo-500"></i>
                                 Informasi Kontak
                             </h4>
-                            <p class="text-gray-700">{{ $acara->info_kontak ?? '-' }}</p>
+                            <p class="text-gray-700">{{ $acara->no_telp_narahubung ?? '-' }}</p>
                         </div>
 
                         <div class="border-t border-gray-100"></div>

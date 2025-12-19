@@ -19,16 +19,17 @@
             <!-- Mobile header -->
             {{-- <div class="sticky top-0 z-20 px-4 py-4 bg-white sm:px-6 border-b lg:hidden">
                 <button @click="sidebarOpen = true"
-                    class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M4 6h16M4 12h16M4 18h16" />
-                    </svg>
-                </button>
-            </div> --}}
+                        </svg>
+                    </button>
+                </div> --}}
 
             <!-- Main content -->
             <main class="max-w-7xl mx-auto">
+
                 <div class="py-6 sm:py-8 lg:py-12 px-4 sm:px-6 ">
                     <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 lg:gap-6">
                         <!-- Main Content Card -->
@@ -50,6 +51,12 @@
                                     {{ $acara->nama_acara }}
                                 </div>
 
+                                @if ($alreadyBought ?? false)
+                                    <div
+                                        class="my-3 rounded-md bg-yellow-50 border-l-4 border-yellow-400 p-3 text-yellow-700 text-sm">
+                                        Kamu sudah membeli tiket untuk acara ini.
+                                    </div>
+                                @endif
 
 
                                 <!-- Deskripsi -->
@@ -249,20 +256,26 @@
                                         Informasi Kontak
                                     </p>
                                     <p class="ml-6 text-gray-600 text-xs sm:text-base leading-relaxed">
-                                        {{ $acara->info_kontak }}
+                                        {{ $acara->no_telp_narahubung }}
                                     </p>
                                 </div>
 
                                 <div class="border-t border-gray-200 my-5"></div>
 
                                 <!-- CTA Button -->
-                                <a href="{{ route('pembeli.checkout.show', $acara->slug ?? 1) }}"
-                                    class="bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 w-full text-white font-semibold py-3 px-4 rounded-xl transition duration-200 text-center text-sm sm:text-base shadow-md hover:shadow-lg flex items-center justify-center">
-                                    <i data-lucide="shopping-cart" class="inline mr-2 size-4"></i>
-                                    <p>
+                                @if ($alreadyBought ?? false)
+                                    <button type="button" disabled aria-disabled="true"
+                                        class="w-full text-white font-semibold py-3 px-4 rounded-xl transition duration-200 text-sm sm:text-base shadow-md flex items-center justify-center bg-gray-400 opacity-70 cursor-not-allowed">
+                                        <i data-lucide="shopping-cart" class="inline mr-2 size-4"></i>
                                         Beli Tiket Sekarang
-                                    </p>
-                                </a>
+                                    </button>
+                                @else
+                                    <a href="{{ route('pembeli.checkout.show', $acara->slug ?? 1) }}"
+                                        class="bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 w-full text-white font-semibold py-3 px-4 rounded-xl transition duration-200 text-sm sm:text-base shadow-md hover:shadow-lg flex items-center justify-center">
+                                        <i data-lucide="shopping-cart" class="inline mr-2 size-4"></i>
+                                        <p>Beli Tiket Sekarang</p>
+                                    </a>
+                                @endif
                             </div>
                         </div>
                     </div>

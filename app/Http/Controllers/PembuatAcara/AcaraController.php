@@ -42,6 +42,7 @@ class AcaraController extends Controller
      */
     public function store(Request $request)
     {
+        // dd($request);
         $validate = $request->validate([
             'banner_acara' => 'nullable|image|mimes:jpg,jpeg,png',
             'nama_acara' => 'required|string|max:255',
@@ -51,8 +52,8 @@ class AcaraController extends Controller
             'waktu_selesai' => 'required|date',
             'lokasi' => 'required|string',
             'deskripsi_acara' => 'required|string',
-            'maks_pembelian_per_akun' => 'required',
-            'maks_tiket_per_transaksi' => 'required',
+            'satu_transaksi_per_akun' => 'boolean',
+            'maks_tiket_per_transaksi' => 'required|integer|min:1',
         ]);
 
         $acara = new Acara;
@@ -63,9 +64,9 @@ class AcaraController extends Controller
         $acara->lokasi = $request->lokasi;
         $acara->waktu_mulai = $request->waktu_mulai;
         $acara->waktu_selesai = $request->waktu_selesai;
-        $acara->info_kontak = $request->info_kontak;
+        $acara->no_telp_narahubung = $request->no_telp_narahubung;
         $acara->status = 'published';
-        $acara->maks_pembelian_per_akun = $request->maks_pembelian_per_akun;
+        $acara->satu_transaksi_per_akun = $request->boolean('satu_transaksi_per_akun');
         $acara->maks_tiket_per_transaksi = $request->maks_tiket_per_transaksi;
 
         if ($request->hasFile('banner_acara')) {
@@ -131,7 +132,6 @@ class AcaraController extends Controller
      */
     public function update(Request $request, $id)
     {
-        // ✅ Validasi input
         $validated = $request->validate([
             'banner_acara' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
             'nama_acara' => 'required|string|max:255',
@@ -140,8 +140,8 @@ class AcaraController extends Controller
             'waktu_selesai' => 'required|date|after_or_equal:waktu_mulai',
             'lokasi' => 'required|string',
             'deskripsi_acara' => 'required|string',
-            'maks_pembelian_per_akun' => 'required|numeric|min:0',
-            'maks_tiket_per_transaksi' => 'required|numeric|min:1',
+            'satu_transaksi_per_akun' => 'boolean',
+            'maks_tiket_per_transaksi' => 'required|integer|min:1',
             'kategori_tiket' => 'array',
             'kategori_tiket.*.nama' => 'required_with:kategori_tiket|string',
             'kategori_tiket.*.harga' => 'nullable|numeric|min:0',
@@ -163,9 +163,9 @@ class AcaraController extends Controller
             'lokasi' => $request->lokasi,
             'waktu_mulai' => $request->waktu_mulai,
             'waktu_selesai' => $request->waktu_selesai,
-            'info_kontak' => $request->info_kontak,
+            'no_telp_narahubung' => $request->no_telp_narahubung,
             'status' => 'published',
-            'maks_pembelian_per_akun' => $request->maks_pembelian_per_akun,
+            'satu_transaksi_per_akun' => $request->boolean('satu_transaksi_per_akun'),
             'maks_tiket_per_transaksi' => $request->maks_tiket_per_transaksi,
         ]);
 

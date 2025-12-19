@@ -123,20 +123,22 @@
                     <div class="border-t border-gray-200 my-4"></div>
                     <p class="text-gray-800 font-medium">Informasi Kontak</p>
                     <div class="text-gray-600 mt-2">
-                        {{ $acara->info_kontak }}
+                        {{ $acara->no_telp_narahubung }}
                     </div>
                     <div class="border-t border-gray-200 my-4"></div>
                     <p class="text-gray-800 font-medium">Status</p>
                     <div class="mt-2">
-                        @if($acara->status == 'draft')
-                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                        @if ($acara->status == 'draft')
+                            <span
+                                class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
                                 <svg class="mr-1.5 h-2 w-2 text-yellow-400" fill="currentColor" viewBox="0 0 8 8">
                                     <circle cx="4" cy="4" r="3" />
                                 </svg>
                                 Draft
                             </span>
                         @elseif($acara->status == 'published')
-                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                            <span
+                                class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
                                 <svg class="mr-1.5 h-2 w-2 text-green-400" fill="currentColor" viewBox="0 0 8 8">
                                     <circle cx="4" cy="4" r="3" />
                                 </svg>

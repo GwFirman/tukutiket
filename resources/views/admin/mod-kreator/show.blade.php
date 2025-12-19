@@ -91,7 +91,7 @@
                 <!-- Catatan Admin (jika sudah di-review) -->
                 @if ($verifikasi->status !== 'pending')
                     <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-                        <div class="flex items-center gap-2 mb-4">
+                        <div class="flex items-center gap-2">
                             <div class="bg-indigo-100 p-2 rounded-lg">
                                 <i data-lucide="message-square" class="w-4 h-4 text-indigo-600"></i>
                             </div>

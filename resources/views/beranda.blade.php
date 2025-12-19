@@ -32,8 +32,8 @@
 
                     <!-- Search Bar with Filters -->
                     <form action="{{ route('beranda') }}" method="GET"
-                        class="animate-fade-in-up animation-delay-300 px-2 sm:px-0">
-                        <div class="bg-white rounded-xl sm:rounded-2xl shadow-xl p-2  flex gap-2">
+                        class="animate-fade-in-up animation-delay-300 px-2 sm:px-0" x-data="{ filterOpen: false }">
+                        <div class="bg-white rounded-xl sm:rounded-2xl shadow-xl p-2 flex gap-2">
                             <!-- Search Input -->
                             <div class="flex-1 relative">
                                 <div class="absolute inset-y-0 left-3 sm:left-4 flex items-center pointer-events-none">
@@ -44,8 +44,14 @@
                                     class="w-full pl-10 sm:pl-12 pr-4 py-3 sm:py-4 rounded-lg sm:rounded-xl border-0 focus:ring-2 focus:ring-indigo-500 text-gray-700 placeholder-gray-400 text-sm sm:text-base">
                             </div>
 
-                            <!-- Filters Row -->
-                            <div class="flex flex-col sm:flex-row gap-2">
+                            <!-- Mobile Filter Button -->
+                            <button type="button" @click="filterOpen = !filterOpen"
+                                class="sm:hidden bg-gray-50 hover:bg-gray-100 text-gray-700 font-semibold py-3 px-4 rounded-lg transition-all duration-300 flex items-center justify-center gap-2">
+                                <i data-lucide="sliders-horizontal" class="w-5 h-5"></i>
+                            </button>
+
+                            <!-- Desktop Filters -->
+                            <div class="hidden sm:flex gap-2">
                                 <!-- Location Filter -->
                                 <div class="relative flex-1">
                                     <div
@@ -84,9 +90,61 @@
                                 <button type="submit"
                                     class="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-semibold py-2 sm:py-2 px-6 sm:px-8 rounded-lg sm:rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl flex items-center justify-center gap-2 text-sm sm:text-base">
                                     <i data-lucide="search" class="w-4 h-4 sm:w-5 sm:h-5"></i>
-                                    <span>Cari</span>
                                 </button>
                             </div>
+                        </div>
+
+                        <!-- Mobile Filter Panel -->
+                        <div x-show="filterOpen" x-transition:enter="transition ease-out duration-200"
+                            x-transition:enter-start="opacity-0 -translate-y-2"
+                            x-transition:enter-end="opacity-100 translate-y-0"
+                            x-transition:leave="transition ease-in duration-150"
+                            x-transition:leave-start="opacity-100 translate-y-0"
+                            x-transition:leave-end="opacity-0 -translate-y-2"
+                            class="sm:hidden mt-3 bg-white rounded-xl shadow-lg p-4 space-y-3" style="display: none;">
+                            <!-- Location Filter Mobile -->
+                            <div class="relative">
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Lokasi</label>
+                                <div class="relative">
+                                    <div class="absolute inset-y-0 left-3 flex items-center pointer-events-none">
+                                        <i data-lucide="map-pin" class="w-4 h-4 text-gray-400"></i>
+                                    </div>
+                                    <select name="lokasi"
+                                        class="w-full pl-10 pr-8 py-3 rounded-lg border border-gray-300 bg-white focus:ring-2 focus:ring-indigo-500 text-gray-700 appearance-none cursor-pointer text-sm">
+                                        <option value="">Semua Lokasi</option>
+                                        @foreach ($lokasis ?? [] as $lokasi)
+                                            <option value="{{ $lokasi }}"
+                                                {{ request('lokasi') == $lokasi ? 'selected' : '' }}>
+                                                {{ $lokasi }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                    <div class="absolute inset-y-0 right-3 flex items-center pointer-events-none">
+                                        <i data-lucide="chevron-down" class="w-4 h-4 text-gray-400"></i>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Date Filter Mobile -->
+                            <div class="relative">
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Tanggal</label>
+                                <div class="relative">
+                                    <div class="absolute inset-y-0 left-3 flex items-center pointer-events-none z-10">
+                                        <i data-lucide="calendar" class="w-4 h-4 text-gray-400"></i>
+                                    </div>
+                                    <input type="text" name="tanggal" id="tanggal-filter-mobile"
+                                        value="{{ request('tanggal') }}" placeholder="Pilih Tanggal"
+                                        class="w-full pl-10 pr-4 py-3 rounded-lg border border-gray-300 bg-white focus:ring-2 focus:ring-indigo-500 text-gray-700 placeholder-gray-400 cursor-pointer text-sm"
+                                        readonly>
+                                </div>
+                            </div>
+
+                            <!-- Apply Button -->
+                            <button type="submit"
+                                class="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-semibold py-3 px-4 rounded-lg transition-all duration-300 shadow-lg hover:shadow-xl flex items-center justify-center gap-2">
+                                <i data-lucide="search" class="w-4 h-4"></i>
+                                Terapkan Filter
+                            </button>
                         </div>
 
                         <!-- Quick Filter Tags -->
@@ -147,7 +205,8 @@
                             @else
                                 <div
                                     class="w-full h-40 sm:h-48 md:h-56 flex flex-col items-center justify-center bg-gradient-to-br from-indigo-100 to-purple-100">
-                                    <i data-lucide="image-off" class="w-12 h-12 sm:w-16 sm:h-16 text-gray-400 mb-2"></i>
+                                    <i data-lucide="image-off"
+                                        class="w-12 h-12 sm:w-16 sm:h-16 text-gray-400 mb-2"></i>
                                     <span class="text-gray-500 text-xs sm:text-sm">No Banner Available</span>
                                 </div>
                             @endif

@@ -1,7 +1,7 @@
 <x-admin>
     <x-slot:header>
         <div class="flex items-center justify-between mx-2">
-            <div class="flex items-center gap-2 mb-4">
+            <div class="flex items-center gap-2">
                 <i data-lucide="shield" class="size-5 text-gray-600"></i>
                 <i data-lucide="chevron-right" class="size-4 font-medium text-gray-400"></i>
                 <p class="font-medium">Moderasi Kreator</p>

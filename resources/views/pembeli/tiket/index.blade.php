@@ -1,6 +1,6 @@
 <x-app-layout>
     <x-slot name="header">
-        <div class="flex items-center gap-2 mb-4">
+        <div class="flex items-center gap-2">
             <i data-lucide="ticket" class="size-5 text-gray-600"></i>
             <i data-lucide="chevron-right" class="size-4 font-medium text-gray-400"></i>
             <p class="font-medium">Tiket Saya</p>
@@ -32,14 +32,14 @@
         @if ($tiketList->count() > 0)
 
             {{-- ================= TABS NAVIGATION ================= --}}
-            <div class="flex flex-wrap gap-4 border-b border-gray-200 mb-8 overflow-x-auto">
+            <div class="flex gap-4 mb-8 overflow-x-auto">
                 {{-- Tab Semua --}}
                 <button @click="activeTab = 'all'"
                     :class="activeTab === 'all'
                         ?
                         'border-blue-600 text-blue-600' :
                         'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
-                    class="py-4 px-1 border-b-2 font-medium text-sm transition-colors duration-200 whitespace-nowrap">
+                    class="py-4 px-1 border-b-2 font-medium text-xs md:text-sm transition-colors duration-200 whitespace-nowrap">
                     Semua
                 </button>
 
@@ -49,7 +49,7 @@
                         ?
                         'border-blue-600 text-blue-600' :
                         'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
-                    class="py-4 px-1 border-b-2 font-medium text-sm transition-colors duration-200 flex items-center gap-2 whitespace-nowrap">
+                    class="py-4 px-1 border-b-2 font-medium text-xs md:text-sm transition-colors duration-200 flex items-center gap-2 whitespace-nowrap">
                     Belum Digunakan
                     <span x-show="countBelum > 0" x-text="countBelum"
                         class="px-2 py-0.5 rounded-full bg-blue-50 text-xs text-blue-600 font-bold"></span>
@@ -61,7 +61,7 @@
                         ?
                         'border-blue-600 text-blue-600' :
                         'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
-                    class="py-4 px-1 border-b-2 font-medium text-sm transition-colors duration-200 whitespace-nowrap">
+                    class="py-4 px-1 border-b-2 font-medium text-xs md:text-sm transition-colors duration-200 whitespace-nowrap">
                     Sudah Digunakan
                 </button>
             </div>

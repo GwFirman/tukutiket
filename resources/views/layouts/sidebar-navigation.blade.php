@@ -1,5 +1,5 @@
 <!-- Navigation Links -->
-<nav class="mt-5 px-2">
+<nav class="mt-5 px-2 flex-1">
     <x-nav-link :href="route('beranda')" :active="request()->routeIs('beranda')" class="group">
         <i data-lucide="compass" class="size-5 mr-2"></i>
         {{ __('Jelajahi Acara') }}
@@ -184,5 +184,40 @@
             <i data-lucide="log-out" class="size-5 mr-2"></i>Logout
         </x-nav-link>
     </form>
-
 </nav>
+
+<!-- User Profile Footer -->
+<div class="mt-auto border-2 m-2 rounded-md border-gray-200  dark:border-indigo-100 bg-gray-50 ">
+    <div class="p-4">
+        <div class="flex items-center gap-3">
+            <!-- Avatar -->
+            <div class="flex-shrink-0">
+                @if (auth()->user()->avatar ?? false)
+                    <img src="{{ asset('storage/' . auth()->user()->avatar) }}" alt="{{ auth()->user()->name }}"
+                        class="size-10 rounded-full object-cover border-2 border-gray-200">
+                @else
+                    <div
+                        class="size-10 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-semibold text-sm border-2 border-gray-200">
+                        {{ strtoupper(substr(auth()->user()->name, 0, 2)) }}
+                    </div>
+                @endif
+            </div>
+
+            <!-- User Info -->
+            <div class="flex-1 min-w-0">
+                <p class="text-sm font-medium text-gray-900 truncate">
+                    {{ auth()->user()->name }}
+                </p>
+                <p class="text-xs text-gray-500 dark:text-gray-400 truncate">
+                    {{ auth()->user()->email }}
+                </p>
+            </div>
+
+            <!-- Settings Icon -->
+            <a href="{{ route('profile.edit') }}"
+                class="flex-shrink-0 p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
+                <i data-lucide="settings" class="size-5"></i>
+            </a>
+        </div>
+    </div>
+</div>

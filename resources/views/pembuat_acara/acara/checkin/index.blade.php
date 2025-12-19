@@ -36,7 +36,7 @@
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <!-- Scanner -->
             <div class="rounded-2xl  p-6 bg-white h-fit border border-gray-100">
-                <h3 class="text-lg font-semibold flex items-center gap-2 mb-4">
+                <h3 class="text-lg font-semibold flex items-center gap-2">
                     <div class="bg-indigo-100 p-2 rounded-lg">
                         <i data-lucide="camera" class="size-5 text-indigo-600"></i>
                     </div>

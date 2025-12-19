@@ -20,17 +20,18 @@
 <body class="font-sans antialiased">
     <div x-data="{ sidebarOpen: true }" class="min-h-screen">
         <!-- Sidebar -->
-        <div class="fixed inset-y-0 left-0 z-30 w-64 bg-white border-r border-gray-100  transform transition-transform duration-300" 
-             :class="{'translate-x-0': sidebarOpen, '-translate-x-full': !sidebarOpen}">
+        <div class="fixed inset-y-0 left-0 z-30 w-64 bg-white border-r border-gray-100  transform transition-transform duration-300"
+            :class="{ 'translate-x-0': sidebarOpen, '-translate-x-full': !sidebarOpen }">
             <!-- Logo -->
             <div class="flex items-center justify-center h-16 px-4 border-b border-gray-300">
-                <i data-lucide="ticket" class="size-7 mr-2"></i> 
+                <i data-lucide="ticket" class="size-7 mr-2"></i>
                 <div class="text-xl font-semibold text-gray-800">
                     Tukutiket
                 </div>
                 <button @click="sidebarOpen = false" class="p-2 rounded-md lg:hidden">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M6 18L18 6M6 6l12 12" />
                     </svg>
                 </button>
             </div>
@@ -42,9 +43,11 @@
         <div class="lg:pl-64">
             <!-- Mobile header -->
             <div class="sticky top-0 z-20 px-4 py-4 bg-white sm:px-6 border-b lg:hidden">
-                <button @click="sidebarOpen = true" class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100">
+                <button @click="sidebarOpen = true"
+                    class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M4 6h16M4 12h16M4 18h16" />
                     </svg>
                 </button>
             </div>
@@ -73,4 +76,5 @@
         lucide.createIcons();
     </script>
 </body>
+
 </html>

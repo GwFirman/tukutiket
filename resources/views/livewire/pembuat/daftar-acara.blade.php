@@ -1,7 +1,7 @@
 <div>
     <!-- Search -->
     <div class="bg-white rounded-xl shadow-sm p-6 mb-6">
-        <form wire:submit.prevent="searchAcara" class="flex flex-col md:flex-row gap-4">
+        <form wire:submit.prevent="searchAcara" class="flex  gap-4">
             <div class="flex-1">
                 <div class="relative">
                     <input type="text" wire:model.defer="search" placeholder="Cari nama acara atau lokasi..."
@@ -19,7 +19,6 @@
             <button type="submit"
                 class="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors flex items-center gap-2 shadow-md hover:shadow-lg">
                 <i data-lucide="search" class="size-5"></i>
-                Cari
             </button>
 
             @if ($search)
@@ -85,7 +84,7 @@
                     <tbody class="bg-white divide-y divide-gray-200">
                         @foreach ($acaras as $acara)
                             <tr class="hover:bg-gray-50 transition-colors">
-                                <td class="px-6 py-4 whitespace-nowrap">
+                                <td class="pl-6 pr-10 py-4 whitespace-nowrap">
                                     <div class="flex items-center">
                                         @if ($acara->banner_acara)
                                             <img src="{{ Storage::url($acara->banner_acara) }}"
@@ -99,10 +98,9 @@
 
                                         <div class="ml-4">
                                             <div class="text-sm font-bold text-gray-900">{{ $acara->nama_acara }}</div>
-
-                                            <div class="flex items-center mt-1 text-xs text-gray-400 mt-3">
-                                                <i data-lucide="map-pin" class="size-4"></i>
-                                                {{ $acara->lokasi }}
+                                            <div class="flex items-center gap-1 mt-1 text-xs text-gray-500">
+                                                <i data-lucide="map-pin" class="size-3 flex-shrink-0"></i>
+                                                <span class="truncate max-w-xs">{{ $acara->lokasi }}</span>
                                             </div>
                                         </div>
                                     </div>

@@ -147,16 +147,8 @@
                                     </div>
                                 </div>
 
-                                <div
-                                    class="bg-gray-50 rounded-lg p-4 mb-4 text-center border border-dashed border-gray-300 group hover:border-blue-400 transition-colors">
-                                    <p class="text-xs text-gray-500 mb-1 uppercase tracking-wider">Kode Tiket</p>
-                                    <p class="text-lg font-mono font-bold text-gray-800 tracking-widest select-all">
-                                        {{ $tiket->kode_tiket }}
-                                    </p>
-                                </div>
-
                                 <div class="flex gap-2 mt-auto">
-                                    <a href="{{ route('pembeli.tiket.show', $tiket->id) }}"
+                                    <a href="{{ route('pembeli.tiket.preview', $tiket->id) }}"
                                         class="flex-1 bg-blue-600 text-white text-center py-2.5 rounded-lg hover:bg-blue-700 transition font-medium text-sm flex items-center justify-center gap-2 shadow-sm">
                                         Lihat Detail
                                     </a>
@@ -167,11 +159,11 @@
                                         <i data-lucide="download" class="size-5"></i>
                                     </a>
 
-                                    <a href="{{ route('pembeli.tiket.preview', $tiket->id) }}"
+                                    {{-- <a href="{{ route('pembeli.tiket.preview', $tiket->id) }}"
                                         class="px-4 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition inline-flex items-center justify-center border border-gray-200"
                                         title="Priview">
                                         <i data-lucide="eye" class="size-5"></i>
-                                    </a>
+                                    </a> --}}
                                 </div>
                             </div>
                         </div>

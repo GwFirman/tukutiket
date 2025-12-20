@@ -117,6 +117,6 @@ class ExportPDFController extends Controller
             ->firstOrFail();
 
         // Kembalikan tampilan HTML biasa (untuk preview)
-        return view('export.pdf.tiket', compact('tiket'));
+        return view('pembeli.tiket.preview', compact('tiket'));
     }
 }

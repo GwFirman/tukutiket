@@ -12,7 +12,7 @@
         <div class="px-6 lg:px-24">
 
             {{-- ================= TABS NAVIGATION ================= --}}
-            <div class="flex flex-wrap gap-4 border-b border-gray-200 mb-6 overflow-x-auto">
+            <div class="flex  gap-4 border-b border-gray-200 mb-6 overflow-x-auto">
                 @php
                     $tabs = [
                         'all' => 'Semua',

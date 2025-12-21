@@ -85,7 +85,7 @@
             </div>
 
             <!-- Ticket Details Section -->
-            <div class="p-6 sm:p-8 space-y-6">
+            <div class="">
 
                 <!-- Ticket Details Section -->
                 <div class="p-6 sm:p-8 space-y-6">

@@ -1,6 +1,6 @@
 <x-app-layout>
     <x-slot name="header">
-        <div class="flex items-center gap-2">
+        <div class="flex items-center gap-2 max-w-5xl mx-auto">
             <a href="{{ route('pembuat.acara.index') }}" class="text-gray-500 hover:text-indigo-600 transition">
                 <i data-lucide="home" class="size-5"></i>
             </a>
@@ -11,30 +11,60 @@
         </div>
     </x-slot>
 
-    <div class="max-w-7xl mx-auto px-4 py-8">
-
+    <div class="max-w-5xl mx-auto px-6 lg:mt-4 lg:px-0 pb-6">
         <!-- Action Buttons -->
-        <div class="flex items-center justify-between mb-6">
-            <a href="{{ route('pembuat.acara.index') }}"
-                class="inline-flex items-center gap-2 text-gray-600 hover:text-indigo-600 transition">
-                <i data-lucide="arrow-left" class="size-4"></i>
-                Kembali ke Daftar
-            </a>
-            <div class="flex items-center gap-3">
+        <div class="mb-6 space-y-3 sm:space-y-0">
+            <!-- Back Button - Always visible -->
+            <div class="flex items-center justify-between sm:hidden">
+                <a href="{{ route('pembuat.acara.index') }}"
+                    class="inline-flex items-center gap-2 text-gray-600 hover:text-indigo-600 transition text-sm">
+                    <i data-lucide="arrow-left" class="size-4"></i>
+                    <span>Kembali</span>
+                </a>
+            </div>
+
+            <!-- Desktop Layout -->
+            <div class="hidden sm:flex sm:items-center sm:justify-between">
+                <a href="{{ route('pembuat.acara.index') }}"
+                    class="inline-flex items-center gap-2 text-gray-600 hover:text-indigo-600 transition">
+                    <i data-lucide="arrow-left" class="size-4"></i>
+                    Kembali ke Daftar
+                </a>
+                <div class="flex items-center gap-2 lg:gap-3">
+                    <a href="{{ route('pembuat.acara.edit', $acara->id) }}"
+                        class="inline-flex items-center gap-2 px-3 lg:px-4 py-2 bg-indigo-50 text-indigo-600 rounded-lg hover:bg-indigo-100 transition font-medium text-sm">
+                        <i data-lucide="edit-3" class="size-4"></i>
+                        <span class="hidden md:inline">Edit</span>
+                    </a>
+                    <a href="{{ route('pembuat.acara.daftar-peserta', $acara->id) }}"
+                        class="inline-flex items-center gap-2 px-3 lg:px-4 py-2 bg-purple-50 text-purple-600 rounded-lg hover:bg-purple-100 transition font-medium text-sm">
+                        <i data-lucide="users" class="size-4"></i>
+                        <span class="hidden md:inline">Peserta</span>
+                    </a>
+                    <a href="{{ route('pembuat.scan.index', $acara->slug) }}"
+                        class="inline-flex items-center gap-2 px-3 lg:px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition font-medium text-sm">
+                        <i data-lucide="scan-line" class="size-4"></i>
+                        <span class="hidden md:inline">Scan</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Mobile Grid Layout -->
+            <div class="grid grid-cols-3 gap-2 sm:hidden">
                 <a href="{{ route('pembuat.acara.edit', $acara->id) }}"
-                    class="inline-flex items-center gap-2 px-4 py-2 bg-indigo-50 text-indigo-600 rounded-lg hover:bg-indigo-100 transition font-medium">
-                    <i data-lucide="edit-3" class="size-4"></i>
-                    Edit Acara
+                    class="flex flex-col items-center gap-1.5 p-3 bg-indigo-50 text-indigo-600 rounded-lg hover:bg-indigo-100 transition">
+                    <i data-lucide="edit-3" class="size-5"></i>
+                    <span class="text-xs font-medium">Edit</span>
                 </a>
                 <a href="{{ route('pembuat.acara.daftar-peserta', $acara->id) }}"
-                    class="inline-flex items-center gap-2 px-4 py-2 bg-purple-50 text-purple-600 rounded-lg hover:bg-purple-100 transition font-medium">
-                    <i data-lucide="users" class="size-4"></i>
-                    Daftar Peserta
+                    class="flex flex-col items-center gap-1.5 p-3 bg-purple-50 text-purple-600 rounded-lg hover:bg-purple-100 transition">
+                    <i data-lucide="users" class="size-5"></i>
+                    <span class="text-xs font-medium">Peserta</span>
                 </a>
                 <a href="{{ route('pembuat.scan.index', $acara->slug) }}"
-                    class="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg hover:from-indigo-700 hover:to-purple-700 transition font-medium shadow-lg shadow-indigo-500/25">
-                    <i data-lucide="scan-line" class="size-4"></i>
-                    Scan Tiket
+                    class="flex flex-col items-center gap-1.5 p-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition">
+                    <i data-lucide="scan-line" class="size-5"></i>
+                    <span class="text-xs font-medium">Scan</span>
                 </a>
             </div>
         </div>
@@ -45,7 +75,7 @@
 
                 <!-- Banner -->
                 <div
-                    class="relative h-72 w-full rounded-2xl flex items-center justify-center overflow-hidden bg-gradient-to-br from-indigo-100 to-purple-100 shadow-sm">
+                    class="relative h-72 w-full rounded-lg flex items-center justify-center overflow-hidden bg-gradient-to-br from-indigo-100 to-purple-100 ">
                     @if ($acara->banner_acara)
                         <img src="{{ asset('storage/' . $acara->banner_acara) }}" class="h-full w-full object-cover">
                         <!-- Overlay Gradient -->
@@ -55,19 +85,19 @@
                         <div class="absolute top-4 right-4">
                             @if ($acara->status == 'draft')
                                 <span
-                                    class="inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-semibold bg-yellow-500 text-white shadow-lg">
+                                    class="inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-semibold bg-yellow-500 text-white ">
                                     <i data-lucide="file-edit" class="size-3"></i>
                                     Draft
                                 </span>
                             @elseif($acara->status == 'published')
                                 <span
-                                    class="inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-semibold bg-green-500 text-white shadow-lg">
+                                    class="inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-semibold bg-green-500 text-white ">
                                     <i data-lucide="check-circle" class="size-3"></i>
                                     Published
                                 </span>
                             @elseif($acara->status == 'archived')
                                 <span
-                                    class="inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-semibold bg-gray-500 text-white shadow-lg">
+                                    class="inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-semibold bg-gray-500 text-white ">
                                     <i data-lucide="archive" class="size-3"></i>
                                     Archived
                                 </span>
@@ -75,7 +105,7 @@
                         </div>
                         <!-- Event Name on Banner -->
                         <div class="absolute bottom-4 left-4 right-4">
-                            <h1 class="text-2xl font-bold text-white drop-shadow-lg">{{ $acara->nama_acara }}</h1>
+                            <h1 class="text-2xl font-bold text-white drop-">{{ $acara->nama_acara }}</h1>
                         </div>
                     @else
                         <div class="text-center">
@@ -88,8 +118,23 @@
                     @endif
                 </div>
 
+                <!-- Deskripsi -->
+                @if ($acara->deskripsi)
+                    <div>
+                        <h4
+                            class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-2 flex items-center gap-2">
+                            <i data-lucide="file-text" class="size-4 text-indigo-500"></i>
+                            Deskripsi
+                        </h4>
+                        <div class="text-gray-600 text-sm prose prose-sm max-w-none">{!! $acara->deskripsi !!}
+                        </div>
+                    </div>
+                    <div class="border-t border-gray-100"></div>
+                @endif
+
+
                 <!-- Informasi Tiket -->
-                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+                <div class="bg-white rounded-lg  border border-gray-100 overflow-hidden">
                     <div class="bg-indigo-50 px-6 py-4 border-b border-indigo-100">
                         <h2 class="text-lg font-semibold text-indigo-900 flex items-center gap-2">
                             <i data-lucide="ticket" class="size-5"></i>
@@ -192,30 +237,10 @@
             <div class="col-span-12 lg:col-span-4 space-y-6">
 
                 <!-- Info Card -->
-                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden sticky top-4">
-                    <!-- Header -->
-                    <div class="bg-gradient-to-r from-indigo-600 to-purple-600 p-6 text-white">
-                        <h2 class="text-xl font-bold mb-1">{{ $acara->nama_acara }}</h2>
-                        <div class="flex items-center gap-2 text-white text-sm font-medium">
-                            <i data-lucide="calendar" class="size-4 "></i>
-                            <span>{{ \Carbon\Carbon::parse($acara->waktu_mulai)->format('d M Y') }}</span>
-                        </div>
-                    </div>
+                <div class="bg-white rounded-lg  border border-gray-100 overflow-hidden sticky top-4">
+
 
                     <div class="p-6 space-y-5">
-                        <!-- Deskripsi -->
-                        @if ($acara->deskripsi)
-                            <div>
-                                <h4
-                                    class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-2 flex items-center gap-2">
-                                    <i data-lucide="file-text" class="size-4 text-indigo-500"></i>
-                                    Deskripsi
-                                </h4>
-                                <div class="text-gray-600 text-sm prose prose-sm max-w-none">{!! $acara->deskripsi !!}
-                                </div>
-                            </div>
-                            <div class="border-t border-gray-100"></div>
-                        @endif
 
                         <!-- Waktu Pelaksanaan -->
                         <div>
@@ -224,33 +249,32 @@
                                 <i data-lucide="clock" class="size-4 text-indigo-500"></i>
                                 Waktu Pelaksanaan
                             </h4>
-                            <div class="space-y-2">
-                                <div class="flex items-center gap-3 bg-indigo-50 rounded-lg p-3">
-                                    <div class="h-10 w-10 rounded-lg bg-indigo-100 flex items-center justify-center">
-                                        <i data-lucide="play" class="size-5 text-indigo-600"></i>
-                                    </div>
+                            <div class="space-y-2.5">
+                                <div
+                                    class="flex items-center gap-2.5 border-2 border-indigo-200 rounded-lg p-2 bg-indigo-50">
+                                    <i data-lucide="calendar-days" class="size-5 text-indigo-400"></i>
                                     <div>
                                         <p class="text-xs text-gray-500">Mulai</p>
-                                        <p class="font-medium text-gray-900">
+                                        <p class="text-sm font-medium text-gray-900">
                                             {{ \Carbon\Carbon::parse($acara->waktu_mulai)->format('d M Y, H:i') }} WIB
                                         </p>
                                     </div>
                                 </div>
-                                <div class="flex items-center gap-3 bg-purple-50 rounded-lg p-3">
-                                    <div class="h-10 w-10 rounded-lg bg-purple-100 flex items-center justify-center">
-                                        <i data-lucide="square" class="size-5 text-purple-600"></i>
-                                    </div>
+                                <div
+                                    class="flex items-center gap-2.5 border-2 border-indigo-200 rounded-lg p-2 bg-indigo-50">
+                                    <i data-lucide="calendar-check" class="size-5 text-indigo-400"></i>
                                     <div>
                                         <p class="text-xs text-gray-500">Selesai</p>
-                                        <p class="font-medium text-gray-900">
+                                        <p class="text-sm font-medium text-gray-900">
                                             {{ \Carbon\Carbon::parse($acara->waktu_selesai)->format('d M Y, H:i') }}
-                                            WIB</p>
+                                            WIB
+                                        </p>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
-                        <div class="border-t border-gray-100"></div>
+                        <div class="border-t border-indigo-100"></div>
 
                         <!-- Lokasi -->
                         <div>
@@ -267,11 +291,30 @@
                         <!-- Informasi Kontak -->
                         <div>
                             <h4
-                                class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-2 flex items-center gap-2">
-                                <i data-lucide="phone" class="size-4 text-indigo-500"></i>
-                                Informasi Kontak
+                                class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3 flex items-center gap-2">
+                                <i data-lucide="user" class="size-4 text-indigo-500"></i>
+                                Informasi Narahubung
                             </h4>
-                            <p class="text-gray-700">{{ $acara->no_telp_narahubung ?? '-' }}</p>
+                            <div class="space-y-2">
+                                @if ($acara->info_narahubung)
+                                    <div class="bg-gray-50 rounded-lg p-3">
+                                        <p class="text-xs text-gray-500 mb-1">Nama</p>
+                                        <p class="text-sm text-gray-700">{{ $acara->info_narahubung }}</p>
+                                    </div>
+                                @endif
+                                @if ($acara->no_telp_narahubung)
+                                    <div class="bg-gray-50 rounded-lg p-3">
+                                        <p class="text-xs text-gray-500 mb-1">Telepon</p>
+                                        <p class="text-sm text-gray-700">{{ $acara->no_telp_narahubung }}</p>
+                                    </div>
+                                @endif
+                                @if ($acara->email_narahubung)
+                                    <div class="bg-gray-50 rounded-lg p-3">
+                                        <p class="text-xs text-gray-500 mb-1">Email</p>
+                                        <p class="text-sm text-gray-700">{{ $acara->email_narahubung }}</p>
+                                    </div>
+                                @endif
+                            </div>
                         </div>
 
                         <div class="border-t border-gray-100"></div>

@@ -3,6 +3,19 @@
     selectedCategory: null,
     selectedCategoryName: '',
 
+    init() {
+        // Muat nilai lama (old) jika ada
+        const oldCategoryId = '{{ old('id_kategori', '') }}';
+        if (oldCategoryId) {
+            this.selectedCategory = parseInt(oldCategoryId);
+            // Cari nama kategori berdasarkan ID
+            @foreach ($kategori as $kat)
+                if (this.selectedCategory === {{ $kat->id }}) {
+                    this.selectedCategoryName = '{{ $kat->nama_kategori }}';
+                } @endforeach
+        }
+    },
+
     selectCategory(id, name) {
         this.selectedCategory = id;
         this.selectedCategoryName = name;

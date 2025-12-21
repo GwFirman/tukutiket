@@ -42,14 +42,46 @@
                 });
             }
         });
+
+        // 3. Muat nilai lama (old) jika ada
+        this.$nextTick(() => {
+            // tipe event
+            this.finalEventType = '{{ old('tipe_event', 'offline') }}';
+            this.eventType = this.finalEventType;
+
+            // lokasi (bisa berupa alamat atau link)
+            const oldLokasi = '{{ old('lokasi', '') }}';
+            if (oldLokasi) {
+                this.finalLocation = oldLokasi;
+                this.tempAddress = oldLokasi;
+                document.getElementById('lokasi').value = oldLokasi;
+            }
+
+            // koordinat
+            const oldLat = '{{ old('latitude', '') }}';
+            const oldLng = '{{ old('longitude', '') }}';
+            if (oldLat && oldLng) {
+                document.getElementById('latitude').value = oldLat;
+                document.getElementById('longitude').value = oldLng;
+                this.tempCoordinates = oldLat + ', ' + oldLng;
+                // set finalLocation ke koordinat jika belum ada alamat
+                if (!this.finalLocation) this.finalLocation = this.tempCoordinates;
+            }
+        });
     },
 
     initMap() {
         const defaultLat = -6.200000;
         const defaultLng = 106.816666;
 
-        // Inisialisasi Map
-        this.mapInstance = L.map('map').setView([defaultLat, defaultLng], 13);
+        // Jika ada koordinat lama (misal dari old()), gunakan itu sebagai awal
+        const latVal = document.getElementById('latitude') ? document.getElementById('latitude').value : '';
+        const lngVal = document.getElementById('longitude') ? document.getElementById('longitude').value : '';
+        const lat = latVal ? parseFloat(latVal) : defaultLat;
+        const lng = lngVal ? parseFloat(lngVal) : defaultLng;
+
+        // Inisialisasi Map (gunakan koordinat awal yang terdeteksi)
+        this.mapInstance = L.map('map').setView([lat, lng], 13);
 
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '&copy; OpenStreetMap'
@@ -58,8 +90,8 @@
         // Inisialisasi Marker
         this.markerInstance = L.marker([defaultLat, defaultLng], { draggable: true }).addTo(this.mapInstance);
 
-        // Set koordinat awal
-        this.updateCoordinates(defaultLat, defaultLng);
+        // Set koordinat awal (sesuaikan jika ada koordinat lama)
+        this.updateCoordinates(lat, lng);
 
         // EVENT LISTENER: SAAT MARKER DIGESER (DRAGEND)
         // Menggunakan arrow function '() =>' agar 'this' tetap mengacu ke Alpine component

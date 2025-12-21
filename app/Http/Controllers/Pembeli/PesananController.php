@@ -41,9 +41,15 @@ class PesananController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
+    public function show(Acara $checkout)
     {
-        //
+        $checkout->load('jenisTiket');
+
+        $user = Auth::user();
+
+        $maksTiket = $checkout->maks_tiket_per_transaksi;
+
+        return view('pembeli.acara.checkout', ['acara' => $checkout, 'user' => $user, 'maksTiket' => $maksTiket]);
     }
 
     /**
@@ -118,15 +124,18 @@ class PesananController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Acara $checkout)
+    public function detail($kodePesanan)
     {
-        $checkout->load('jenisTiket');
+        // Cari pesanan berdasarkan kode pesanan dan milik user yang login
+        $pesanan = Pesanan::where('kode_pesanan', $kodePesanan)
+            ->where('id_pembeli', Auth::id())
+            ->with([
+                'detailPesanan.jenisTiket.acara',
+                'detailPesanan.tiketPeserta',
+            ])
+            ->firstOrFail();
 
-        $user = Auth::user();
-
-        $maksTiket = $checkout->maks_tiket_per_transaksi;
-
-        return view('pembeli.acara.checkout', ['acara' => $checkout, 'user' => $user, 'maksTiket' => $maksTiket]);
+        return view('pembeli.pesanan.show', compact('pesanan'));
 
     }
 

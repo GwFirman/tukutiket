@@ -26,4 +26,9 @@ class Kreator extends Model
     {
         return $this->hasOne(VerifikasiKreator::class, 'id_kreator');
     }
+
+    public function acara()
+    {
+        return $this->hasMany(Acara::class, 'id_kreator');
+    }
 }

@@ -286,43 +286,7 @@
     <script>
         lucide.createIcons();
     </script>
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            // Flatpickr untuk filter tanggal di beranda
-            const tanggalFilter = document.getElementById('tanggal-filter');
-            if (tanggalFilter) {
-                flatpickr(tanggalFilter, {
-                    enableTime: false,
-                    dateFormat: "Y-m-d",
-                    altInput: true,
-                    altFormat: "d M Y",
-                    allowInput: false,
-                    disableMobile: true,
-                    locale: {
-                        firstDayOfWeek: 1,
-                        weekdays: {
-                            shorthand: ['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'],
-                            longhand: ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu']
-                        },
-                        months: {
-                            shorthand: ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep',
-                                'Okt', 'Nov', 'Des'
-                            ],
-                            longhand: ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli',
-                                'Agustus', 'September', 'Oktober', 'November', 'Desember'
-                            ]
-                        }
-                    }
-                });
-            }
 
-            // Flatpickr default untuk class .datepicker
-            flatpickr(".datepicker", {
-                enableTime: false,
-                dateFormat: "Y-m-d",
-            });
-        });
-    </script>
 </body>
 
 </html>

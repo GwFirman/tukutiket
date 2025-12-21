@@ -1,57 +1,61 @@
-<div class="w-full relative">
-    <label class="mb-1.5 block text-sm font-medium text-gray-700">
-        Tanggal Acara
-    </label>
+    <div class="w-full relative">
+        <label class="mb-1.5 block text-sm font-medium text-gray-700">
+            Tanggal Acara
+        </label>
 
-    {{-- Label tampilan --}}
-    <div class="flex items-center h-11 pl-4 rounded-lg cursor-pointer border border-gray-300"
-         wire:click="bukaModal">
-        <span class="block text-md text-gray-700 mr-2">{{ $this->label }}</span>
-        <span class="text-blue-500 ml-auto mr-3">
-            <svg class="fill-current" width="20" height="20" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                <path fill-rule="evenodd" clip-rule="evenodd"
-                      d="M6.66659 1.5415C7.0808 1.5415 7.41658 1.87729 7.41658 2.2915V2.99984H12.5833V2.2915C12.5833 1.87729 12.919 1.5415 13.3333 1.5415C13.7475 1.5415 14.0833 1.87729 14.0833 2.2915V2.99984L15.4166 2.99984C16.5212 2.99984 17.4166 3.89527 17.4166 4.99984V7.49984V15.8332C17.4166 16.9377 16.5212 17.8332 15.4166 17.8332H4.58325C3.47868 17.8332 2.58325 16.9377 2.58325 15.8332V7.49984V4.99984C2.58325 3.89527 3.47868 2.99984 4.58325 2.99984L5.91659 2.99984V2.2915C5.91659 1.87729 6.25237 1.5415 6.66659 1.5415ZM6.66659 4.49984H4.58325C4.30711 4.49984 4.08325 4.7237 4.08325 4.99984V6.74984H15.9166V4.99984C15.9166 4.7237 15.6927 4.49984 15.4166 4.49984H13.3333H6.66659ZM15.9166 8.24984H4.08325V15.8332C4.08325 16.1093 4.30711 16.3332 4.58325 16.3332H15.4166C15.6927 16.3332 15.9166 16.1093 15.9166 15.8332V8.24984Z"/>
-            </svg>
-        </span>
-    </div>
+        {{-- Label tampilan --}}
+        <div class="flex items-center h-11 pl-4 rounded-lg cursor-pointer border border-gray-300" wire:click="bukaModal">
+            <span class="block text-md text-gray-700 mr-2">{{ $this->label }}</span>
+            <span class="text-blue-500 ml-auto mr-3">
+                <svg class="fill-current" width="20" height="20" viewBox="0 0 20 20"
+                    xmlns="http://www.w3.org/2000/svg">
+                    <path fill-rule="evenodd" clip-rule="evenodd"
+                        d="M6.66659 1.5415C7.0808 1.5415 7.41658 1.87729 7.41658 2.2915V2.99984H12.5833V2.2915C12.5833 1.87729 12.919 1.5415 13.3333 1.5415C13.7475 1.5415 14.0833 1.87729 14.0833 2.2915V2.99984L15.4166 2.99984C16.5212 2.99984 17.4166 3.89527 17.4166 4.99984V7.49984V15.8332C17.4166 16.9377 16.5212 17.8332 15.4166 17.8332H4.58325C3.47868 17.8332 2.58325 16.9377 2.58325 15.8332V7.49984V4.99984C2.58325 3.89527 3.47868 2.99984 4.58325 2.99984L5.91659 2.99984V2.2915C5.91659 1.87729 6.25237 1.5415 6.66659 1.5415ZM6.66659 4.49984H4.58325C4.30711 4.49984 4.08325 4.7237 4.08325 4.99984V6.74984H15.9166V4.99984C15.9166 4.7237 15.6927 4.49984 15.4166 4.49984H13.3333H6.66659ZM15.9166 8.24984H4.08325V15.8332C4.08325 16.1093 4.30711 16.3332 4.58325 16.3332H15.4166C15.6927 16.3332 15.9166 16.1093 15.9166 15.8332V8.24984Z" />
+                </svg>
+            </span>
+        </div>
 
-    {{-- Modal --}}
-    @if($showModal)
-        <div>
-            <!-- Overlay -->
-            <div class="fixed inset-0 bg-black/60 z-40" wire:click="$set('showModal', false)"></div>
+        {{-- Modal --}}
+        @if ($showModal)
+            <div>
+                <!-- Overlay -->
+                <div class="fixed inset-0 bg-black/60 z-40" wire:click="$set('showModal', false)"></div>
 
-            <!-- Modal -->
-            <div class="fixed inset-0 flex items-center justify-center z-50">
-                <div class="bg-white rounded-lg p-6 w-full max-w-md shadow-lg">
-                    <h3 class="text-lg font-semibold mb-4 text-gray-800">Pilih Tanggal Acara</h3>
+                <!-- Modal -->
+                <div class="fixed inset-0 flex items-center justify-center z-50">
+                    <div class="bg-white rounded-lg p-6 w-full max-w-md shadow-lg">
+                        <h3 class="text-lg font-semibold mb-4 text-gray-800">Pilih Tanggal Acara</h3>
 
-                    <div class="mb-4">
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Tanggal Mulai</label>
-                        <input type="date" wire:model="waktu_mulai"
-                               class="h-11 w-full rounded-lg border border-gray-300 px-4 text-sm text-gray-800">
-                        @error('waktu_mulai') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
-                    </div>
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Tanggal Mulai</label>
+                            <input type="date" wire:model="waktu_mulai"
+                                class="h-11 w-full rounded-lg border border-gray-300 px-4 text-sm text-gray-800">
+                            @error('waktu_mulai')
+                                <span class="text-red-500 text-sm">{{ $message }}</span>
+                            @enderror
+                        </div>
 
-                    <div class="mb-4">
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Tanggal Selesai</label>
-                        <input type="date" wire:model="waktu_selesai"
-                               class="h-11 w-full rounded-lg border border-gray-300 px-4 text-sm text-gray-800">
-                        @error('waktu_selesai') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
-                    </div>
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Tanggal Selesai</label>
+                            <input type="date" wire:model="waktu_selesai"
+                                class="h-11 w-full rounded-lg border border-gray-300 px-4 text-sm text-gray-800">
+                            @error('waktu_selesai')
+                                <span class="text-red-500 text-sm">{{ $message }}</span>
+                            @enderror
+                        </div>
 
-                    <div class="flex justify-end gap-2">
-                        <button wire:click="$set('showModal', false)" type="button"
+                        <div class="flex justify-end gap-2">
+                            <button wire:click="$set('showModal', false)" type="button"
                                 class="px-4 py-2 rounded bg-gray-200 text-gray-700">
-                            Batal
-                        </button>
-                        <button wire:click="simpanTanggal" type="button"
+                                Batal
+                            </button>
+                            <button wire:click="simpanTanggal" type="button"
                                 class="px-4 py-2 rounded bg-blue-500 text-white">
-                            Simpan
-                        </button>
+                                Simpan
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-    @endif
-</div>
+        @endif
+    </div>

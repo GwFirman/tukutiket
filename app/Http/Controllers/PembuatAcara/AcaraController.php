@@ -10,6 +10,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
+use Yajra\DataTables\Facades\DataTables;
 
 class AcaraController extends Controller
 {
@@ -21,9 +23,73 @@ class AcaraController extends Controller
         $userId = Auth::id();
 
         $acaras = Acara::where('id_pembuat', $userId)->get();
+
         $totalAcara = $acaras->count();
 
         return view('pembuat_acara.acara.index', compact('acaras', 'totalAcara'));
+    }
+
+    public function data(Request $request)
+    {
+        $userId = Auth::id();
+
+        $query = Acara::query()
+            ->where('id_pembuat', $userId)
+            ->with('kreator')
+            ->select('acara.*');
+
+        // Optional filter status
+        if ($status = $request->get('status')) {
+            $query->where('status', $status);
+        }
+
+        // Custom search param to avoid conflict with DataTables default
+        if ($search = $request->get('search_text')) {
+            $query->where(function ($q) use ($search) {
+                $q->where('nama_acara', 'like', "%{$search}%")
+                    ->orWhere('lokasi', 'like', "%{$search}%");
+            });
+        }
+
+        return DataTables::eloquent($query)
+            ->addColumn('banner', function ($acara) {
+                if ($acara->banner_acara) {
+                    return '<img src="'.e(Storage::url($acara->banner_acara)).'" class="h-12 w-12 rounded object-cover" />';
+                }
+
+                return '<div class="h-12 w-12 rounded bg-indigo-100 flex items-center justify-center"><i data-lucide="image" class="size-5 text-indigo-500"></i></div>';
+            })
+            ->addColumn('nama_lokasi', function ($acara) {
+                return '<div class="text-sm font-semibold">'.e($acara->nama_acara).'</div>
+                        <div class="text-xs text-gray-500">'.e(Str::limit($acara->lokasi, 30)).'</div>';
+            })
+            ->addColumn('waktu', function ($acara) {
+                return '<div class="text-sm">
+                            <div><span class="font-medium">Mulai:</span> '.e(\Carbon\Carbon::parse($acara->waktu_mulai)->format('d M Y')).'</div>
+                            <div class="text-gray-500"><span class="font-medium">Selesai:</span> '.e(\Carbon\Carbon::parse($acara->waktu_selesai)->format('d M Y')).'</div>
+                        </div>';
+            })
+            ->addColumn('aksi', function ($acara) {
+                $show = route('pembuat.acara.show', $acara->slug);
+                $edit = route('pembuat.acara.edit', $acara->slug);
+
+                return '<div class="flex  gap-3">
+                            <a href="'.$show.'" class="text-indigo-600 hover:text-indigo-800" title="Lihat"><i data-lucide="eye" class="size-5"></i></a>
+                            <a href="'.$edit.'" class="text-yellow-600 hover:text-yellow-800" title="Edit"><i data-lucide="edit-3" class="size-5"></i></a>
+                        </div>';
+            })
+            ->editColumn('status', function ($acara) {
+                $map = [
+                    'published' => 'bg-green-100 text-green-800',
+                    'draft' => 'bg-yellow-100 text-yellow-800',
+                    'archived' => 'bg-red-100 text-red-800',
+                ];
+                $cls = $map[$acara->status] ?? 'bg-gray-100 text-gray-800';
+
+                return '<span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full '.$cls.'">'.e(ucfirst($acara->status)).'</span>';
+            })
+            ->rawColumns(['banner', 'nama_lokasi', 'waktu', 'aksi', 'status'])
+            ->toJson();
     }
 
     /**
@@ -54,6 +120,8 @@ class AcaraController extends Controller
             'deskripsi_acara' => 'required|string',
             'satu_transaksi_per_akun' => 'boolean',
             'maks_tiket_per_transaksi' => 'required|integer|min:1',
+            'info_narahubung' => 'nullable|string',
+            'email_narahubung' => 'nullable|email',
         ]);
 
         $acara = new Acara;
@@ -65,6 +133,8 @@ class AcaraController extends Controller
         $acara->waktu_mulai = $request->waktu_mulai;
         $acara->waktu_selesai = $request->waktu_selesai;
         $acara->no_telp_narahubung = $request->no_telp_narahubung;
+        $acara->info_narahubung = $request->info_narahubung;
+        $acara->email_narahubung = $request->email_narahubung;
         $acara->status = 'published';
         $acara->satu_transaksi_per_akun = $request->boolean('satu_transaksi_per_akun');
         $acara->maks_tiket_per_transaksi = $request->maks_tiket_per_transaksi;

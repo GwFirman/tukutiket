@@ -1,4 +1,4 @@
-<div class="bg-gradient-to-b from-white to-indigo-50 py-12 md:py-20">
+<div class="bg-gradient-to-b from-white to-indigo-50 ">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="text-center mb-10 md:mb-16">
             <div
@@ -17,12 +17,12 @@
             <!-- Event cards will be looped here -->
             @forelse($acaras ?? [] as $acara)
                 <a href="{{ route('beranda.acara', $acara->slug) }}"
-                    class="group bg-white rounded-xl sm:rounded-2xl overflow-hidden transition-all duration-500 hover:shadow-md hover:-translate-y-2 block">
+                    class="group bg-white shadow-2xs rounded-lg overflow-hidden  block">
                     <div class="relative overflow-hidden">
                         @if ($acara->banner_acara && file_exists(storage_path('app/public/' . $acara->banner_acara)))
                             <img src="{{ asset('storage/' . $acara->banner_acara) }}"
                                 alt="{{ $acara->nama_acara ?? 'Event' }}"
-                                class="w-full h-40 sm:h-48 md:h-56 object-cover transition-transform duration-500 group-hover:scale-110">
+                                class="w-full h-40 sm:h-48 md:h-56 object-cover ">
                         @else
                             <div
                                 class="w-full h-40 sm:h-48 md:h-56 flex flex-col items-center justify-center bg-gradient-to-br from-indigo-100 to-purple-100">
@@ -39,8 +39,7 @@
                         </div>
                     </div>
                     <div class="p-4 sm:p-5 md:p-6">
-                        <h3
-                            class="text-base sm:text-lg md:text-xl font-bold text-gray-900 mb-2 sm:mb-3 line-clamp-2 group-hover:text-indigo-600 transition-colors">
+                        <h3 class="text-base sm:text-lg md:text-xl font-bold text-gray-900 mb-2 sm:mb-3 line-clamp-2 ">
                             {{ $acara->nama_acara ?? 'Event Name' }}
                         </h3>
                         <div class="space-y-2 sm:space-y-3 mb-4 sm:mb-6">
@@ -76,7 +75,7 @@
                                     $harga = optional($acara->jenisTiket->first())->harga ?? 0;
                                 @endphp
                                 <span
-                                    class="text-xl sm:text-2xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+                                    class="text-xl sm:text-2xl font-bold bg-indigo-600  bg-clip-text text-transparent">
                                     @if ($harga == 0)
                                         Gratis
                                     @else
@@ -100,9 +99,10 @@
         </div>
 
         {{-- <div class="text-center mt-12">
-                    <a href="{{ route('acara.index') }}" class="inline-block bg-indigo-100 hover:bg-indigo-200 text-indigo-800 font-semibold py-3 px-6 rounded-lg transition duration-300">
-                        View All Events
-                    </a>
-                </div> --}}
+            <a href="{{ route('acara.index') }}"
+                class="inline-block bg-indigo-100 hover:bg-indigo-200 text-indigo-800 font-semibold py-3 px-6 rounded-lg transition duration-300">
+                View All Events
+            </a>
+        </div> --}}
     </div>
 </div>

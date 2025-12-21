@@ -43,7 +43,12 @@ class DashboardController extends Controller
             ->where('pesanan.status_pembayaran', 'paid')
             ->sum('detail_pesanan.jumlah');
 
-        return view('pembuat_acara.dashboard', compact('acaras', 'totalAcara', 'totalPendapatan', 'totalPeserta','totalTiketTerjual'));
+        $acaraTerbaru = Acara::where('id_pembuat', $idPembuat)
+            ->where('status', 'published')
+            ->latest('created_at')
+            ->first();
+
+        return view('pembuat_acara.dashboard', compact('acaras', 'totalAcara', 'totalPendapatan', 'totalPeserta', 'totalTiketTerjual', 'acaraTerbaru'));
     }
 
     /**

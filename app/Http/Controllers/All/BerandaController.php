@@ -15,11 +15,18 @@ class BerandaController extends Controller
      */
     public function index()
     {
-
         $acaras = Acara::with('jenisTiket')->where('status', 'published')->get();
 
-        // dd($acaras);
-        return view('beranda', compact('acaras'));
+        // Ambil kreator yang sudah diverifikasi (approved)
+        $kreatorsPopuler = \App\Models\Kreator::whereHas('verifikasi', function ($q) {
+            $q->where('status', 'approved');
+        })
+            ->withCount('acara') // Hitung jumlah acara per kreator
+            ->orderBy('acara_count', 'desc') // Urutkan berdasarkan jumlah acara terbanyak
+            ->take(6) // Ambil 6 kreator teratas
+            ->get();
+
+        return view('beranda.index', compact('acaras', 'kreatorsPopuler'));
     }
 
     /**

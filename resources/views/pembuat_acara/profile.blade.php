@@ -1,13 +1,13 @@
 <x-app-layout>
     <x-slot name="header">
-        <div class="flex items-center gap-2">
+        <div class=" max-w-4xl mx-auto flex items-center gap-2">
             <i data-lucide="user" class="size-5 text-gray-600"></i>
             <i data-lucide="chevron-right" class="size-4 text-gray-400"></i>
             <span class="font-semibold">Profil Kreator</span>
         </div>
     </x-slot>
 
-    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-0 py-6 sm:py-8">
 
         @if (session('success'))
             <div class="mb-6 p-4 bg-green-50 border border-green-200 text-green-800 rounded-lg flex items-start gap-3">

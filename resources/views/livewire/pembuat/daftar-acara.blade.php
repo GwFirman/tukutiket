@@ -1,34 +1,21 @@
 <div>
-    <!-- Search -->
-    <div class="bg-white rounded-xl shadow-sm p-6 mb-6">
-        <form wire:submit.prevent="searchAcara" class="flex  gap-4">
-            <div class="flex-1">
-                <div class="relative">
-                    <input type="text" wire:model.defer="search" placeholder="Cari nama acara atau lokasi..."
-                        class="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
-
-                    <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                        <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                        </svg>
-                    </div>
-                </div>
-            </div>
-
-            <button type="submit"
-                class="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors flex items-center gap-2 shadow-md hover:shadow-lg">
-                <i data-lucide="search" class="size-5"></i>
+    <!-- Search kecil di atas tabel -->
+    <div class="mb-4 flex items-center gap-2">
+        <div class="relative w-full sm:w-64">
+            <input type="text" wire:model.defer="search" placeholder="Cari acara atau lokasi"
+                class="w-full pl-9 pr-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500">
+            <i data-lucide="search" class="size-4 text-gray-400 absolute left-2.5 top-1/2 -translate-y-1/2"></i>
+        </div>
+        <button type="button" wire:click="searchAcara"
+            class="px-3 py-2 text-xs sm:text-sm bg-blue-600 hover:bg-blue-700 text-white rounded-lg">
+            Cari
+        </button>
+        @if ($search)
+            <button type="button" wire:click="resetFilters"
+                class="px-3 py-2 text-xs sm:text-sm bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg">
+                Reset
             </button>
-
-            @if ($search)
-                <button type="button" wire:click="resetFilters"
-                    class="px-4 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium rounded-lg transition-colors flex items-center gap-2">
-                    <i data-lucide="x" class="size-5"></i>
-                    Reset
-                </button>
-            @endif
-        </form>
+        @endif
     </div>
 
     <!-- Tabs Filter Status -->

@@ -61,6 +61,10 @@ Route::middleware(['auth', 'role:kreator'])
     ->prefix('kreator')
     ->name('pembuat.')
     ->group(function () {
+        // Ubah endpoint DataTables agar tidak bentrok dengan resource /acara
+        Route::get('/acara-data/table', [PembuatAcaraController::class, 'data'])
+            ->name('acara.table-data');
+
         Route::get('/dashboard', [DashboardPembuatController::class, 'index'])->name('dashboard');
         Route::resource('/acara', PembuatAcaraController::class);
         Route::get('/acara/daftar-peserta/{acara}', [PembuatAcaraController::class, 'daftarPeserta'])->name('acara.daftar-peserta');
@@ -107,6 +111,7 @@ Route::middleware(['auth', 'role:pembeli'])
         // Route::get('/dasboard', [DashboardPembeliController::class, 'index'])->name('dashboard');
         Route::get('/tiket-saya', [TiketController::class, 'index'])->name('tiket-saya');
         Route::get('/pesanan-saya', [PesananController::class, 'index'])->name('pesanan-saya');
+        Route::get('/pesanan-saya/{kode_pesanan}', [PesananController::class, 'detail'])->name('pesanan-saya.show');
         Route::resource('tiket', TiketController::class);
         Route::resource('pembayaran', PembayaranController::class);
         Route::resource('acara', PembeliAcaraController::class);

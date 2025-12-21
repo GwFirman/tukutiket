@@ -21,7 +21,8 @@
         }
         return 'Tentukan durasi acara';
     }
-}">
+}" x-init="startDate = '{{ old('waktu_mulai') ? \Carbon\Carbon::parse(old('waktu_mulai'))->format('Y-m-d') : '' }}';
+endDate = '{{ old('waktu_selesai') ? \Carbon\Carbon::parse(old('waktu_selesai'))->format('Y-m-d') : '' }}'">
     <label class="mb-2 block text-sm font-medium text-gray-700">
         Tanggal Acara
     </label>

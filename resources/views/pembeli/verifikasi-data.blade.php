@@ -1,15 +1,14 @@
 <x-app-layout>
     <x-slot name="header">
-        <div class="flex items-center gap-2">
-            <i data-lucide="shield-check" class="size-6 text-indigo-600"></i>
-            <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-                {{ __('Verifikasi Identitas Kreator') }}
-            </h2>
+        <div class="flex max-w-4xl mx-auto items-center gap-2">
+            <i data-lucide="calendar" class="w-5 h-5 text-gray-600"></i>
+            <i data-lucide="chevron-right" class="w-4 h-4 text-gray-400"></i>
+            <span class="font-semibold text-gray-800">Daftar Acara</span>
         </div>
     </x-slot>
 
-    <div class="py-12">
-        <div class="max-w-4xl mx-auto sm:px-6 lg:px-8">
+    <div class="">
+        <div class="max-w-4xl mx-auto px-6 lg:px-0 pb-6 lg:pt-6">
 
             {{-- Success Message --}}
             @if (session('success'))
@@ -60,7 +59,7 @@
 
             {{-- Check if already submitted --}}
             @if (isset($verifikasi) && $verifikasi)
-                <div class="bg-white overflow-hidden shadow-xl sm:rounded-2xl border border-gray-100">
+                <div class="bg-white overflow-hidden sm:rounded-2xl border border-gray-100">
                     <div class="p-8">
                         <div class="text-center">
                             @if ($verifikasi->status == 'pending')

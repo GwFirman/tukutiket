@@ -1,5 +1,6 @@
 <!-- Navigation Links -->
-<nav class="mt-5 px-2 flex-1">
+<nav
+    class="mt-5 mb-4 px-2 flex-1 overflow-y-auto overflow-x-hidden scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 hover:scrollbar-thumb-gray-400">
     <x-nav-link :href="route('beranda')" :active="request()->routeIs('beranda')" class="group">
         <i data-lucide="compass" class="size-5 mr-2"></i>
         {{ __('Jelajahi Acara') }}

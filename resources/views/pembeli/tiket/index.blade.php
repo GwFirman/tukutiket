@@ -94,7 +94,7 @@
                         @endphp
 
                         {{-- CARD ITEM --}}
-                        <div class="bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden flex flex-col h-full hover:shadow-xl transition-shadow duration-300"
+                        <div class="bg-white rounded-xl  border border-gray-100 overflow-hidden flex flex-col h-full  duration-300"
                             x-show="activeTab === 'all' || activeTab === '{{ $statusDB }}'"
                             x-transition.opacity.duration.300ms>
 
@@ -149,7 +149,7 @@
 
                                 <div class="flex gap-2 mt-auto">
                                     <a href="{{ route('pembeli.tiket.preview', $tiket->id) }}"
-                                        class="flex-1 bg-blue-600 text-white text-center py-2.5 rounded-lg hover:bg-blue-700 transition font-medium text-sm flex items-center justify-center gap-2 shadow-sm">
+                                        class="flex-1 bg-blue-600 text-white text-center py-2.5 rounded-lg hover:bg-blue-700 transition font-medium text-sm flex items-center justify-center gap-2 ">
                                         Lihat Detail
                                     </a>
 
@@ -198,7 +198,7 @@
                         Anda belum memiliki tiket apapun. Jelajahi acara menarik dan dapatkan tiket Anda sekarang!
                     </p>
                     <a href="{{ route('beranda') }}"
-                        class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105">
+                        class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold rounded-lg  transition-all duration-300 transform hover:scale-105">
                         <i data-lucide="search" class="size-5 mr-2"></i>
                         Jelajahi Acara
                     </a>

@@ -1,9 +1,19 @@
 <x-app-layout>
-    <div class="max-w-6xl mx-auto py-10 px-4">
+    <div class="max-w-6xl mx-auto pb-6 md:py-10 px-6">
 
         {{-- Header --}}
-        <div class="bg-gradient-to-r from-indigo-600 to-purple-600 rounded-xl p-6 mb-8 text-white shadow-lg">
-            <div class="flex items-center justify-between">
+        <div class="relative rounded-xl px-6 py-12 mb-8 text-white overflow-hidden">
+            {{-- Background banner_acara --}}
+            @if (!empty($acara->banner_acara))
+                <div class="absolute inset-0">
+                    <img src="{{ \Illuminate\Support\Str::startsWith($acara->banner_acara, ['http://', 'https://']) ? $acara->banner_acara : asset('storage/' . $acara->banner_acara) }}"
+                        alt="Banner Acara" class="w-full h-full object-cover">
+                </div>
+            @endif
+            {{-- Overlay gradient agar teks tetap terbaca --}}
+            <div class="absolute inset-0 bg-gradient-to-r from-gray-600/80 to-gray-50/10"></div>
+
+            <div class="relative flex items-center justify-between">
                 <div>
                     <div class="flex items-center gap-2 text-indigo-200 text-sm mb-1">
                         <i data-lucide="bar-chart-3" class="size-4"></i>
@@ -23,7 +33,7 @@
 
         {{-- --- REKAP ACARA --- --}}
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-            <div class="bg-white rounded-xl shadow-sm p-5 border-l-4 border-indigo-500">
+            <div class="bg-white rounded-lg shadow-sm p-5 border border-indigo-500">
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-sm text-gray-500 mb-1">Total Transaksi</p>
@@ -35,7 +45,7 @@
                 </div>
             </div>
 
-            <div class="bg-white rounded-xl shadow-sm p-5 border-l-4 border-purple-500">
+            <div class="bg-white rounded-lg shadow-sm p-5 border border-purple-500">
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-sm text-gray-500 mb-1">Tiket Terjual</p>
@@ -47,7 +57,7 @@
                 </div>
             </div>
 
-            <div class="bg-white rounded-xl shadow-sm p-5 border-l-4 border-green-500">
+            <div class="bg-white rounded-lg shadow-sm p-5 border border-green-500">
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-sm text-gray-500 mb-1">Pendapatan</p>
@@ -61,7 +71,7 @@
                 </div>
             </div>
 
-            <div class="bg-white rounded-xl shadow-sm p-5 border-l-4 border-blue-500">
+            <div class="bg-white rounded-lg shadow-sm p-5 border border-blue-500">
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-sm text-gray-500 mb-1">Sudah Check-in</p>
@@ -76,118 +86,66 @@
 
         {{-- --- REKAP PER JENIS TIKET --- --}}
         <div class="bg-white shadow-sm rounded-xl overflow-hidden">
-            <div class="bg-indigo-50 px-6 py-4 border-b border-indigo-100">
-                <h2 class="text-lg font-semibold text-indigo-900 flex items-center gap-2">
-                    <i data-lucide="list" class="size-5"></i>
-                    Detail Penjualan Per Jenis Tiket
-                </h2>
+            <div class="px-6 py-4 border-b border-gray-200">
+                <h2 class="text-lg font-semibold text-gray-900">Detail Penjualan Per Jenis Tiket</h2>
             </div>
 
             <div class="overflow-x-auto">
                 <table class="w-full">
-                    <thead>
-                        <tr class="bg-indigo-50/50">
-                            <th
-                                class="px-6 py-4 text-left text-xs font-semibold text-indigo-700 uppercase tracking-wider">
-                                Jenis Tiket
-                            </th>
-                            <th
-                                class="px-6 py-4 text-left text-xs font-semibold text-indigo-700 uppercase tracking-wider">
-                                Harga
-                            </th>
-                            <th
-                                class="px-6 py-4 text-center text-xs font-semibold text-indigo-700 uppercase tracking-wider">
-                                Kuota
-                            </th>
-                            <th
-                                class="px-6 py-4 text-center text-xs font-semibold text-indigo-700 uppercase tracking-wider">
-                                Terjual
-                            </th>
-                            <th
-                                class="px-6 py-4 text-center text-xs font-semibold text-indigo-700 uppercase tracking-wider">
-                                Sisa
-                            </th>
-                            <th
-                                class="px-6 py-4 text-left text-xs font-semibold text-indigo-700 uppercase tracking-wider">
-                                Pendapatan
-                            </th>
-                            <th
-                                class="px-6 py-4 text-center text-xs font-semibold text-indigo-700 uppercase tracking-wider">
-                                Check-in
-                            </th>
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-sm font-medium text-gray-700">Jenis Tiket</th>
+                            <th class="px-6 py-3 text-left text-sm font-medium text-gray-700">Harga</th>
+                            <th class="px-6 py-3 text-center text-sm font-medium text-gray-700">Kuota</th>
+                            <th class="px-6 py-3 text-center text-sm font-medium text-gray-700">Terjual</th>
+                            <th class="px-6 py-3 text-center text-sm font-medium text-gray-700">Sisa</th>
+                            <th class="px-6 py-3 text-right text-sm font-medium text-gray-700">Pendapatan</th>
+                            <th class="px-6 py-3 text-center text-sm font-medium text-gray-700">Check-in</th>
                         </tr>
                     </thead>
 
-                    <tbody class="divide-y divide-gray-100">
+                    <tbody class="divide-y divide-gray-200">
                         @foreach ($rekapJenisTiket as $jt)
-                            <tr class="hover:bg-indigo-50/30 transition-colors">
+                            <tr class="hover:bg-gray-50">
                                 <td class="px-6 py-4">
-                                    <div class="flex items-center gap-3">
-                                        <div
-                                            class="h-10 w-10 rounded-lg bg-gradient-to-br from-indigo-400 to-purple-500 flex items-center justify-center">
-                                            <i data-lucide="ticket" class="size-5 text-white"></i>
-                                        </div>
-                                        <span class="font-medium text-gray-900">{{ $jt->nama_jenis }}</span>
-                                    </div>
+                                    <div class="font-medium text-gray-900">{{ $jt->nama_jenis }}</div>
                                 </td>
-
-                                <td class="px-6 py-4">
-                                    <span class="text-gray-700 font-medium">
-                                        Rp {{ number_format($jt->harga, 0, ',', '.') }}
-                                    </span>
+                                <td class="px-6 py-4 text-gray-700">
+                                    Rp {{ number_format($jt->harga, 0, ',', '.') }}
                                 </td>
-
+                                <td class="px-6 py-4 text-center text-gray-700">{{ $jt->kuota }}</td>
+                                <td class="px-6 py-4 text-center">
+                                    <span class="text-indigo-600 font-medium">{{ $jt->tiket_terjual }}</span>
+                                </td>
                                 <td class="px-6 py-4 text-center">
                                     <span
-                                        class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-700">
-                                        {{ $jt->kuota }}
-                                    </span>
-                                </td>
-
-                                <td class="px-6 py-4 text-center">
-                                    <span
-                                        class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-indigo-100 text-indigo-700">
-                                        {{ $jt->tiket_terjual }}
-                                    </span>
-                                </td>
-
-                                <td class="px-6 py-4 text-center">
-                                    <span
-                                        class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium {{ $jt->sisa_kuota > 0 ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700' }}">
+                                        class="{{ $jt->sisa_kuota > 0 ? 'text-green-600' : 'text-red-600' }} font-medium">
                                         {{ $jt->sisa_kuota }}
                                     </span>
                                 </td>
-
-                                <td class="px-6 py-4">
-                                    <span class="text-green-600 font-semibold">
-                                        Rp {{ number_format($jt->pendapatan, 0, ',', '.') }}
-                                    </span>
+                                <td class="px-6 py-4 text-right font-medium text-green-600">
+                                    Rp {{ number_format($jt->pendapatan, 0, ',', '.') }}
                                 </td>
-
-                                <td class="px-6 py-4 text-center">
-                                    <span
-                                        class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-700">
-                                        <i data-lucide="check-circle" class="size-3"></i>
-                                        {{ $jt->checkin_count }}
-                                    </span>
+                                <td class="px-6 py-4 text-center text-blue-600 font-medium">
+                                    {{ $jt->checkin_count }}
                                 </td>
                             </tr>
                         @endforeach
                     </tbody>
 
-                    {{-- Footer Total --}}
-                    <tfoot class="bg-indigo-50">
+                    <tfoot class="bg-gray-50">
                         <tr class="font-semibold">
-                            <td class="px-6 py-4 text-indigo-900">Total</td>
+                            <td class="px-6 py-4 text-gray-900">Total</td>
                             <td class="px-6 py-4"></td>
-                            <td class="px-6 py-4 text-center text-indigo-700">{{ $rekapJenisTiket->sum('kuota') }}</td>
-                            <td class="px-6 py-4 text-center text-indigo-700">
+                            <td class="px-6 py-4 text-center text-gray-700">{{ $rekapJenisTiket->sum('kuota') }}</td>
+                            <td class="px-6 py-4 text-center text-indigo-600">
                                 {{ $rekapJenisTiket->sum('tiket_terjual') }}</td>
-                            <td class="px-6 py-4 text-center text-indigo-700">{{ $rekapJenisTiket->sum('sisa_kuota') }}
+                            <td class="px-6 py-4 text-center text-gray-700">{{ $rekapJenisTiket->sum('sisa_kuota') }}
                             </td>
-                            <td class="px-6 py-4 text-green-600">Rp
-                                {{ number_format($rekapJenisTiket->sum('pendapatan'), 0, ',', '.') }}</td>
-                            <td class="px-6 py-4 text-center text-indigo-700">
+                            <td class="px-6 py-4 text-right text-green-600">
+                                Rp {{ number_format($rekapJenisTiket->sum('pendapatan'), 0, ',', '.') }}
+                            </td>
+                            <td class="px-6 py-4 text-center text-blue-600">
                                 {{ $rekapJenisTiket->sum('checkin_count') }}</td>
                         </tr>
                     </tfoot>

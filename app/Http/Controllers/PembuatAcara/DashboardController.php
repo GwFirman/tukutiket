@@ -47,8 +47,16 @@ class DashboardController extends Controller
             ->where('status', 'published')
             ->latest('created_at')
             ->first();
+        $pendapatanTerbaru = Pesanan::whereHas('detailPesanan.jenisTiket.acara', function ($query) use ($idPembuat) {
+            $query->where('id_pembuat', $idPembuat);
+        })
+            ->where('status_pembayaran', 'paid')
+            ->latest('created_at')
+            ->first();
 
-        return view('pembuat_acara.dashboard', compact('acaras', 'totalAcara', 'totalPendapatan', 'totalPeserta', 'totalTiketTerjual', 'acaraTerbaru'));
+        $pendapatanTerbaru = $pendapatanTerbaru ? $pendapatanTerbaru->total_harga : 0;
+
+        return view('pembuat_acara.dashboard', compact('acaras', 'totalAcara', 'totalPendapatan', 'totalPeserta', 'totalTiketTerjual', 'acaraTerbaru', 'pendapatanTerbaru'));
     }
 
     /**

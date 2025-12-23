@@ -109,36 +109,57 @@ class AcaraController extends Controller
     public function store(Request $request)
     {
         // dd($request);
-        $validate = $request->validate([
-            'banner_acara' => 'nullable|image|mimes:jpg,jpeg,png',
-            'nama_acara' => 'required|string|max:255',
-            'id_kreator' => 'required|string',
-            'id_kategori' => 'required|exists:kategori,id',
-            'waktu_mulai' => 'required|date',
-            'waktu_selesai' => 'required|date',
-            'lokasi' => 'required|string',
-            'deskripsi_acara' => 'required|string',
-            'satu_transaksi_per_akun' => 'boolean',
-            'maks_tiket_per_transaksi' => 'required|integer|min:1',
-            'info_narahubung' => 'nullable|string',
-            'email_narahubung' => 'nullable|email',
-        ]);
+        $isDraft = $request->input('status') === 'draft';
+
+        // Jika bukan draft → jalankan validasi penuh
+        if (! $isDraft) {
+            $request->validate([
+                'banner_acara' => 'nullable|image|mimes:jpg,jpeg,png',
+                'nama_acara' => 'required|string|max:255',
+                'id_kreator' => 'required|string',
+                'id_kategori' => 'required|exists:kategori,id',
+                'waktu_mulai' => 'required|date',
+                'waktu_selesai' => 'required|date',
+                'lokasi' => 'required|string',
+                'deskripsi_acara' => 'required|string',
+                'satu_transaksi_per_akun' => 'boolean',
+                'maks_tiket_per_transaksi' => 'required|integer|min:1',
+                'info_narahubung' => 'nullable|string',
+                'email_narahubung' => 'nullable|email',
+                'is_online' => 'nullable|boolean',
+                'venue' => 'nullable|string',
+                'latitude' => 'nullable|numeric',
+                'longitude' => 'nullable|numeric',
+            ]);
+        }
 
         $acara = new Acara;
-        $acara->nama_acara = $request->nama_acara;
+        // Wajib isi id_pembuat
         $acara->id_pembuat = Auth::id();
-        $acara->id_kreator = $request->id_kreator;
-        $acara->deskripsi = $request->deskripsi_acara;
-        $acara->lokasi = $request->lokasi;
-        $acara->waktu_mulai = $request->waktu_mulai;
-        $acara->waktu_selesai = $request->waktu_selesai;
-        $acara->no_telp_narahubung = $request->no_telp_narahubung;
-        $acara->info_narahubung = $request->info_narahubung;
-        $acara->email_narahubung = $request->email_narahubung;
-        $acara->status = 'published';
-        $acara->satu_transaksi_per_akun = $request->boolean('satu_transaksi_per_akun');
-        $acara->maks_tiket_per_transaksi = $request->maks_tiket_per_transaksi;
 
+        // Isi field hanya jika tersedia (untuk draft boleh kosong)
+        $acara->nama_acara = $request->input('nama_acara');
+        $acara->id_kreator = $request->input('id_kreator');
+        $acara->deskripsi = $request->input('deskripsi_acara');
+        $acara->lokasi = $request->input('lokasi');
+        $acara->waktu_mulai = $request->input('waktu_mulai');
+        $acara->waktu_selesai = $request->input('waktu_selesai');
+        $acara->no_telp_narahubung = $request->input('no_telp_narahubang');
+        $acara->info_narahubung = $request->input('info_narahubung');
+        $acara->email_narahubung = $request->input('email_narahubung');
+        $acara->is_online = $request->input('is_online');
+        $acara->venue = $request->input('venue');
+        $acara->latitude = $request->input('latitude');
+        $acara->longitude = $request->input('longitude');
+
+        // Status mengikuti tombol
+        $acara->status = $isDraft ? 'draft' : 'published';
+
+        // Opsi transaksi (boleh kosong saat draft)
+        $acara->satu_transaksi_per_akun = $request->boolean('satu_transaksi_per_akun');
+        $acara->maks_tiket_per_transaksi = $request->input('maks_tiket_per_transaksi');
+
+        // Banner (opsional)
         if ($request->hasFile('banner_acara')) {
             $path = $request->file('banner_acara')->store('banner_acara', 'public');
             $acara->banner_acara = $path;
@@ -146,29 +167,34 @@ class AcaraController extends Controller
 
         $acara->save();
 
-        // Simpan relasi acara dengan kategori
-        \App\Models\EventKategori::create([
-            'id_acara' => $acara->id,
-            'id_kategori' => $request->id_kategori,
-        ]);
+        // Relasi kategori hanya jika bukan draft dan kategori tersedia
+        if (! $isDraft && $request->filled('id_kategori')) {
+            EventKategori::create([
+                'id_acara' => $acara->id,
+                'id_kategori' => $request->id_kategori,
+            ]);
+        }
 
-        // Simpan kategori tiket gratis
+        // Jenis tiket: simpan jika dikirim; untuk draft semua field tiket boleh null
         if ($request->has('kategori_tiket') && is_array($request->kategori_tiket)) {
             foreach ($request->kategori_tiket as $kategori) {
                 $jenisTiket = new \App\Models\JenisTiket;
                 $jenisTiket->id_acara = $acara->id;
-                $jenisTiket->nama_jenis = $kategori['nama'];
-                $jenisTiket->harga = $kategori['harga'] ?? 0; // Harga 0 untuk tiket gratis
-                $jenisTiket->kuota = $kategori['kuota'];
-                $jenisTiket->penjualan_mulai = $kategori['penjualan_mulai'];
-                $jenisTiket->penjualan_selesai = $kategori['penjualan_selesai'];
+                $jenisTiket->nama_jenis = $kategori['nama'] ?? null;
+                $jenisTiket->harga = $kategori['harga'] ?? 0;
+                $jenisTiket->kuota = $kategori['kuota'] ?? 0;
+                $jenisTiket->penjualan_mulai = $kategori['penjualan_mulai'] ?? null;
+                $jenisTiket->penjualan_selesai = $kategori['penjualan_selesai'] ?? null;
+                $jenisTiket->berlaku_mulai = $kategori['berlaku_mulai'] ?? null;
+                $jenisTiket->berlaku_sampai = $kategori['berlaku_sampai'] ?? null;
                 $jenisTiket->deskripsi = $kategori['deskripsi'] ?? null;
                 $jenisTiket->save();
             }
         }
 
-        return redirect()->route('pembuat.acara.index')->with('success', 'Acara berhasil dibuat!');
-
+        return redirect()
+            ->route('pembuat.acara.index')
+            ->with('success', $isDraft ? 'Draft acara berhasil disimpan!' : 'Acara berhasil dipublish!');
     }
 
     /**
@@ -181,7 +207,8 @@ class AcaraController extends Controller
             abort(403, 'Acara tidak ditemukan');
         }
 
-        $acara->load('jenisTiket');
+        // Muat relasi untuk tampilan
+        $acara->load(['jenisTiket', 'kreator', 'kategori']);
 
         return view('pembuat_acara.acara.show', compact('acara'));
     }
@@ -194,7 +221,16 @@ class AcaraController extends Controller
         // $acara->with('jenisTiket')->findOrFail($acara);
         $kreator = Auth::user()->kreator;
 
-        return view('pembuat_acara.acara.edit', compact('acara', 'kreator'));
+        // Muat relasi lengkap untuk form
+        $acara->load(['jenisTiket', 'kreator', 'kategori']);
+        $kategori = kategori::all();
+
+        // dd($acara);
+        $kategoriacara = $acara->kategori()->first();
+
+        // dd($kategoriacara);
+
+        return view('pembuat_acara.acara.edit', compact('acara', 'kreator', 'kategori'));
     }
 
     /**
@@ -202,31 +238,37 @@ class AcaraController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $validated = $request->validate([
-            'banner_acara' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
-            'nama_acara' => 'required|string|max:255',
-            'id_kategori' => 'nullable|exists:kategori,id',
-            'waktu_mulai' => 'required|date',
-            'waktu_selesai' => 'required|date|after_or_equal:waktu_mulai',
-            'lokasi' => 'required|string',
-            'deskripsi_acara' => 'required|string',
-            'satu_transaksi_per_akun' => 'boolean',
-            'maks_tiket_per_transaksi' => 'required|integer|min:1',
-            'kategori_tiket' => 'array',
-            'kategori_tiket.*.nama' => 'required_with:kategori_tiket|string',
-            'kategori_tiket.*.harga' => 'nullable|numeric|min:0',
-            'kategori_tiket.*.kuota' => 'nullable|numeric|min:0',
-        ]);
+        $isDraft = $request->input('status') === 'draft';
 
-        // ✅ Ambil data acara
-        $acara = \App\Models\Acara::findOrFail($id);
+        // Validasi kondisional seperti store
+        if (! $isDraft) {
+            $request->validate([
+                'banner_acara' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+                'nama_acara' => 'required|string|max:255',
+                'id_kategori' => 'required|exists:kategori,id',
+                'waktu_mulai' => 'required|date',
+                'waktu_selesai' => 'required|date|after_or_equal:waktu_mulai',
+                'lokasi' => 'required|string',
+                'deskripsi_acara' => 'required|string',
+                'satu_transaksi_per_akun' => 'boolean',
+                'maks_tiket_per_transaksi' => 'required|integer|min:1',
+                'info_narahubung' => 'nullable|string',
+                'email_narahubung' => 'nullable|email',
+                'no_telp_narahubung' => 'nullable|string',
+                'is_online' => 'nullable|boolean',
+                'venue' => 'nullable|string',
+                'latitude' => 'nullable|numeric',
+                'longitude' => 'nullable|numeric',
+            ]);
+        }
 
-        // Pastikan hanya pembuat acara yang boleh mengupdate
+        $acara = Acara::findOrFail($id);
+
         if ($acara->id_pembuat !== Auth::id()) {
             abort(403, 'Kamu tidak memiliki izin untuk mengubah acara ini.');
         }
 
-        // ✅ Update data acara utama
+        // Update field utama (boleh kosong untuk draft)
         $acara->fill([
             'nama_acara' => $request->nama_acara,
             'deskripsi' => $request->deskripsi_acara,
@@ -234,48 +276,45 @@ class AcaraController extends Controller
             'waktu_mulai' => $request->waktu_mulai,
             'waktu_selesai' => $request->waktu_selesai,
             'no_telp_narahubung' => $request->no_telp_narahubung,
-            'status' => 'published',
+            'info_narahubung' => $request->info_narahubung,
+            'email_narahubung' => $request->email_narahubung,
+            'is_online' => $request->input('is_online'),
+            'venue' => $request->input('venue'),
+            'latitude' => $request->input('latitude'),
+            'longitude' => $request->input('longitude'),
+            'status' => $isDraft ? 'draft' : 'published',
             'satu_transaksi_per_akun' => $request->boolean('satu_transaksi_per_akun'),
             'maks_tiket_per_transaksi' => $request->maks_tiket_per_transaksi,
         ]);
 
-        // ✅ Ganti banner jika ada file baru
+        // Banner handling seperti sebelumnya
         if ($request->hasFile('banner_acara')) {
-            // Hapus file lama jika ada
             if ($acara->banner_acara && Storage::disk('public')->exists($acara->banner_acara)) {
                 Storage::disk('public')->delete($acara->banner_acara);
             }
-
-            // Simpan banner baru
             $path = $request->file('banner_acara')->store('banner_acara', 'public');
             $acara->banner_acara = $path;
         }
 
         $acara->save();
 
-        // ✅ Update relasi kategori acara jika ada perubahan
-        if ($request->has('id_kategori') && $request->id_kategori) {
-            // Hapus relasi lama
+        // Relasi kategori: Hanya jika bukan draft dan ada id_kategori
+        if (! $isDraft && $request->filled('id_kategori')) {
             EventKategori::where('id_acara', $acara->id)->delete();
-
-            // Buat relasi baru
             EventKategori::create([
                 'id_acara' => $acara->id,
                 'id_kategori' => $request->id_kategori,
             ]);
         }
 
-        // ✅ Kelola jenis tiket (gratis dan berbayar)
+        // Jenis tiket: Tetap seperti sekarang (kelola existing)
         if ($request->has('kategori_tiket') && is_array($request->kategori_tiket)) {
             $existingIds = [];
-
             foreach ($request->kategori_tiket as $kategori) {
-                // Jika tiket sudah ada → update
                 if (! empty($kategori['id'])) {
                     $jenisTiket = \App\Models\JenisTiket::where('id', $kategori['id'])
                         ->where('id_acara', $acara->id)
                         ->first();
-
                     if ($jenisTiket) {
                         $jenisTiket->update([
                             'nama_jenis' => $kategori['nama'],
@@ -283,13 +322,13 @@ class AcaraController extends Controller
                             'kuota' => $kategori['kuota'] ?? 0,
                             'penjualan_mulai' => $kategori['penjualan_mulai'] ?? null,
                             'penjualan_selesai' => $kategori['penjualan_selesai'] ?? null,
+                            'berlaku_mulai' => $kategori['berlaku_mulai'] ?? null,
+                            'berlaku_sampai' => $kategori['berlaku_sampai'] ?? null,
                             'deskripsi' => $kategori['deskripsi'] ?? null,
                         ]);
-
                         $existingIds[] = $jenisTiket->id;
                     }
                 } else {
-                    // Jika tiket baru → buat baru
                     $new = \App\Models\JenisTiket::create([
                         'id_acara' => $acara->id,
                         'nama_jenis' => $kategori['nama'],
@@ -297,24 +336,21 @@ class AcaraController extends Controller
                         'kuota' => $kategori['kuota'] ?? 0,
                         'penjualan_mulai' => $kategori['penjualan_mulai'] ?? null,
                         'penjualan_selesai' => $kategori['penjualan_selesai'] ?? null,
+                        'berlaku_mulai' => $kategori['berlaku_mulai'] ?? null,
+                        'berlaku_sampai' => $kategori['berlaku_sampai'] ?? null,
                         'deskripsi' => $kategori['deskripsi'] ?? null,
                     ]);
-
                     $existingIds[] = $new->id;
                 }
             }
-
-            // ✅ Hapus tiket yang tidak lagi dikirim dari form
             \App\Models\JenisTiket::where('id_acara', $acara->id)
                 ->whereNotIn('id', $existingIds)
                 ->delete();
         } else {
-            // Jika tidak ada kategori tiket yang dikirim, hapus semua
             \App\Models\JenisTiket::where('id_acara', $acara->id)->delete();
         }
 
-        // ✅ Redirect dengan pesan sukses
-        return redirect()->route('pembuat.acara.index')->with('success', 'Acara berhasil diperbarui!');
+        return redirect()->route('pembuat.acara.index')->with('success', $isDraft ? 'Draft acara berhasil diperbarui!' : 'Acara berhasil diperbarui!');
     }
 
     /**

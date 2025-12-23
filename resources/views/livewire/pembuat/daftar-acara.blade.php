@@ -129,7 +129,7 @@
                                             <i data-lucide="edit-3" class="size-5"></i>
                                         </a>
 
-                                        {{-- Archive / Publish / Restore --}}
+                                        {{-- Archive / Publish / Restore
                                         @if ($acara->status !== 'archived')
                                             @if ($acara->status !== 'published')
                                                 <form action="{{ route('pembuat.acara.publish', $acara->id) }}"
@@ -159,7 +159,7 @@
                                                     <i data-lucide="rotate-ccw" class="size-5"></i>
                                                 </button>
                                             </form>
-                                        @endif
+                                        @endif --}}
                                     </div>
                                 </td>
                             </tr>

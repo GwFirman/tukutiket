@@ -27,7 +27,8 @@ class TiketController extends Controller
             ->orderBy('created_at', 'desc')
             ->get();
 
-        // dd($pesanan);
+        // dd($tiketList);
+
         return view('pembeli.tiket.index', compact('tiketList'));
     }
 

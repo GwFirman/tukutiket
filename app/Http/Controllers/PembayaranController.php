@@ -17,6 +17,37 @@ class PembayaranController extends Controller
         //
     }
 
+    public function bayar(Request $request)
+    {
+        $validated = $request->validate([
+            'kode_pesanan' => 'required|string|exists:pesanan,kode_pesanan',
+            'bukti_pembayaran' => 'required|image|mimes:jpeg,jpg,png|max:5120', // max 5MB
+            'bank_tujuan' => 'required|string',
+        ]);
+
+        // Cari pesanan berdasarkan kode pesanan
+        $pesanan = Pesanan::where('kode_pesanan', $validated['kode_pesanan'])->firstOrFail();
+
+        // Upload bukti pembayaran
+        $buktiPath = null;
+        if ($request->hasFile('bukti_pembayaran')) {
+            $file = $request->file('bukti_pembayaran');
+            $fileName = time().'_'.$validated['kode_pesanan'].'.'.$file->getClientOriginalExtension();
+            $buktiPath = $file->storeAs('bukti_pembayaran', $fileName, 'public');
+        }
+
+        // Update pesanan dengan bukti pembayaran dan ubah status ke pending
+        $pesanan->update([
+            'bukti_pembayaran' => $buktiPath,
+            'status_pembayaran' => 'pending',
+            'metode_pembayaran' => $validated['bank_tujuan'],
+        ]);
+
+        return redirect()
+            ->route('pembeli.tiket-saya')
+            ->with('success', 'Bukti pembayaran berhasil diupload! Pesanan Anda sedang dalam proses verifikasi.');
+    }
+
     /**
      * Show the form for creating a new resource.
      */
@@ -102,7 +133,7 @@ class PembayaranController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request)
     {
         //
     }

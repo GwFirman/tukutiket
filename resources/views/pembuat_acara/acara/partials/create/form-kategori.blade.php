@@ -1,34 +1,50 @@
-<div class="w-full mt-6" x-data="{
-    showCategoryModal: false,
-    selectedCategory: null,
-    selectedCategoryName: '',
+@php
+    // 1. Inisialisasi variabel default
+    $selectedId = null;
+    $selectedName = '';
 
-    init() {
-        // Muat nilai lama (old) jika ada
-        const oldCategoryId = '{{ old('id_kategori', '') }}';
-        if (oldCategoryId) {
-            this.selectedCategory = parseInt(oldCategoryId);
-            // Cari nama kategori berdasarkan ID
-            @foreach ($kategori as $kat)
-                if (this.selectedCategory === {{ $kat->id }}) {
-                    this.selectedCategoryName = '{{ $kat->nama_kategori }}';
-                } @endforeach
+    // 2. Cek apakah ada input lama (jika submit gagal)
+    if (old('id_kategori')) {
+        $selectedId = old('id_kategori');
+        // Cari nama kategori berdasarkan ID dari list $kategori untuk ditampilkan
+        $oldKategori = $kategori->firstWhere('id', $selectedId);
+        $selectedName = $oldKategori ? $oldKategori->nama_kategori : '';
+    }
+    // 3. Jika tidak ada old input, cek data dari database ($acara)
+    elseif (isset($acara)) {
+        // Mengambil item pertama dari relasi kategori sesuai request
+        // Menggunakan property access ($acara->kategori) agar efisien (tidak query ulang jika sudah di-load)
+        // Kita handle jika return-nya Collection atau Single Model
+        $kategoriAcara =
+            $acara->kategori instanceof \Illuminate\Support\Collection ? $acara->kategori->first() : $acara->kategori;
+
+        if ($kategoriAcara) {
+            $selectedId = $kategoriAcara->id;
+            $selectedName = $kategoriAcara->nama_kategori;
         }
-    },
+    }
+@endphp
 
+<div class="w-full mt-6 border rounded-2xl border-gray-100" x-data="{
+    showCategoryModal: false,
+    selectedCategory: @js($selectedId), // Render aman ke Javascript (null atau int)
+    selectedCategoryName: @js($selectedName), // Render aman ke string
+
+    // Fungsi Helper untuk memilih kategori
     selectCategory(id, name) {
         this.selectedCategory = id;
         this.selectedCategoryName = name;
         this.showCategoryModal = false;
     }
 }">
-    <label class="mb-2 block text-sm font-medium text-gray-700">
-        Kategori Acara
-    </label>
+    <div class="flex items-center gap-2 p-5">
+        <i data-lucide="calendars" class="size-5 text-indigo-600"></i>
+        <h3 class="text-lg font-semibold text-gray-900">Kategori acara</h3>
+    </div>
 
     <input type="hidden" name="id_kategori" x-model="selectedCategory" required>
 
-    <div class="flex items-start gap-3">
+    <div class="flex items-start gap-3 border-t border-gray-100 p-5">
         <div class="shrink-0 mt-0.5 text-gray-500">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
                 stroke="currentColor" stroke-width="2">
@@ -38,7 +54,8 @@
         </div>
 
         <div class="mr-4">
-            <p class="text-gray-900 font-medium" x-text="selectedCategoryName || 'Belum ada kategori dipilih'">
+            <p class="text-gray-900 font-medium"
+                x-text="selectedCategoryName ? selectedCategoryName : 'Belum ada kategori dipilih'">
             </p>
             <p class="text-gray-500 text-sm mt-0.5">
                 Tentukan kategori acara Anda
@@ -68,24 +85,25 @@
             </div>
 
             <div class="space-y-4 max-h-96 overflow-y-auto">
-                <!-- Grid Kategori -->
                 <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
                     @foreach ($kategori as $kat)
                         <button type="button" @click="selectCategory({{ $kat->id }}, '{{ $kat->nama_kategori }}')"
-                            class="group relative flex items-center justify-center p-4 border-2 border-gray-200 rounded-xl cursor-pointer transition-all hover:border-indigo-300 hover:shadow-md"
-                            :class="selectedCategory == {{ $kat->id }} ? 'border-indigo-500 bg-indigo-50' : ''">
+                            class="group relative flex items-center justify-center p-4 border-2 rounded-xl cursor-pointer transition-all hover:shadow-md"
+                            :class="selectedCategory == {{ $kat->id }} ?
+                                'border-indigo-500 bg-indigo-50' :
+                                'border-gray-200 hover:border-indigo-300'">
 
-                            <!-- Label -->
-                            <span
-                                class="text-sm font-medium text-gray-700 text-center group-hover:text-indigo-700 transition-colors"
-                                :class="selectedCategory == {{ $kat->id }} ? 'text-indigo-600' : ''">
+                            <span class="text-sm font-medium text-center transition-colors"
+                                :class="selectedCategory == {{ $kat->id }} ?
+                                    'text-indigo-600' :
+                                    'text-gray-700 group-hover:text-indigo-700'">
                                 {{ $kat->nama_kategori }}
                             </span>
 
-                            <!-- Selected Indicator -->
-                            <div class="absolute top-3 right-3 w-4 h-4 rounded-full border-2 border-gray-300 bg-white transition-all"
+                            <div class="absolute top-3 right-3 w-4 h-4 rounded-full border-2 transition-all"
                                 :class="selectedCategory == {{ $kat->id }} ?
-                                    'opacity-100 border-indigo-500 bg-indigo-500' : 'opacity-0'">
+                                    'opacity-100 border-indigo-500 bg-indigo-500' :
+                                    'opacity-0 border-gray-300 bg-white'">
                                 <div
                                     class="w-2 h-2 bg-white rounded-full absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
                                 </div>
@@ -100,17 +118,12 @@
                     class="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50">
                     Batal
                 </button>
-                <button type="button" @click="showCategoryModal = false"
-                    class="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg text-sm font-medium"
-                    :disabled="!selectedCategory">
-                    Pilih Kategori
-                </button>
             </div>
         </div>
     </div>
 
     @error('id_kategori')
-        <div class="flex items-center gap-2 text-red-600 text-sm mt-2">
+        <div class="flex items-center gap-2 text-red-600 text-sm mt-2 px-5 pb-5">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                     d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -119,27 +132,3 @@
         </div>
     @enderror
 </div>
-
-<style>
-    /* Custom styling for better UX */
-    input[type="radio"]:checked+.peer-checked\:bg-indigo-500 {
-        background-color: rgb(99 102 241);
-    }
-
-    input[type="radio"]:checked+.peer-checked\:border-indigo-500 {
-        border-color: rgb(99 102 241);
-    }
-
-    input[type="radio"]:checked+.peer-checked\:text-indigo-600 {
-        color: rgb(79 70 229);
-    }
-
-    input[type="radio"]:checked+.peer-checked\:text-white {
-        color: white;
-    }
-
-    /* Animation untuk check icon */
-    .peer:checked~.peer-checked\:scale-75 {
-        transform: scale(0.75);
-    }
-</style>

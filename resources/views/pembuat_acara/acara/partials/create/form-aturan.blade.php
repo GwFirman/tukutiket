@@ -1,8 +1,11 @@
 <div class="mt-4 rounded-2xl border border-gray-200 bg-white">
     <div class="px-5 py-4 sm:px-6 sm:py-5">
-        <h3 class="text-base font-medium text-gray-800">
-            Aturan Pembelian
-        </h3>
+        <div class="mb-2">
+            <div class="flex items-center gap-2 mb-2">
+                <i data-lucide="shield-alert" class="size-5 text-indigo-600"></i>
+                <h3 class="text-lg font-semibold text-gray-900">Aturan pembelian tiket</h3>
+            </div>
+        </div>
     </div>
     <div class="space-y-6 border-t border-gray-100 p-5 sm:p-6">
         <!-- Elements -->
@@ -15,11 +18,12 @@
                 </div>
                 <select name="maks_tiket_per_transaksi"
                     class="shadow-theme-xs w-24 focus:border-blue-300 focus:ring-blue-500/10 h-11 rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 focus:ring-3 focus:outline-hidden">
-                    <option value="5">5 tiket</option>
-                    <option value="4">4 tiket</option>
-                    <option value="3">3 tiket</option>
-                    <option value="2">2 tiket</option>
-                    <option value="1">1 tiket</option>
+                    @php($maksOld = old('maks_tiket_per_transaksi', isset($acara) ? $acara->maks_tiket_per_transaksi : 5))
+                    <option value="5" {{ (string) $maksOld === '5' ? 'selected' : '' }}>5 tiket</option>
+                    <option value="4" {{ (string) $maksOld === '4' ? 'selected' : '' }}>4 tiket</option>
+                    <option value="3" {{ (string) $maksOld === '3' ? 'selected' : '' }}>3 tiket</option>
+                    <option value="2" {{ (string) $maksOld === '2' ? 'selected' : '' }}>2 tiket</option>
+                    <option value="1" {{ (string) $maksOld === '1' ? 'selected' : '' }}>1 tiket</option>
                 </select>
             </div>
             <div class="flex items-center justify-between gap-4" x-data="{ switchToggle: @json((bool) old('satu_transaksi_per_akun', isset($acara) ? $acara->satu_transaksi_per_akun : false)) }">

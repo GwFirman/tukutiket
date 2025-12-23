@@ -132,19 +132,21 @@
                     {{ __('Daftar Peserta') }}
                 </x-nav-link>
 
-                <x-nav-link :href="route('pembuat.checkin.index', $acaraSlug)" :active="request()->routeIs('pembuat.checkin.index')" class="group pl-4">
-                    <i data-lucide="user-round-check" class="size-4 mr-2"></i>
-                    {{ __('Check in peserta') }}
-                </x-nav-link>
+                @if (!$routeAcara->is_online)
+                    <x-nav-link :href="route('pembuat.checkin.index', $acaraSlug)" :active="request()->routeIs('pembuat.checkin.index')" class="group pl-4">
+                        <i data-lucide="user-round-check" class="size-4 mr-2"></i>
+                        {{ __('Check in peserta') }}
+                    </x-nav-link>
 
-                <x-nav-link :href="route('pembuat.checkout.index', $acaraSlug)" :active="request()->routeIs('pembuat.checkout.index')" class="group pl-4">
-                    <i data-lucide="user-round-minus" class="size-4 mr-2"></i>
-                    {{ __('Check out peserta') }}
-                </x-nav-link>
+                    <x-nav-link :href="route('pembuat.checkout.index', $acaraSlug)" :active="request()->routeIs('pembuat.checkout.index')" class="group pl-4">
+                        <i data-lucide="user-round-minus" class="size-4 mr-2"></i>
+                        {{ __('Check out peserta') }}
+                    </x-nav-link>
+                @endif
 
-                <x-nav-link :href="route('dashboard', request()->route('acara'))" class="group pl-4">
-                    <i data-lucide="chart-no-axes-combined" class="size-4 mr-2"></i>
-                    {{ __('Transaksi') }}
+                <x-nav-link :href="route('pembuat.transaksi.index', $acaraSlug)" :active="request()->routeIs('pembuat.transaksi.index', 'pembuat.transaksi.acc')" class="group pl-4">
+                    <i data-lucide="credit-card" class="size-4 mr-2"></i>
+                    {{ __('Laporan Transaksi') }}
                 </x-nav-link>
             </div>
         @endif
@@ -191,34 +193,42 @@
 <div class="mt-auto border-2 m-2 rounded-md border-gray-200  dark:border-indigo-100 bg-gray-50 ">
     <div class="p-4">
         <div class="flex items-center gap-3">
+            @php
+                $onPembuat = request()->routeIs('pembuat.*');
+                $kreator = auth()->user()->kreator ?? null;
+            @endphp
             <!-- Avatar -->
             <div class="flex-shrink-0">
-                @if (auth()->user()->avatar ?? false)
+                @if ($onPembuat && $kreator && $kreator->logo)
+                    <img src="{{ asset('storage/' . $kreator->logo) }}" alt="{{ $kreator->nama_kreator }}"
+                        class="size-10 rounded-full object-cover border-2 border-gray-200">
+                @elseif (auth()->user()->avatar ?? false)
                     <img src="{{ asset('storage/' . auth()->user()->avatar) }}" alt="{{ auth()->user()->name }}"
                         class="size-10 rounded-full object-cover border-2 border-gray-200">
                 @else
                     <div
                         class="size-10 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-semibold text-sm border-2 border-gray-200">
-                        {{ strtoupper(substr(auth()->user()->name, 0, 2)) }}
+                        {{ strtoupper(substr($onPembuat && $kreator ? $kreator->nama_kreator : auth()->user()->name, 0, 2)) }}
                     </div>
                 @endif
             </div>
 
             <!-- User Info -->
             <div class="flex-1 min-w-0">
-                <p class="text-sm font-medium text-gray-900 truncate">
-                    {{ auth()->user()->name }}
-                </p>
-                <p class="text-xs text-gray-500 dark:text-gray-400 truncate">
-                    {{ auth()->user()->email }}
-                </p>
+                @if ($onPembuat && $kreator)
+                    <p class="text-sm font-medium text-gray-900 truncate">{{ $kreator->nama_kreator }}</p>
+                    <p class="text-xs text-gray-500 truncate">{{ auth()->user()->email }}</p>
+                @else
+                    <p class="text-sm font-medium text-gray-900 truncate">{{ auth()->user()->name }}</p>
+                    <p class="text-xs text-gray-500 dark:text-gray-400 truncate">{{ auth()->user()->email }}</p>
+                @endif
             </div>
 
-            <!-- Settings Icon -->
+            {{-- <!-- Settings Icon -->
             <a href="{{ route('profile.edit') }}"
                 class="flex-shrink-0 p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
                 <i data-lucide="settings" class="size-5"></i>
-            </a>
+            </a> --}}
         </div>
     </div>
 </div>

@@ -31,41 +31,53 @@
                     Kembali ke Daftar
                 </a>
                 <div class="flex items-center gap-2 lg:gap-3">
-                    <a href="{{ route('pembuat.acara.edit', $acara->id) }}"
-                        class="inline-flex items-center gap-2 px-3 lg:px-4 py-2 bg-indigo-50 text-indigo-600 rounded-lg hover:bg-indigo-100 transition font-medium text-sm">
-                        <i data-lucide="edit-3" class="size-4"></i>
-                        <span class="hidden md:inline">Edit</span>
-                    </a>
-                    <a href="{{ route('pembuat.acara.daftar-peserta', $acara->id) }}"
-                        class="inline-flex items-center gap-2 px-3 lg:px-4 py-2 bg-purple-50 text-purple-600 rounded-lg hover:bg-purple-100 transition font-medium text-sm">
-                        <i data-lucide="users" class="size-4"></i>
-                        <span class="hidden md:inline">Peserta</span>
-                    </a>
-                    <a href="{{ route('pembuat.scan.index', $acara->slug) }}"
-                        class="inline-flex items-center gap-2 px-3 lg:px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition font-medium text-sm">
-                        <i data-lucide="scan-line" class="size-4"></i>
-                        <span class="hidden md:inline">Scan</span>
-                    </a>
+                    @if ($acara->status === 'published')
+                        <form method="POST" action="{{ route('pembuat.acara.archive', $acara->id) }}">
+                            @csrf
+                            @method('PATCH')
+                            <button type="submit"
+                                class="inline-flex items-center gap-2 px-3 lg:px-4 py-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition font-medium text-sm">
+                                <i data-lucide="archive" class="size-4"></i>
+                                <span class="hidden md:inline">Archive</span>
+                            </button>
+                        </form>
+                    @else
+                        <form method="POST" action="{{ route('pembuat.acara.publish', $acara->id) }}">
+                            @csrf
+                            @method('PATCH')
+                            <button type="submit"
+                                class="inline-flex items-center gap-2 px-3 lg:px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition font-medium text-sm">
+                                <i data-lucide="upload" class="size-4"></i>
+                                <span class="hidden md:inline">Publish</span>
+                            </button>
+                        </form>
+                    @endif
                 </div>
             </div>
 
             <!-- Mobile Grid Layout -->
-            <div class="grid grid-cols-3 gap-2 sm:hidden">
-                <a href="{{ route('pembuat.acara.edit', $acara->id) }}"
-                    class="flex flex-col items-center gap-1.5 p-3 bg-indigo-50 text-indigo-600 rounded-lg hover:bg-indigo-100 transition">
-                    <i data-lucide="edit-3" class="size-5"></i>
-                    <span class="text-xs font-medium">Edit</span>
-                </a>
-                <a href="{{ route('pembuat.acara.daftar-peserta', $acara->id) }}"
-                    class="flex flex-col items-center gap-1.5 p-3 bg-purple-50 text-purple-600 rounded-lg hover:bg-purple-100 transition">
-                    <i data-lucide="users" class="size-5"></i>
-                    <span class="text-xs font-medium">Peserta</span>
-                </a>
-                <a href="{{ route('pembuat.scan.index', $acara->slug) }}"
-                    class="flex flex-col items-center gap-1.5 p-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition">
-                    <i data-lucide="scan-line" class="size-5"></i>
-                    <span class="text-xs font-medium">Scan</span>
-                </a>
+            <div class="grid grid-cols-2 gap-2 sm:hidden">
+                @if ($acara->status === 'published')
+                    <form method="POST" action="{{ route('pembuat.acara.archive', $acara->id) }}" class="flex">
+                        @csrf
+                        @method('PATCH')
+                        <button type="submit"
+                            class="flex flex-col items-center gap-1.5 p-3 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition w-full">
+                            <i data-lucide="archive" class="size-5"></i>
+                            <span class="text-xs font-medium">Archive</span>
+                        </button>
+                    </form>
+                @else
+                    <form method="POST" action="{{ route('pembuat.acara.publish', $acara->id) }}" class="flex">
+                        @csrf
+                        @method('PATCH')
+                        <button type="submit"
+                            class="flex flex-col items-center gap-1.5 p-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition w-full">
+                            <i data-lucide="check-circle" class="size-5"></i>
+                            <span class="text-xs font-medium">Publish</span>
+                        </button>
+                    </form>
+                @endif
             </div>
         </div>
 
@@ -134,28 +146,27 @@
 
 
                 <!-- Informasi Tiket -->
-                <div class="bg-white rounded-lg  border border-gray-100 overflow-hidden">
-                    <div class="bg-indigo-50 px-6 py-4 border-b border-indigo-100">
-                        <h2 class="text-lg font-semibold text-indigo-900 flex items-center gap-2">
+                <div class="bg-white rounded-lg border border-gray-100 overflow-hidden">
+                    <div class="bg-indigo-50 px-4 sm:px-6 py-3 border-b border-indigo-100">
+                        <h2 class="text-base sm:text-lg font-semibold text-indigo-900 flex items-center gap-2">
                             <i data-lucide="ticket" class="size-5"></i>
                             Informasi Tiket
                         </h2>
                     </div>
 
-                    <div class="p-6 space-y-4">
+                    <div class="p-4 sm:p-6 space-y-4">
                         @forelse ($acara->jenisTiket as $tiket)
-                            <div class="border border-gray-200 rounded-xl overflow-hidden hover:border-indigo-300 transition cursor-pointer group"
+                            <div class="border border-gray-200 rounded-lg overflow-hidden hover:border-indigo-300 transition cursor-pointer"
                                 onclick="toggleTicketDetails('ticket-{{ $tiket->id }}')">
-                                <div
-                                    class="p-4 flex justify-between items-center bg-white group-hover:bg-indigo-50/50 transition">
-                                    <div class="flex items-center gap-4">
+                                <div class="p-3 sm:p-4 flex justify-between items-center bg-white">
+                                    <div class="flex items-center gap-3 sm:gap-4">
                                         <div
-                                            class="h-12 w-12 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center">
-                                            <i data-lucide="ticket" class="size-6 text-white"></i>
+                                            class="h-10 w-10 sm:h-12 sm:w-12 rounded-md bg-indigo-100 flex items-center justify-center">
+                                            <i data-lucide="ticket" class="size-5 sm:size-6 text-indigo-600"></i>
                                         </div>
                                         <div>
                                             <h3 class="font-semibold text-gray-900">{{ $tiket->nama_jenis }}</h3>
-                                            <p class="text-indigo-600 font-bold">
+                                            <p class="text-indigo-600 font-bold text-sm">
                                                 @if ($tiket->harga == 0)
                                                     Gratis
                                                 @else
@@ -166,7 +177,7 @@
                                     </div>
                                     <div class="flex items-center gap-3">
                                         <span
-                                            class="px-3 py-1 rounded-full text-xs font-medium bg-indigo-100 text-indigo-700">
+                                            class="px-2.5 py-1 rounded-full text-xs font-medium bg-indigo-100 text-indigo-700">
                                             Kuota: {{ $tiket->kuota }}
                                         </span>
                                         <i data-lucide="chevron-down"
@@ -175,8 +186,8 @@
                                 </div>
 
                                 <div id="ticket-{{ $tiket->id }}"
-                                    class="hidden border-t border-gray-100 bg-gray-50 p-4">
-                                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                                    class="hidden border-t border-gray-100 bg-gray-50 p-3 sm:p-4">
+                                    <div class="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 text-sm">
                                         <div class="bg-white rounded-lg p-3">
                                             <p class="text-gray-500 text-xs mb-1">Penjualan Mulai</p>
                                             <p class="font-medium text-gray-900">
@@ -196,6 +207,18 @@
                                                 WIB</p>
                                         </div>
                                         <div class="bg-white rounded-lg p-3">
+                                            <p class="text-gray-500 text-xs mb-1">Berlaku Mulai</p>
+                                            <p class="font-medium text-gray-900">
+                                                {{ optional($tiket->berlaku_mulai ? \Carbon\Carbon::parse($tiket->berlaku_mulai) : null)?->format('d M Y') ?? '-' }}
+                                            </p>
+                                        </div>
+                                        <div class="bg-white rounded-lg p-3">
+                                            <p class="text-gray-500 text-xs mb-1">Berlaku Sampai</p>
+                                            <p class="font-medium text-gray-900">
+                                                {{ optional($tiket->berlaku_sampai ? \Carbon\Carbon::parse($tiket->berlaku_sampai) : null)?->format('d M Y') ?? '-' }}
+                                            </p>
+                                        </div>
+                                        <div class="bg-white rounded-lg p-3">
                                             <p class="text-gray-500 text-xs mb-1">Kuota Tiket</p>
                                             <p class="font-medium text-gray-900">{{ $tiket->kuota }} tiket</p>
                                         </div>
@@ -208,7 +231,7 @@
                                         </div>
                                     </div>
                                     @if ($tiket->deskripsi)
-                                        <div class="mt-4 bg-white rounded-lg p-3">
+                                        <div class="mt-3 sm:mt-4 bg-white rounded-lg p-3">
                                             <p class="text-gray-500 text-xs mb-1">Deskripsi</p>
                                             <p class="text-gray-700 text-sm">{{ $tiket->deskripsi }}</p>
                                         </div>
@@ -237,7 +260,7 @@
             <div class="col-span-12 lg:col-span-4 space-y-6">
 
                 <!-- Info Card -->
-                <div class="bg-white rounded-lg  border border-gray-100 overflow-hidden sticky top-4">
+                <div class="bg-white rounded-lg  border border-gray-100 overflow-hidden top-4">
 
 
                     <div class="p-6 space-y-5">
@@ -279,11 +302,37 @@
                         <!-- Lokasi -->
                         <div>
                             <h4
-                                class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-2 flex items-center gap-2">
+                                class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3 flex items-center gap-2">
                                 <i data-lucide="map-pin" class="size-4 text-indigo-500"></i>
-                                Lokasi
+                                Lokasi & Venue
                             </h4>
-                            <p class="text-gray-700">{{ $acara->lokasi }}</p>
+                            <div class="space-y-2">
+                                @if ($acara->is_online)
+                                    <div class="bg-green-50 rounded-lg p-3 border border-green-200">
+                                        <p class="text-xs text-green-600 mb-1">Acara Online</p>
+                                        @if ($acara->link_acara)
+                                            <a href="{{ $acara->link_acara }}" target="_blank"
+                                                class="text-sm font-medium text-green-700 hover:text-green-800 underline flex items-center gap-1">
+                                                {{ $acara->link_acara }}
+                                                <i data-lucide="external-link" class="size-3"></i>
+                                            </a>
+                                        @else
+                                            <p class="text-sm text-green-700">Link akan diberikan kemudian</p>
+                                        @endif
+                                    </div>
+                                @else
+                                    @if ($acara->venue)
+                                        <div class="bg-gray-50 rounded-lg p-3">
+                                            <p class="text-xs text-gray-500 mb-1">Venue</p>
+                                            <p class="text-sm font-medium text-gray-700">{{ $acara->venue }}</p>
+                                        </div>
+                                    @endif
+                                    <div class="bg-gray-50 rounded-lg p-3">
+                                        <p class="text-xs text-gray-500 mb-1">Alamat</p>
+                                        <p class="text-sm text-gray-700">{{ $acara->lokasi }}</p>
+                                    </div>
+                                @endif
+                            </div>
                         </div>
 
                         <div class="border-t border-gray-100"></div>

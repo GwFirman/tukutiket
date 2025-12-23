@@ -1,6 +1,6 @@
 <x-app-layout>
     <x-slot name="header">
-        <div class="flex items-center gap-2 max-w-5xl mx-auto">
+        <div class="flex items-center gap-2 max-w-4xl mx-auto">
             <i data-lucide="calendar" class="size-5 text-gray-600"></i>
             <i data-lucide="chevron-right" class="size-4 font-medium text-gray-400"></i>
             <p class="font-medium">Buat Acara</p>
@@ -9,8 +9,8 @@
 
     <form method="POST" action="{{ route('pembuat.acara.store') }}" enctype="multipart/form-data" class="">
         @csrf
-        <div class="mb-6">
-            <div class="mx-auto max-w-5xl">
+        <div class="mb-6 lg:mt-6 px-6 lg:p-0">
+            <div class="mx-auto max-w-4xl">
                 <div class="">
                     @if ($errors->any())
                         <div class="bg-red-50 border-l-4 border-red-500 p-4 mb-6">
@@ -35,18 +35,20 @@
                             </div>
                         </div>
                     @endif
+                    <div class="border border-gray-300 rounded-lg">
 
-                    @include('pembuat_acara.acara.partials.create.form-banner')
+                        @include('pembuat_acara.acara.partials.create.form-banner')
 
-                    @include('pembuat_acara.acara.partials.create.form-acara')
+                        @include('pembuat_acara.acara.partials.create.form-acara')
 
-                    <div class="flex gap-5 mt-5">
-                        @include('pembuat_acara.acara.partials.create.profile-kreator')
+                        <div class="lg:flex gap-5 mt-5 px-5 pb-5 space-y-4">
+                            @include('pembuat_acara.acara.partials.create.profile-kreator')
 
-                        @include('pembuat_acara.acara.partials.create.form-tanggal')
+                            @include('pembuat_acara.acara.partials.create.form-tanggal')
 
-                        @include('pembuat_acara.acara.partials.create.form-lokasi')
+                            @include('pembuat_acara.acara.partials.create.form-lokasi')
 
+                        </div>
                     </div>
                     <div class="mt-6">
                         <div class="border-b border-gray-200">
@@ -92,15 +94,15 @@
                         });
                     </script>
 
-
-                    <div class="flex justify-between mt-4">
+                    <div class="flex justify-between mt-4 px-5">
                         <div class="flex gap-3 justify-end w-full">
                             <button type="submit" name="status" value="draft"
                                 class="bg-gray-200 text-gray-800 px-4 py-2 rounded-lg hover:bg-gray-300 transition">
                                 Simpan Draft
                             </button>
-                            <button type="submit" name="status" value="publish"
-                                class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition">
+                            <button id="publishBtn" type="submit" name="status" value="publish"
+                                class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                                disabled>
                                 Publish
                             </button>
                         </div>
@@ -108,6 +110,41 @@
                 </div>
             </div>
     </form>
+    <script>
+        // Toggle tombol Publish berdasarkan validitas form
+        (function() {
+            const form = document.querySelector('form[action="{{ route('pembuat.acara.store') }}"]');
+            const publishBtn = document.getElementById('publishBtn');
+            if (!form || !publishBtn) return;
+
+            // Tandai field wajib dengan required bila belum
+            const requiredSelectors = [
+                'input[name="nama_acara"]',
+                'input[name="id_kreator"]',
+                'select[name="id_kategori"]',
+                'input[name="waktu_mulai"]',
+                'input[name="waktu_selesai"]',
+                'input[name="lokasi"]',
+                'textarea[name="deskripsi_acara"]',
+                'input[name="info_narahubung"]',
+                'input[name="email_narahubung"]',
+                // Minimal 1 tiket
+                'input[name="has_tickets"]'
+            ];
+            requiredSelectors.forEach(sel => {
+                const el = form.querySelector(sel);
+                if (el) el.setAttribute('required', 'required');
+            });
+
+            const checkValidity = () => {
+                publishBtn.disabled = !form.checkValidity();
+            };
+
+            form.addEventListener('input', checkValidity, true);
+            form.addEventListener('change', checkValidity, true);
+            document.addEventListener('DOMContentLoaded', checkValidity);
+        })();
+    </script>
     </div>
     {{-- </div> --}}
 </x-app-layout>

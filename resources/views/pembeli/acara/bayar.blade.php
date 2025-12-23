@@ -12,241 +12,365 @@
             <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
             </svg>
-            <span class="font-semibold text-blue-600">Menunggu Pembayaran</span>
+            <span class="font-semibold text-blue-600">Konfirmasi Pembayaran</span>
         </div>
     </x-slot>
 
     <div class="min-h-screen bg-gray-50 py-8">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-24">
-            <!-- Alert Warning -->
-            <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6 rounded-r-lg">
+            <!-- Alert Info -->
+            <div class="bg-blue-50 border-l-4 border-blue-400 p-4 mb-6 rounded-r-lg">
                 <div class="flex">
                     <div class="flex-shrink-0">
-                        <svg class="h-5 w-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                        <svg class="h-5 w-5 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
                             <path fill-rule="evenodd"
-                                d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
+                                d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
                                 clip-rule="evenodd" />
                         </svg>
                     </div>
                     <div class="ml-3">
-                        <p class="text-sm text-yellow-700 font-medium">
-                            Selesaikan pembayaran sebelum waktu habis!
+                        <p class="text-sm text-blue-700 font-medium">
+                            Silakan lakukan transfer ke salah satu rekening di bawah ini, lalu upload bukti pembayaran
+                            Anda.
                         </p>
                     </div>
                 </div>
             </div>
 
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <!-- Main Content - Payment Instructions -->
+                <!-- Main Content - Payment Methods and Upload -->
                 <div class="lg:col-span-2 space-y-6">
-                    <!-- Countdown Timer Card -->
-                    <div class="bg-gradient-to-r from-red-500 to-red-600 rounded-xl shadow-lg p-6 text-white">
-                        <div class="text-center">
-                            <p class="text-sm font-medium mb-2">Selesaikan Pembayaran Dalam</p>
-                            <div class="flex justify-center items-center space-x-2" x-data="countdown()"
-                                x-init="startCountdown()">
-                                <div class="bg-white/20 backdrop-blur-sm rounded-lg px-4 py-3">
-                                    <div class="text-3xl font-bold" x-text="hours">00</div>
-                                    <div class="text-xs">Jam</div>
+                    @if ($pesanan->status_pembayaran === 'pending' && $pesanan->bukti_pembayaran)
+                        <!-- Payment Status Pending -->
+                        <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+                            <div class="bg-gradient-to-r from-yellow-500 to-yellow-600 px-6 py-4">
+                                <h3 class="text-lg font-bold text-white flex items-center">
+                                    <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                    Menunggu Verifikasi Pembayaran
+                                </h3>
+                                <p class="text-sm text-yellow-100 mt-1">Bukti pembayaran Anda sedang dalam proses
+                                    verifikasi</p>
+                            </div>
+                            <div class="p-6">
+                                <div class="flex items-center justify-between mb-6">
+                                    <div>
+                                        <p class="text-sm text-gray-500">Status Pembayaran</p>
+                                        <div class="flex items-center gap-2 mt-1">
+                                            <span
+                                                class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium bg-yellow-100 text-yellow-700">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor"
+                                                    viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                        stroke-width="2"
+                                                        d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                </svg>
+                                                Menunggu Verifikasi
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="text-right">
+                                        <p class="text-sm text-gray-500">Bank Tujuan</p>
+                                        <p class="font-medium text-gray-900 capitalize">
+                                            {{ $pesanan->metode_pembayaran }}</p>
+                                    </div>
                                 </div>
-                                <div class="text-2xl">:</div>
-                                <div class="bg-white/20 backdrop-blur-sm rounded-lg px-4 py-3">
-                                    <div class="text-3xl font-bold" x-text="minutes">00</div>
-                                    <div class="text-xs">Menit</div>
+
+                                <div class="bg-gray-50 rounded-lg p-4 mb-4">
+                                    <p class="text-sm font-medium text-gray-700 mb-3">Bukti Pembayaran:</p>
+                                    <div class="flex justify-center">
+                                        <img src="{{ asset('storage/' . $pesanan->bukti_pembayaran) }}"
+                                            alt="Bukti Pembayaran"
+                                            class="max-w-full max-h-96 rounded-lg shadow-md border">
+                                    </div>
                                 </div>
-                                <div class="text-2xl">:</div>
-                                <div class="bg-white/20 backdrop-blur-sm rounded-lg px-4 py-3">
-                                    <div class="text-3xl font-bold" x-text="seconds">00</div>
-                                    <div class="text-xs">Detik</div>
+
+                                <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                                    <div class="flex">
+                                        <svg class="h-5 w-5 text-blue-400 mt-0.5" fill="currentColor"
+                                            viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd"
+                                                d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+                                                clip-rule="evenodd" />
+                                        </svg>
+                                        <div class="ml-3">
+                                            <h4 class="text-sm font-medium text-blue-800">Sedang Diverifikasi</h4>
+                                            <p class="text-sm text-blue-700 mt-1">
+                                                Bukti pembayaran Anda telah diterima dan sedang dalam proses verifikasi
+                                                oleh tim kami.
+                                                Proses ini biasanya memakan waktu 1-24 jam kerja. Kami akan mengirimkan
+                                                notifikasi
+                                                setelah pembayaran berhasil diverifikasi.
+                                            </p>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    @else
+                        <!-- Upload Payment Proof -->
+                        <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+                            <div class="bg-gray-50 px-6 py-4 border-b">
+                                <h3 class="text-lg font-bold text-gray-900">Upload Bukti Pembayaran</h3>
+                                <p class="text-sm text-gray-600 mt-1">Upload screenshot atau foto bukti transfer Anda
+                                </p>
+                            </div>
+                            <div class="p-6">
+                                <form action="{{ route('pembeli.pembayaran.bayar') }}" method="POST"
+                                    enctype="multipart/form-data" class="space-y-6">
+                                    @csrf
+                                    <input type="hidden" name="kode_pesanan" value="{{ $pesanan->kode_pesanan }}">
+                                    <input type="hidden" name="bank_tujuan" id="bank_tujuan">
 
-                    <!-- Payment Method Card -->
+                                    <!-- Dropzone dengan aspect ratio custom (lebih pendek dari 16:9) -->
+                                    <div id="buktiPreview"
+                                        class="flex items-center justify-center w-full h-64 border-2 border-dashed border-gray-300 rounded-lg bg-gray-50 cursor-pointer hover:bg-gray-100 transition overflow-hidden">
+                                        <span class="text-gray-500 text-sm text-center" id="dropzoneText">
+                                            <svg class="w-10 h-10 mb-3 text-gray-400 mx-auto" fill="none"
+                                                stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                                            </svg>
+                                            <strong>Seret dan letakkan gambar di sini</strong><br>
+                                            atau klik untuk memilih file<br>
+                                            <p class="text-xs text-gray-500 mt-2">PNG, JPG, JPEG (MAX. 5MB)</p>
+                                        </span>
+                                        <img id="previewImage" src=""
+                                            class="hidden w-full h-full object-cover rounded-lg"
+                                            alt="Preview Bukti Pembayaran">
+                                    </div>
+
+                                    <!-- Input tersembunyi -->
+                                    <input type="file" name="bukti_pembayaran" id="bukti_pembayaran"
+                                        accept="image/*" class="hidden" required />
+
+                                    @error('bukti_pembayaran')
+                                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                    @enderror
+
+                                    <!-- Remove File Button -->
+                                    <div id="removeFileBtn" class="text-center hidden">
+                                        <button type="button" onclick="removeFile()"
+                                            class="text-red-600 hover:text-red-800 text-sm font-medium">
+                                            Hapus File
+                                        </button>
+                                    </div>
+
+                                    <!-- Submit Button -->
+                                    <button type="submit"
+                                        class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 rounded-lg transition-colors flex items-center justify-center gap-2">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor"
+                                            viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        </svg>
+                                        Konfirmasi Pembayaran
+                                    </button>
+                                </form>
+
+                                @if ($errors->any())
+                                    <div class="bg-red-50 border border-red-200 rounded-lg p-4 mt-4">
+                                        <div class="flex">
+                                            <div class="flex-shrink-0">
+                                                <svg class="h-5 w-5 text-red-400" fill="currentColor"
+                                                    viewBox="0 0 20 20">
+                                                    <path fill-rule="evenodd"
+                                                        d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                                                        clip-rule="evenodd" />
+                                                </svg>
+                                            </div>
+                                            <div class="ml-3">
+                                                <h3 class="text-sm font-medium text-red-800">Terjadi kesalahan:</h3>
+                                                <div class="mt-2 text-sm text-red-700">
+                                                    <ul class="list-disc pl-5 space-y-1">
+                                                        @foreach ($errors->all() as $error)
+                                                            <li>{{ $error }}</li>
+                                                        @endforeach
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                @endif
+                            </div>
+
+                            <script>
+                                const dropzone = document.getElementById('buktiPreview');
+                                const input = document.getElementById('bukti_pembayaran');
+                                const previewImg = document.getElementById('previewImage');
+                                const dropzoneText = document.getElementById('dropzoneText');
+                                const removeBtn = document.getElementById('removeFileBtn');
+
+                                // Klik area dropzone untuk membuka file dialog
+                                dropzone.addEventListener('click', () => input.click());
+
+                                // Saat file dipilih
+                                input.addEventListener('change', handleFiles);
+
+                                // Saat drag file ke area
+                                dropzone.addEventListener('dragover', (e) => {
+                                    e.preventDefault();
+                                    dropzone.classList.add('bg-gray-200');
+                                    dropzone.classList.remove('border-gray-300');
+                                    dropzone.classList.add('border-blue-400');
+                                });
+
+                                // Saat keluar dari area
+                                dropzone.addEventListener('dragleave', () => {
+                                    dropzone.classList.remove('bg-gray-200');
+                                    dropzone.classList.add('border-gray-300');
+                                    dropzone.classList.remove('border-blue-400');
+                                });
+
+                                // Saat file dijatuhkan
+                                dropzone.addEventListener('drop', (e) => {
+                                    e.preventDefault();
+                                    dropzone.classList.remove('bg-gray-200');
+                                    dropzone.classList.add('border-gray-300');
+                                    dropzone.classList.remove('border-blue-400');
+
+                                    const files = e.dataTransfer.files;
+                                    if (files.length > 0) {
+                                        input.files = files; // sinkron ke input
+                                        handleFiles();
+                                    }
+                                });
+
+                                // Fungsi untuk preview gambar
+                                function handleFiles() {
+                                    const file = input.files[0];
+                                    if (file && file.type.startsWith('image/')) {
+                                        // Validate file size (5MB)
+                                        if (file.size > 5 * 1024 * 1024) {
+                                            alert('File terlalu besar. Maksimal ukuran file adalah 5MB.');
+                                            removeFile();
+                                            return;
+                                        }
+
+                                        const reader = new FileReader();
+                                        reader.onload = (e) => {
+                                            previewImg.src = e.target.result;
+                                            previewImg.classList.remove('hidden');
+                                            dropzoneText.classList.add('hidden');
+                                            removeBtn.classList.remove('hidden');
+                                            dropzone.classList.add('border-green-500', 'bg-green-50');
+                                            dropzone.classList.remove('border-gray-300');
+                                        };
+                                        reader.readAsDataURL(file);
+                                    } else {
+                                        alert('File harus berupa gambar.');
+                                        removeFile();
+                                    }
+                                }
+
+                                // Fungsi untuk hapus file
+                                function removeFile() {
+                                    previewImg.src = '';
+                                    previewImg.classList.add('hidden');
+                                    dropzoneText.classList.remove('hidden');
+                                    removeBtn.classList.add('hidden');
+                                    dropzone.classList.remove('border-green-500', 'bg-green-50');
+                                    dropzone.classList.add('border-gray-300');
+                                    input.value = '';
+                                }
+                            </script>
+                        </div>
+                    @endif
+
+
+                    <!-- Bank Account Options -->
                     <div class="bg-white rounded-xl shadow-lg overflow-hidden">
                         <div class="bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-4">
-                            <h2 class="text-xl font-bold text-white flex items-center">
-                                <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <h2 class="text-lg font-bold text-white flex items-center">
+                                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
                                 </svg>
-                                Metode Pembayaran
+                                Rekening Tujuan Transfer
                             </h2>
                         </div>
-                        <div class="p-6">
-                            <div class="flex items-center justify-between mb-4">
-                                <div>
-                                    <p class="text-sm text-gray-500">Metode</p>
-                                    <p class="text-lg font-bold text-gray-900">Transfer Bank BCA</p>
+                        <div class="p-6 space-y-3" x-data="{ selectedBank: '' }" x-init="// Share selectedBank with the form above
+                        $watch('selectedBank', value => {
+                            document.querySelector('input[name=bank_tujuan]').value = value;
+                        })">
+                            <!-- BCA Option -->
+                            <div class="border rounded-lg p-3 cursor-pointer hover:border-blue-300 transition-colors"
+                                :class="selectedBank === 'bca' ? 'border-blue-500 bg-blue-50' : 'border-gray-200'"
+                                @click="selectedBank = 'bca'">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center space-x-3">
+                                        <img src="https://upload.wikimedia.org/wikipedia/commons/5/5c/Bank_Central_Asia.svg"
+                                            alt="BCA" class="h-6">
+                                        <div>
+                                            <p class="font-medium text-gray-900 text-sm">Bank Central Asia</p>
+                                            <p class="text-xs text-gray-600">No. Rekening: <span
+                                                    class="font-mono font-medium">1234567890</span></p>
+                                            <p class="text-xs text-gray-600">A.n: PT TukuTiket Indonesia</p>
+                                        </div>
+                                    </div>
+                                    <input type="radio" name="bank" value="bca" x-model="selectedBank"
+                                        class="text-blue-600 h-4 w-4">
                                 </div>
-                                <img src="https://upload.wikimedia.org/wikipedia/commons/5/5c/Bank_Central_Asia.svg"
-                                    alt="BCA" class="h-8">
                             </div>
-                            <div class="bg-gray-50 rounded-lg p-4 mb-4">
-                                <p class="text-xs text-gray-500 mb-2">Nomor Virtual Account</p>
-                                <div
-                                    class="flex items-center justify-between bg-white rounded-lg p-3 border-2 border-blue-200">
-                                    <span class="text-xl font-mono font-bold text-gray-900">8277 1234 5678 9012</span>
-                                    <button onclick="copyVA()"
-                                        class="text-blue-600 hover:text-blue-700 font-medium text-sm flex items-center gap-1">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                                        </svg>
-                                        Salin
-                                    </button>
+
+                            <!-- Mandiri Option -->
+                            <div class="border rounded-lg p-3 cursor-pointer hover:border-blue-300 transition-colors"
+                                :class="selectedBank === 'mandiri' ? 'border-blue-500 bg-blue-50' : 'border-gray-200'"
+                                @click="selectedBank = 'mandiri'">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center space-x-3">
+                                        <img src="https://upload.wikimedia.org/wikipedia/commons/a/ad/Bank_Mandiri_logo_2016.svg"
+                                            alt="Mandiri" class="h-6">
+                                        <div>
+                                            <p class="font-medium text-gray-900 text-sm">Bank Mandiri</p>
+                                            <p class="text-xs text-gray-600">No. Rekening: <span
+                                                    class="font-mono font-medium">1122334455</span></p>
+                                            <p class="text-xs text-gray-600">A.n: PT TukuTiket Indonesia</p>
+                                        </div>
+                                    </div>
+                                    <input type="radio" name="bank" value="mandiri" x-model="selectedBank"
+                                        class="text-blue-600 h-4 w-4">
                                 </div>
                             </div>
-                            <div class="bg-blue-50 rounded-lg p-4">
-                                <p class="text-xs text-gray-500 mb-2">Total Pembayaran</p>
-                                <p class="text-2xl font-bold text-blue-600">Rp
-                                    {{ number_format($pesanan->total_harga, 0, ',', '.') }}</p>
+
+                            <!-- BRI Option -->
+                            <div class="border rounded-lg p-3 cursor-pointer hover:border-blue-300 transition-colors"
+                                :class="selectedBank === 'bri' ? 'border-blue-500 bg-blue-50' : 'border-gray-200'"
+                                @click="selectedBank = 'bri'">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center space-x-3">
+                                        <img src="https://upload.wikimedia.org/wikipedia/commons/2/2e/BRI_2020.svg"
+                                            alt="BRI" class="h-6">
+                                        <div>
+                                            <p class="font-medium text-gray-900 text-sm">Bank BRI</p>
+                                            <p class="text-xs text-gray-600">No. Rekening: <span
+                                                    class="font-mono font-medium">5566778899</span></p>
+                                            <p class="text-xs text-gray-600">A.n: PT TukuTiket Indonesia</p>
+                                        </div>
+                                    </div>
+                                    <input type="radio" name="bank" value="bri" x-model="selectedBank"
+                                        class="text-blue-600 h-4 w-4">
+                                </div>
                             </div>
-                        </div>
-                    </div>
 
-                    <!-- Payment Instructions -->
-                    <div class="bg-white rounded-xl shadow-lg overflow-hidden">
-                        <div class="bg-gray-50 px-6 py-4 border-b">
-                            <h3 class="text-lg font-bold text-gray-900">Cara Pembayaran</h3>
-                        </div>
-                        <div class="p-6">
-                            <!-- Tabs -->
-                            <div class="border-b border-gray-200 mb-6" x-data="{ activeTab: 'atm' }">
-                                <nav class="flex space-x-4">
-                                    <button @click="activeTab = 'atm'"
-                                        :class="activeTab === 'atm' ? 'border-blue-600 text-blue-600' :
-                                            'border-transparent text-gray-500 hover:text-gray-700'"
-                                        class="py-2 px-4 border-b-2 font-medium text-sm">
-                                        ATM
-                                    </button>
-                                    <button @click="activeTab = 'mobile'"
-                                        :class="activeTab === 'mobile' ? 'border-blue-600 text-blue-600' :
-                                            'border-transparent text-gray-500 hover:text-gray-700'"
-                                        class="py-2 px-4 border-b-2 font-medium text-sm">
-                                        Mobile Banking
-                                    </button>
-                                    <button @click="activeTab = 'internet'"
-                                        :class="activeTab === 'internet' ? 'border-blue-600 text-blue-600' :
-                                            'border-transparent text-gray-500 hover:text-gray-700'"
-                                        class="py-2 px-4 border-b-2 font-medium text-sm">
-                                        Internet Banking
-                                    </button>
-                                </nav>
-
-                                <!-- ATM Instructions -->
-                                <div x-show="activeTab === 'atm'" class="mt-6 space-y-4">
-                                    <div class="flex items-start">
-                                        <div
-                                            class="flex-shrink-0 w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold text-sm">
-                                            1</div>
-                                        <p class="ml-3 text-gray-700">Masukkan kartu ATM dan PIN Anda</p>
-                                    </div>
-                                    <div class="flex items-start">
-                                        <div
-                                            class="flex-shrink-0 w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold text-sm">
-                                            2</div>
-                                        <p class="ml-3 text-gray-700">Pilih menu <strong>Transaksi Lainnya</strong></p>
-                                    </div>
-                                    <div class="flex items-start">
-                                        <div
-                                            class="flex-shrink-0 w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold text-sm">
-                                            3</div>
-                                        <p class="ml-3 text-gray-700">Pilih <strong>Transfer</strong> → <strong>Ke Rek
-                                                BCA Virtual Account</strong></p>
-                                    </div>
-                                    <div class="flex items-start">
-                                        <div
-                                            class="flex-shrink-0 w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold text-sm">
-                                            4</div>
-                                        <p class="ml-3 text-gray-700">Masukkan nomor Virtual Account: <strong
-                                                class="font-mono">8277 1234 5678 9012</strong></p>
-                                    </div>
-                                    <div class="flex items-start">
-                                        <div
-                                            class="flex-shrink-0 w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold text-sm">
-                                            5</div>
-                                        <p class="ml-3 text-gray-700">Pastikan detail pembayaran benar, lalu konfirmasi
+                            <!-- Transfer Amount Info -->
+                            <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-3 mt-3">
+                                <div class="flex items-start">
+                                    <svg class="h-4 w-4 text-yellow-400 mt-0.5" fill="currentColor"
+                                        viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd"
+                                            d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+                                            clip-rule="evenodd" />
+                                    </svg>
+                                    <div class="ml-2">
+                                        <p class="text-sm font-medium text-yellow-800">Jumlah transfer:
+                                            <span class="font-bold">Rp
+                                                {{ number_format($pesanan->total_harga, 0, ',', '.') }}</span>
                                         </p>
-                                    </div>
-                                    <div class="flex items-start">
-                                        <div
-                                            class="flex-shrink-0 w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold text-sm">
-                                            6</div>
-                                        <p class="ml-3 text-gray-700">Simpan bukti pembayaran Anda</p>
-                                    </div>
-                                </div>
-
-                                <!-- Mobile Banking Instructions -->
-                                <div x-show="activeTab === 'mobile'" class="mt-6 space-y-4">
-                                    <div class="flex items-start">
-                                        <div
-                                            class="flex-shrink-0 w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold text-sm">
-                                            1</div>
-                                        <p class="ml-3 text-gray-700">Buka aplikasi BCA Mobile</p>
-                                    </div>
-                                    <div class="flex items-start">
-                                        <div
-                                            class="flex-shrink-0 w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold text-sm">
-                                            2</div>
-                                        <p class="ml-3 text-gray-700">Pilih menu <strong>m-Transfer</strong></p>
-                                    </div>
-                                    <div class="flex items-start">
-                                        <div
-                                            class="flex-shrink-0 w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold text-sm">
-                                            3</div>
-                                        <p class="ml-3 text-gray-700">Pilih <strong>BCA Virtual Account</strong></p>
-                                    </div>
-                                    <div class="flex items-start">
-                                        <div
-                                            class="flex-shrink-0 w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold text-sm">
-                                            4</div>
-                                        <p class="ml-3 text-gray-700">Masukkan nomor Virtual Account: <strong
-                                                class="font-mono">8277 1234 5678 9012</strong></p>
-                                    </div>
-                                    <div class="flex items-start">
-                                        <div
-                                            class="flex-shrink-0 w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold text-sm">
-                                            5</div>
-                                        <p class="ml-3 text-gray-700">Masukkan PIN Anda dan konfirmasi pembayaran</p>
-                                    </div>
-                                </div>
-
-                                <!-- Internet Banking Instructions -->
-                                <div x-show="activeTab === 'internet'" class="mt-6 space-y-4">
-                                    <div class="flex items-start">
-                                        <div
-                                            class="flex-shrink-0 w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold text-sm">
-                                            1</div>
-                                        <p class="ml-3 text-gray-700">Login ke KlikBCA</p>
-                                    </div>
-                                    <div class="flex items-start">
-                                        <div
-                                            class="flex-shrink-0 w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold text-sm">
-                                            2</div>
-                                        <p class="ml-3 text-gray-700">Pilih <strong>Transfer Dana</strong></p>
-                                    </div>
-                                    <div class="flex items-start">
-                                        <div
-                                            class="flex-shrink-0 w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold text-sm">
-                                            3</div>
-                                        <p class="ml-3 text-gray-700">Pilih <strong>Transfer ke BCA Virtual
-                                                Account</strong></p>
-                                    </div>
-                                    <div class="flex items-start">
-                                        <div
-                                            class="flex-shrink-0 w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold text-sm">
-                                            4</div>
-                                        <p class="ml-3 text-gray-700">Masukkan nomor Virtual Account: <strong
-                                                class="font-mono">8277 1234 5678 9012</strong></p>
-                                    </div>
-                                    <div class="flex items-start">
-                                        <div
-                                            class="flex-shrink-0 w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold text-sm">
-                                            5</div>
-                                        <p class="ml-3 text-gray-700">Klik <strong>Lanjutkan</strong> dan konfirmasi
-                                            dengan KeyBCA Appli</p>
+                                        <p class="text-xs text-yellow-700 mt-1">Pastikan nominal transfer sesuai dengan
+                                            jumlah di atas.</p>
                                     </div>
                                 </div>
                             </div>
@@ -273,13 +397,9 @@
                             <div>
                                 <p class="text-xs text-gray-500 mb-2">Detail Acara</p>
                                 <div class="bg-gray-50 rounded-lg p-3">
-                                    <p class="font-semibold text-gray-900">
-                                        {{ $namaAcara }}
-                                    </p>
-                                    <p class="text-xs text-gray-600 mt-1">
-                                        {{ $lokasi }}r</p>
-                                    <p class="text-xs text-gray-600">
-                                        {{ $waktuMulai }}</p>
+                                    <p class="font-semibold text-gray-900">{{ $namaAcara }}</p>
+                                    <p class="text-xs text-gray-600 mt-1">{{ $lokasi }}</p>
+                                    <p class="text-xs text-gray-600">{{ $waktuMulai }}</p>
                                 </div>
                             </div>
 
@@ -296,7 +416,6 @@
                                                 {{ number_format($tiket['harga'], 0, ',', '.') }}</span>
                                         </div>
                                     @endforeach
-
                                 </div>
                             </div>
 
@@ -333,48 +452,6 @@
                                 </svg>
                                 Butuh Bantuan?
                             </button>
-                            <form action="{{ route('pembeli.pembayaran.store') }}" method="POST" id="paymentForm">
-                                @csrf
-                                <input type="hidden" name="kode_pesanan" value="{{ $pesanan->kode_pesanan }}">
-                                @foreach ($pesanan->detailPesanan as $detail)
-                                    <input type="hidden" name="id_detail_pesanan[]" value="{{ $detail->id }}">
-                                    <input type="hidden" name="nama_peserta[]"
-                                        value="{{ $pesanan->nama_pemesan }}">
-                                    <input type="hidden" name="email_peserta[]"
-                                        value="{{ $pesanan->email_pemesan }}">
-                                    <input type="hidden" name="no_telp_peserta[]"
-                                        value="{{ $pesanan->no_telp_peserta }}">
-                                @endforeach
-
-                                <button type="submit"
-                                    class="w-full bg-blue-100 hover:bg-blue-700 hover:text-white text-blue-700 font-medium py-3 rounded-lg transition-colors flex items-center justify-center gap-2">
-                                    Bayar
-                                </button>
-                            </form>
-                            @if ($errors->any())
-                                <div class="bg-red-50 border border-red-200 rounded-lg p-4 mb-4">
-                                    <div class="flex">
-                                        <div class="flex-shrink-0">
-                                            <svg class="h-5 w-5 text-red-400" fill="currentColor"
-                                                viewBox="0 0 20 20">
-                                                <path fill-rule="evenodd"
-                                                    d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
-                                                    clip-rule="evenodd" />
-                                            </svg>
-                                        </div>
-                                        <div class="ml-3">
-                                            <h3 class="text-sm font-medium text-red-800">Terjadi kesalahan:</h3>
-                                            <div class="mt-2 text-sm text-red-700">
-                                                <ul class="list-disc pl-5 space-y-1">
-                                                    @foreach ($errors->all() as $error)
-                                                        <li>{{ $error }}</li>
-                                                    @endforeach
-                                                </ul>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            @endif
                         </div>
                     </div>
                 </div>
@@ -384,40 +461,40 @@
 
     @push('scripts')
         <script>
-            function countdown() {
+            function fileUpload() {
                 return {
-                    hours: '00',
-                    minutes: '00',
-                    seconds: '00',
-                    endTime: new Date().getTime() + (24 * 60 * 60 * 1000), // 24 hours from now
+                    filePreview: null,
 
-                    startCountdown() {
-                        setInterval(() => {
-                            const now = new Date().getTime();
-                            const distance = this.endTime - now;
-
-                            if (distance < 0) {
-                                this.hours = '00';
-                                this.minutes = '00';
-                                this.seconds = '00';
+                    previewFile(event) {
+                        const file = event.target.files[0];
+                        if (file) {
+                            // Validate file size (5MB)
+                            if (file.size > 5 * 1024 * 1024) {
+                                alert('File terlalu besar. Maksimal ukuran file adalah 5MB.');
+                                this.removeFile();
                                 return;
                             }
 
-                            this.hours = String(Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)))
-                                .padStart(2, '0');
-                            this.minutes = String(Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60))).padStart(2,
-                                '0');
-                            this.seconds = String(Math.floor((distance % (1000 * 60)) / 1000)).padStart(2, '0');
-                        }, 1000);
+                            // Validate file type
+                            if (!file.type.startsWith('image/')) {
+                                alert('File harus berupa gambar.');
+                                this.removeFile();
+                                return;
+                            }
+
+                            const reader = new FileReader();
+                            reader.onload = (e) => {
+                                this.filePreview = e.target.result;
+                            };
+                            reader.readAsDataURL(file);
+                        }
+                    },
+
+                    removeFile() {
+                        this.filePreview = null;
+                        document.getElementById('bukti_pembayaran').value = '';
                     }
                 }
-            }
-
-            function copyVA() {
-                const vaNumber = '8277123456789012';
-                navigator.clipboard.writeText(vaNumber).then(() => {
-                    alert('Nomor Virtual Account berhasil disalin!');
-                });
             }
         </script>
     @endpush

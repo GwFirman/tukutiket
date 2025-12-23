@@ -14,6 +14,7 @@ use App\Http\Controllers\PembuatAcara\AcaraController as PembuatAcaraController;
 use App\Http\Controllers\PembuatAcara\CheckinController;
 use App\Http\Controllers\PembuatAcara\ChekoutController as ScanCheckoutController;
 use App\Http\Controllers\PembuatAcara\DashboardController as DashboardPembuatController;
+use App\Http\Controllers\PembuatAcara\kelolaTransaksiController;
 use App\Http\Controllers\PembuatAcara\KreatorController;
 use App\Http\Controllers\PembuatAcara\LaporanPenjualanController;
 // use App\Http\Controllers\PembuatAcaraController;
@@ -70,6 +71,12 @@ Route::middleware(['auth', 'role:kreator'])
         Route::get('/acara/daftar-peserta/{acara}', [PembuatAcaraController::class, 'daftarPeserta'])->name('acara.daftar-peserta');
         Route::get('/acara/laporan-penjualan/{acara}', [LaporanPenjualanController::class, 'LaporanPenjualan'])->name('acara.laporan-penjualan');
 
+        Route::get('/acara/transaksi/{acara}', [kelolaTransaksiController::class, 'index'])->name('transaksi.index');
+
+        Route::get('/acara/transaksi/{acara}/{kodePesanan}', [kelolaTransaksiController::class, 'Acc'])->name('transaksi.acc');
+
+        Route::post('/acara/transaksi/{acara}/{kodePesanan}', [kelolaTransaksiController::class, 'store'])->name('transaksi.acc.store');
+
         Route::get('/acara/scan/{acara}', [ScanController::class, 'index'])->name('scan.index');
         Route::post('/acara/scan/check/{acara}', [ScanController::class, 'check'])
             ->name('scan.check');
@@ -114,6 +121,7 @@ Route::middleware(['auth', 'role:pembeli'])
         Route::get('/pesanan-saya/{kode_pesanan}', [PesananController::class, 'detail'])->name('pesanan-saya.show');
         Route::resource('tiket', TiketController::class);
         Route::resource('pembayaran', PembayaranController::class);
+        Route::post('/pembayaran/bayar', [PembayaranController::class, 'bayar'])->name('pembayaran.bayar');
         Route::resource('acara', PembeliAcaraController::class);
         Route::resource('checkout', PesananController::class);
 

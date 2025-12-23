@@ -4,15 +4,45 @@
             <i data-lucide="ticket" class="size-5 text-indigo-600"></i>
             <h3 class="text-lg font-semibold text-gray-900">Jenis Tiket</h3>
         </div>
-        <p class="text-sm text-gray-600">Tentukan kategori tiket untuk acara Anda</p>
+        <p class="text-sm text-gray-600">Kelola kategori tiket untuk acara Anda</p>
     </div>
 
     <div x-data="{
         showModal: false,
         editIndex: null,
         currentType: 'gratis',
-        // Mengambil old data, atau array kosong jika belum ada
-        allKategori: {{ \Illuminate\Support\Js::from(array_values(old('kategori_tiket', []))) }},
+    
+        // Variabel baru untuk menyimpan batas tanggal acara (Snapshot)
+        minDateAcara: '',
+        maxDateAcara: '',
+    
+        // Data gabungan semua kategori tiket (gratis/berbayar)
+        allKategori: {{ \Illuminate\Support\Js::from(
+            isset($acara)
+                ? $acara->jenisTiket->map(function ($tiket) {
+                        return [
+                            'id' => $tiket->id,
+                            'nama' => $tiket->nama_jenis,
+                            'harga' => (int) ($tiket->harga ?? 0),
+                            'kuota' => (int) ($tiket->kuota ?? 0),
+                            'penjualan_mulai' => $tiket->penjualan_mulai
+                                ? \Carbon\Carbon::parse($tiket->penjualan_mulai)->format('Y-m-d')
+                                : '',
+                            'penjualan_selesai' => $tiket->penjualan_selesai
+                                ? \Carbon\Carbon::parse($tiket->penjualan_selesai)->format('Y-m-d')
+                                : '',
+                            'berlaku_mulai' => $tiket->berlaku_mulai
+                                ? \Carbon\Carbon::parse($tiket->berlaku_mulai)->format('Y-m-d')
+                                : '',
+                            'berlaku_sampai' => $tiket->berlaku_sampai
+                                ? \Carbon\Carbon::parse($tiket->berlaku_sampai)->format('Y-m-d')
+                                : '',
+                            'deskripsi' => $tiket->deskripsi ?? '',
+                            'tipe' => ($tiket->harga ?? 0) > 0 ? 'berbayar' : 'gratis',
+                        ];
+                    })->values()
+                : array_values(old('kategori_tiket', [])),
+        ) }},
     
         kategoriBaru: {
             nama: '',
@@ -20,71 +50,95 @@
             kuota: '',
             penjualan_mulai: '',
             penjualan_selesai: '',
+            berlaku_mulai: '',
+            berlaku_sampai: '',
             deskripsi: '',
             tipe: 'gratis'
         },
+    
+        today: new Date().toISOString().slice(0, 10),
+    
+        // Validasi form tiket
+        get isFormValid() {
+            if (!this.kategoriBaru.nama || this.kategoriBaru.nama.trim() === '') return false;
+            if (!this.kategoriBaru.kuota || this.kategoriBaru.kuota <= 0) return false;
+            if (this.currentType === 'berbayar' && (!this.kategoriBaru.harga || this.kategoriBaru.harga <= 0)) return false;
+            return true;
+        },
+    
+        // Helper: Update variable tanggal acara dari input hidden
+        updateEventDates() {
+            const inputMulai = document.querySelector('input[name=\'waktu_mulai\']');
+            const inputSelesai = document.querySelector('input[name=\'waktu_selesai\']');
+            this.minDateAcara = inputMulai ? inputMulai.value : '';
+            this.maxDateAcara = inputSelesai ? inputSelesai.value : '';
+        },
+    
         tambahKategori() {
-            // Set tipe sesuai tab yang aktif
             this.kategoriBaru.tipe = this.currentType;
-            // Pastikan harga 0 jika gratis
             if (this.currentType === 'gratis') this.kategoriBaru.harga = 0;
     
             if (this.editIndex !== null) {
-                // Update data yang ada
                 this.allKategori[this.editIndex] = { ...this.kategoriBaru };
                 this.editIndex = null;
             } else {
-                // Tambah data baru
                 this.allKategori.push({ ...this.kategoriBaru });
             }
             this.resetForm();
             this.showModal = false;
         },
+    
         editKategori(index) {
-            // Copy data agar tidak reaktif langsung (Deep Copy sederhana)
+            // Ambil tanggal acara terbaru dulu agar validasi min/max jalan saat edit
+            this.updateEventDates();
+    
             this.kategoriBaru = JSON.parse(JSON.stringify(this.allKategori[index]));
             this.currentType = this.kategoriBaru.tipe;
             this.editIndex = index;
             this.showModal = true;
         },
+    
         hapusKategori(index) {
             this.allKategori.splice(index, 1);
         },
+    
         resetForm() {
+            // Gunakan variable minDateAcara/maxDateAcara yang sudah di-set
             this.kategoriBaru = {
                 nama: '',
                 harga: '',
                 kuota: '',
-                penjualan_mulai: '',
-                penjualan_selesai: '',
+                // Default tanggal tiket mengikuti tanggal acara
+                penjualan_mulai: this.minDateAcara,
+                penjualan_selesai: this.maxDateAcara,
+                berlaku_mulai: this.minDateAcara,
+                berlaku_sampai: this.maxDateAcara,
                 deskripsi: '',
-                tipe: this.currentType // Pertahankan tipe saat ini
+                tipe: this.currentType
             };
         },
+    
         openAddModal(type) {
+            // PENTING: Ambil tanggal acara terbaru saat tombol diklik
+            this.updateEventDates();
+    
             this.currentType = type;
-            this.editIndex = null; // Reset mode edit
+            this.editIndex = null;
             this.resetForm();
             this.showModal = true;
         }
     }" class="space-y-6">
-
         @if ($errors->has('kategori_tiket'))
-            <div class="p-3 bg-red-50 text-red-600 text-sm rounded-lg">
-                {{ $errors->first('kategori_tiket') }}
-            </div>
+            <div class="p-3 bg-red-50 text-red-600 text-sm rounded-lg">{{ $errors->first('kategori_tiket') }}</div>
         @endif
 
         <div class="space-y-3" x-show="allKategori.length > 0">
             <template x-for="(kategori, index) in allKategori" :key="index">
-                <div class="group border rounded-xl p-4 transition-all hover:shadow-md hover:border-indigo-300"
+                <div class="group border rounded-xl p-4 transition-all  hover:border-indigo-300"
                     :class="kategori.tipe === 'gratis' ? 'border-green-200 bg-green-50/30' :
                         'border-indigo-200 bg-indigo-50/30'">
-
                     <div class="flex items-center justify-between gap-4">
-                        <!-- Left: Icon & Info -->
                         <div class="flex items-center gap-3 sm:gap-4 flex-1 min-w-0">
-                            <!-- Icon -->
                             <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-lg flex items-center justify-center flex-shrink-0"
                                 :class="kategori.tipe === 'gratis' ? 'bg-green-100 text-green-600' :
                                     'bg-indigo-100 text-indigo-600'">
@@ -97,11 +151,8 @@
                                         <path d="M13 5v2" />
                                         <path d="M13 17v2" />
                                         <path d="M13 11v2" />
-                                    </svg>
-                                </i>
+                                    </svg></i>
                             </div>
-
-                            <!-- Info -->
                             <div class="flex-1 min-w-0">
                                 <div class="flex items-center gap-2 mb-1 flex-wrap">
                                     <h4 class="font-semibold text-gray-900 text-sm sm:text-base truncate"
@@ -111,9 +162,9 @@
                                 </div>
                                 <div
                                     class="flex items-center gap-2 sm:gap-3 text-xs sm:text-sm text-gray-500 flex-wrap">
-                                    <span x-show="kategori.tipe === 'berbayar'" class="font-semibold text-indigo-600">
-                                        Rp <span x-text="parseInt(kategori.harga || 0).toLocaleString('id-ID')"></span>
-                                    </span>
+                                    <span x-show="kategori.tipe === 'berbayar'" class="font-semibold text-indigo-600">Rp
+                                        <span
+                                            x-text="parseInt(kategori.harga || 0).toLocaleString('id-ID')"></span></span>
                                     <span class="flex items-center gap-1">
                                         <i data-lucide="users" class="size-3.5"><svg xmlns="http://www.w3.org/2000/svg"
                                                 width="14" height="14" viewBox="0 0 24 24" fill="none"
@@ -143,21 +194,38 @@
                                 </div>
                             </div>
                         </div>
-
-                        <!-- Right: Actions -->
                         <div class="flex items-center gap-1 flex-shrink-0">
                             <button type="button" @click="editKategori(index)"
                                 class="p-2 text-gray-500 hover:text-indigo-600 hover:bg-indigo-100 rounded-lg transition-colors">
-                                <i data-lucide="edit-3" class="size-4"></i>
+                                <i data-lucide="edit-3" class="size-4"><svg xmlns="http://www.w3.org/2000/svg"
+                                        width="14" height="14" viewBox="0 0 24 24" fill="none"
+                                        stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                        stroke-linejoin="round" class="lucide lucide-pencil-icon lucide-pencil">
+                                        <path
+                                            d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z" />
+                                        <path d="m15 5 4 4" />
+                                    </svg></i>
                             </button>
                             <button type="button" @click="hapusKategori(index)"
                                 class="p-2 text-gray-500 hover:text-red-600 hover:bg-red-100 rounded-lg transition-colors">
-                                <i data-lucide="trash-2" class="size-4"></i>
+                                <i data-lucide="trash-2" class="size-4"><svg xmlns="http://www.w3.org/2000/svg"
+                                        width="14" height="14" viewBox="0 0 24 24" fill="none"
+                                        stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                        stroke-linejoin="round" class="lucide lucide-trash2-icon lucide-trash-2">
+                                        <path d="M10 11v6" />
+                                        <path d="M14 11v6" />
+                                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6" />
+                                        <path d="M3 6h18" />
+                                        <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                                    </svg></i>
                             </button>
                         </div>
                     </div>
 
                     <!-- Hidden inputs -->
+                    <template x-if="kategori.id">
+                        <input type="hidden" :name="`kategori_tiket[${index}][id]`" :value="kategori.id">
+                    </template>
                     <input type="hidden" :name="`kategori_tiket[${index}][nama]`" :value="kategori.nama">
                     <input type="hidden" :name="`kategori_tiket[${index}][harga]`" :value="kategori.harga">
                     <input type="hidden" :name="`kategori_tiket[${index}][kuota]`" :value="kategori.kuota">
@@ -165,11 +233,19 @@
                         :value="kategori.penjualan_mulai">
                     <input type="hidden" :name="`kategori_tiket[${index}][penjualan_selesai]`"
                         :value="kategori.penjualan_selesai">
+                    <input type="hidden" :name="`kategori_tiket[${index}][berlaku_mulai]`"
+                        :value="kategori.berlaku_mulai">
+                    <input type="hidden" :name="`kategori_tiket[${index}][berlaku_sampai]`"
+                        :value="kategori.berlaku_sampai">
                     <input type="hidden" :name="`kategori_tiket[${index}][deskripsi]`" :value="kategori.deskripsi">
                     <input type="hidden" :name="`kategori_tiket[${index}][tipe]`" :value="kategori.tipe">
                 </div>
             </template>
         </div>
+
+        <!-- Marker: minimal 1 tiket -->
+        <input type="hidden" name="has_tickets" x-ref="hasTickets" :value="allKategori.length > 0 ? 1 : ''"
+            x-effect="$refs.hasTickets.dispatchEvent(new Event('input', { bubbles: true }))" />
 
         <!-- Empty State -->
         <div x-show="allKategori.length === 0"
@@ -179,7 +255,8 @@
                 <i data-lucide="ticket" class="size-8 sm:size-10 text-gray-400"></i>
             </div>
             <p class="text-gray-600 font-medium text-sm sm:text-base">Belum ada tiket</p>
-            <p class="text-xs sm:text-sm text-gray-400 mt-1">Tambahkan tiket gratis atau berbayar untuk acara Anda</p>
+            <p class="text-xs sm:text-sm text-gray-400 mt-1">Tambahkan minimal 1 tiket untuk dapat mem-publish acara
+            </p>
         </div>
 
         <!-- Tombol Tambah -->
@@ -199,7 +276,7 @@
         <!-- Modal -->
         <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4"
             x-show="showModal" x-transition x-cloak style="display: none;">
-            <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md" @click.outside="showModal = false">
+            <div class="bg-white rounded-2xl  w-full max-w-md" @click.outside="showModal = false">
                 <!-- Header -->
                 <div class="flex items-center justify-between p-6 border-b border-gray-100">
                     <div class="flex items-center gap-3">
@@ -249,20 +326,38 @@
                     <div class="grid grid-cols-2 gap-3">
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-2">Mulai Jual</label>
-                            <input type="date" x-model="kategoriBaru.penjualan_mulai"
+                            <input type="date" x-model="kategoriBaru.penjualan_mulai" :min="today"
+                                @change="if (kategoriBaru.penjualan_selesai && new Date(kategoriBaru.penjualan_selesai) < new Date(kategoriBaru.penjualan_mulai)) kategoriBaru.penjualan_selesai = ''"
                                 class="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors text-sm">
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-2">Selesai Jual</label>
                             <input type="date" x-model="kategoriBaru.penjualan_selesai"
+                                :min="kategoriBaru.penjualan_mulai || today" :max="maxDateAcara"
                                 class="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors text-sm">
                         </div>
                     </div>
 
+                    <!-- Berlaku periode tiket -->
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Berlaku Mulai</label>
+                            <input type="date" x-model="kategoriBaru.berlaku_mulai" :min="minDateAcara"
+                                :max="maxDateAcara"
+                                class="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm">
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Berlaku Sampai</label>
+                            <input type="date" x-model="kategoriBaru.berlaku_sampai"
+                                :min="kategoriBaru.berlaku_mulai || minDateAcara" :max="maxDateAcara"
+                                class="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm">
+                        </div>
+                    </div>
+
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">
-                            Deskripsi <span class="text-gray-400 font-normal">(opsional)</span>
-                        </label>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Deskripsi <span
+                                class="text-gray-400 font-normal">(opsional)</span></label>
                         <textarea x-model="kategoriBaru.deskripsi" rows="3" placeholder="Deskripsi singkat tiket..."
                             class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors text-sm resize-none"></textarea>
                     </div>
@@ -271,13 +366,11 @@
                 <!-- Footer -->
                 <div class="flex gap-3 p-6 border-t border-gray-100">
                     <button type="button" @click="showModal = false"
-                        class="flex-1 px-4 py-2.5 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors">
-                        Batal
-                    </button>
-                    <button type="button" @click="tambahKategori()"
-                        class="flex-1 px-4 py-2.5 rounded-lg text-sm font-medium text-white transition-colors"
-                        :class="currentType === 'gratis' ? 'bg-green-600 hover:bg-green-700' :
-                            'bg-indigo-600 hover:bg-indigo-700'">
+                        class="flex-1 px-4 py-2.5 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors">Batal</button>
+                    <button type="button" @click="tambahKategori()" :disabled="!isFormValid"
+                        class="flex-1 px-4 py-2.5 rounded-lg text-sm font-medium text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                        :class="isFormValid ? (currentType === 'gratis' ? 'bg-green-600 hover:bg-green-700' :
+                            'bg-indigo-600 hover:bg-indigo-700') : 'bg-gray-400'">
                         <span x-text="editIndex !== null ? 'Simpan' : 'Tambah'"></span>
                     </button>
                 </div>

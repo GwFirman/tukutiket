@@ -12,8 +12,8 @@
             @role('kreator')
                 <!-- Dashboard Header -->
                 <div class="mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4">
-                    <div>
-                        <p class="text-sm sm:text-base text-gray-600 flex items-center gap-2">
+                    <div class="hidden md:block">
+                        <p class="text-sm sm:text-base text-gray-600 flex items-center gap-2 ">
                             <span>Daftar Acara </span>
                         </p>
                     </div>

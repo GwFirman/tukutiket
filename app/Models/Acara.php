@@ -29,6 +29,10 @@ class Acara extends Model
         'status',
         'maks_pembelian_per_akun',
         'maks_tiket_per_transaksi',
+        'is_online',
+        'venue',
+        'latitude',
+        'longitude',
     ];
 
     public function getSlugOptions(): SlugOptions
@@ -56,5 +60,16 @@ class Acara extends Model
     public function kreator()
     {
         return $this->belongsTo(Kreator::class, 'id_kreator');
+    }
+
+    // Relasi kategori many-to-many melalui tabel pivot event_kategori
+    public function kategori()
+    {
+        return $this->belongsToMany(kategori::class, 'event_kategori', 'id_acara', 'id_kategori');
+    }
+
+    public function eventKategori()
+    {
+        return $this->hasMany(EventKategori::class, 'id_acara');
     }
 }

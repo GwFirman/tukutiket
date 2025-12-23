@@ -7,15 +7,17 @@ use Illuminate\Database\Eloquent\Model;
 class JenisTiket extends Model
 {
     protected $table  = 'jenis_tiket';
-protected $fillable = [
-    'id_acara',
-    'nama_jenis',
-    'harga',
-    'kuota',
-    'deskripsi',
-    'penjualan_mulai',
-    'penjualan_selesai',
-];
+    protected $fillable = [
+        'id_acara',
+        'nama_jenis',
+        'harga',
+        'kuota',
+        'deskripsi',
+        'penjualan_mulai',
+        'penjualan_selesai',
+        'berlaku_mulai',
+        'berlaku_sampai',
+    ];
 
     public function acara() {
         return $this->belongsTo(Acara::class,'id_acara');

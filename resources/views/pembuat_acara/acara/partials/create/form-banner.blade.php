@@ -1,18 +1,20 @@
 <div>
     <div class="mb-4">
-        <label for="banner_acara" class="block text-sm font-medium text-gray-700 mb-2">Banner
-            Acara</label>
-        <!-- Dropzone -->
+
+
+        <!-- Dropzone dengan aspect ratio custom (lebih pendek dari 16:9) -->
         <div id="bannerPreview"
-            class="flex items-center justify-center w-full h-64 border-2 border-dashed border-gray-300 rounded-lg bg-gray-50 cursor-pointer hover:bg-gray-100 transition">
+            class="flex items-center justify-center w-full h-64 border-b border-gray-300 rounded-t-lg bg-gray-50 cursor-pointer hover:bg-gray-100 transition overflow-hidden">
             <span class="text-gray-500 text-sm text-center" id="dropzoneText">
                 <strong>Seret dan letakkan gambar di sini</strong><br>
-                atau klik untuk memilih file
+                atau klik untuk memilih file<br>
+                <!-- Info ukuran -->
+                <p class="text-xs text-gray-500 mb-2">Ukuran yang disarankan: 1920x720 px untuk hasil terbaik</p>
             </span>
             <img id="previewImage"
-                src="{{ old('banner_acara') ?? (isset($acara) && $acara->banner_acara ? asset('storage/' . $acara->banner_acara) : '') }}"
-                class="{{ old('banner_acara') || (isset($acara) && $acara->banner_acara) ? '' : 'hidden' }} w-full h-full object-cover rounded-lg"
-                alt="Preview Banner">
+                src="{{ isset($acara) && $acara->banner_acara ? asset('storage/' . $acara->banner_acara) : '' }}"
+                class="{{ isset($acara) && $acara->banner_acara ? '' : 'hidden' }} w-full h-full object-cover rounded-t-lg"
+                alt="Preview Banner {{ isset($acara) ? ' - ' . ($acara->nama_acara ?? '') : '' }}">
         </div>
 
         <!-- Input tersembunyi -->
@@ -30,7 +32,8 @@
         const dropzoneText = document.getElementById('dropzoneText');
 
         // Cek jika sudah ada gambar preview saat halaman load
-        if (previewImg.src && !previewImg.classList.contains('hidden')) {
+        if (previewImg.getAttribute('src')) {
+            previewImg.classList.remove('hidden');
             dropzoneText.classList.add('hidden');
         }
 

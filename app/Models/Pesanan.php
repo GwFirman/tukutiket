@@ -18,8 +18,10 @@ class Pesanan extends Model
         'email_pemesan',
         'no_telp_pemesan',
         'metode_pembayaran',
+        'bukti_pembayaran',
         'total_harga',
         'status',
+        'status_pembayaran',
         'kode_pesanan',
     ];
 

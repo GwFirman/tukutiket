@@ -133,7 +133,7 @@
                             <p class="text-xs text-gray-500">Total pendapatan</p>
                             <div class="flex mt-1.5 sm:mt-2 items-center text-xs text-green-600 font-medium">
                                 <i data-lucide="plus" class="w-3 h-3"></i>
-                                <p class="ml-0.5">Rp.15.0000</p>
+                                <p class="ml-0.5">{{ $pendapatanTerbaru }}</p>
                             </div>
                         </div>
                     </div>

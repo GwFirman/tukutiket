@@ -1,7 +1,7 @@
 <div class="mt-4 rounded-2xl border border-gray-100">
     <div class="flex items-center gap-2 p-5">
         <i data-lucide="text-initial" class="size-5 text-indigo-600"></i>
-        <h3 class="text-lg font-semibold text-gray-900">Deskripsi acara</h3>
+        <h3 class="text-lg font-semibold text-gray-900">Deskripsi acara <span class="text-red-400">*</span></h3>
     </div>
     <div class="p-5 border-t border-gray-100">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/trix/1.3.1/trix.min.css" />

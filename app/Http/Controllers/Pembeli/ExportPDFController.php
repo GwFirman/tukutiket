@@ -110,6 +110,7 @@ class ExportPDFController extends Controller
                 'a.id AS id_acara',
                 'a.nama_acara',
                 'a.lokasi',
+                'a.is_online',
                 'a.waktu_mulai',
                 'a.waktu_selesai',
                 'a.slug AS slug_acara'

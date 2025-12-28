@@ -1,6 +1,6 @@
 <x-guest-layout :showNavbar="false">
     <div class="flex h-screen w-screen sm:justify-center items-center p-20">
-        <div class="flex h-full bg-white shadow-md overflow-hidden sm:rounded-lg">
+        <div class="flex h-full bg-white  overflow-hidden sm:rounded-lg">
 
             {{-- Bagian gambar kiri --}}
             <div class="w-full h-full sm:rounded-lg">
@@ -37,16 +37,12 @@
                             <div class="relative">
                                 {{-- Preview Logo --}}
                                 <img id="previewImage" src="https://placehold.net/shape.svg"
-                                    class="h-28 w-28 rounded-full object-cover shadow ">
+                                    class="h-28 w-28 rounded-full object-cover  ">
 
                                 {{-- Tombol edit --}}
                                 <button type="button" onclick="document.getElementById('logoInput').click()"
-                                    class="absolute bottom-1 right-1 bg-white p-1 rounded-full shadow hover:bg-gray-100 border">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-600"
-                                        viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M11 5h-5a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.586-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                                    </svg>
+                                    class="absolute bottom-1 right-1 bg-white p-1 rounded-full border border-indigo-300 hover:bg-gray-100">
+                                    <i data-lucide="camera" class="size-4 text-indigo-600"></i>
                                 </button>
                             </div>
 

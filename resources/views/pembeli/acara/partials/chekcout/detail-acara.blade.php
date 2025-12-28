@@ -1,5 +1,5 @@
  <div
-     class="h-64 w-full border-2 border-gray-200 border-dashed rounded-t-lg flex items-center justify-center overflow-hidden bg-gray-50">
+     class="h-64 w-full border-2 border-gray-200 rounded-t-lg flex items-center justify-center overflow-hidden bg-gray-50">
      @if ($acara->banner_acara)
          <img src="{{ asset('storage/' . $acara->banner_acara) }}" alt="Banner Acara"
              class="h-full w-full object-cover rounded-t-lg">

@@ -8,8 +8,27 @@
     </x-slot>
 
     <div class="mb-6 lg:mt-6 px-6 lg:p-0">
+
         <div class="mx-auto max-w-4xl">
-            <div class="">
+            @if ($acara->status == 'published')
+                <div class="bg-orange-100 border-l-4 border-orange-500 text-orange-700 p-4   rounded-r" role="alert">
+                    <div class="flex items-center">
+                        <div class="py-1">
+                            {{-- Opsi: Tambahkan ikon agar lebih informatif --}}
+                            <svg class="fill-current h-6 w-6 text-orange-500 mr-4" xmlns="http://www.w3.org/2000/svg"
+                                viewBox="0 0 20 20">
+                                <path
+                                    d="M2.93 17.07A10 10 0 1 1 17.07 2.93 10 10 0 0 1 2.93 17.07zm12.73-1.41A8 8 0 1 0 4.34 4.34a8 8 0 0 0 11.32 11.32zM9 11V9h2v6H9v-4zm0-6h2v2H9V5z" />
+                            </svg>
+                        </div>
+                        <div>
+                            <p class="font-bold">Status: Published</p>
+                            <p class="text-sm">Acara ini sudah dipublikasikan. Anda hanya dapat mengubah beberapa.</p>
+                        </div>
+                    </div>
+                </div>
+            @endif
+            <div class="mt-4">
                 <form method="POST" action="{{ route('pembuat.acara.update', $acara->id) }}"
                     enctype="multipart/form-data" class="">
                     @csrf
@@ -43,8 +62,11 @@
 
                         @include('pembuat_acara.acara.partials.create.form-acara')
 
+                        @include('pembuat_acara.acara.partials.create.profile-kreator')
+
                         <div class="lg:flex gap-5 mt-5 px-5 pb-5 space-y-4">
-                            @include('pembuat_acara.acara.partials.create.profile-kreator')
+
+                            @include('pembuat_acara.acara.partials.create.form-jam')
 
                             @include('pembuat_acara.acara.partials.create.form-tanggal')
 
@@ -99,14 +121,21 @@
                     </script>
                     <div class="flex justify-between mt-4 px-5">
                         <div class="flex gap-3 justify-end w-full">
-                            <button type="submit" name="status" value="draft"
-                                class="bg-gray-200 text-gray-800 px-4 py-2 rounded-lg hover:bg-gray-300 transition">
-                                Simpan Draft
-                            </button>
-                            <button type="submit" name="status" value="published"
-                                class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition">
-                                Publish
-                            </button>
+                            @if ($acara->status !== 'published')
+                                <button type="submit" name="status" value="draft"
+                                    class="bg-gray-200 text-gray-800 px-4 py-2 rounded-lg hover:bg-gray-300 transition">
+                                    Simpan Draft
+                                </button>
+                                <button type="submit" name="status" value="published"
+                                    class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition">
+                                    Edit
+                                </button>
+                            @else
+                                <button type="submit" name="status" value="published"
+                                    class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition w-64">
+                                    Edit
+                                </button>
+                            @endif
                         </div>
                     </div>
                 </form>

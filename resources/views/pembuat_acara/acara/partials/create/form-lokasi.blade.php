@@ -1,6 +1,7 @@
 <div class="w-full" x-data="{
     showLocationModal: false,
     eventType: 'offline',
+    isPublished: {{ isset($acara) && $acara->status === 'published' ? 'true' : 'false' }},
 
     // State Data
     tempAddress: '',
@@ -197,11 +198,23 @@
 
         document.getElementById('is_online').value = this.finalEventType === 'online' ? '1' : '0';
         this.showLocationModal = false;
+
+        // Notify global script so it can re-check form validity (enables Publish)
+        const lokasiEl = document.getElementById('lokasi');
+        if (lokasiEl) {
+            lokasiEl.dispatchEvent(new Event('input', { bubbles: true }));
+        }
+        window.dispatchEvent(new Event('location-updated'));
     }
 }">
 
     <label class="mb-2 block text-sm font-medium text-gray-700">
-        Lokasi Acara
+        Lokasi Acara <span class="text-red-400">*</span>
+        {{-- @if (isset($acara) && $acara->status === 'published')
+            <span class="ml-2 inline-block px-2 py-1 text-xs font-semibold text-orange-700 bg-orange-100 rounded">
+                Tidak bisa diubah (Acara Published)
+            </span>
+        @endif --}}
     </label>
 
     <input type="hidden" name="tipe_event" x-model="finalEventType">
@@ -216,7 +229,7 @@
 
 
 
-    <div class="flex items-start gap-3">
+    <div class="flex items-start gap-3" :class="{ 'opacity-60 pointer-events-none': isPublished }">
         <div class="shrink-0 mt-0.5 text-gray-500">
             <svg x-show="finalEventType === 'offline'" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5"
                 viewBox="0 0 20 20" fill="currentColor">
@@ -289,8 +302,10 @@
             </div>
         </div>
 
-        <button type="button" @click="showLocationModal = true"
-            class="shrink-0 text-blue-600 hover:text-blue-800 transition-colors p-1" title="Ubah Lokasi">
+        <button type="button" @click="showLocationModal = true" :disabled="isPublished"
+            :class="{ 'opacity-50 cursor-not-allowed': isPublished }"
+            class="shrink-0 text-blue-600 hover:text-blue-800 transition-colors p-1 disabled:hover:text-blue-600"
+            title="Ubah Lokasi">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
                 stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5">
                 <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z" />
@@ -301,11 +316,12 @@
 
     <!-- Modal -->
     <div x-show="showLocationModal" x-cloak class="fixed inset-0 z-50 flex items-center justify-center bg-black/80">
-        <div class="bg-white rounded-xl shadow-xl p-6 w-full max-w-2xl mx-4 max-h-[90vh] overflow-y-auto">
+        <div class="bg-white rounded-xl shadow-xl p-6 w-full max-w-2xl mx-4 max-h-[90vh] overflow-y-auto" @click.stop>
 
             <div class="flex justify-between items-center mb-6">
                 <h3 class="text-xl font-semibold text-gray-900">Atur Lokasi Acara</h3>
-                <button type="button" @click="showLocationModal = false" class="text-gray-400 hover:text-gray-500">
+                <button type="button" @click="showLocationModal = false" class="text-gray-400 hover:text-gray-500"
+                    :disabled="isPublished">
                     <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M6 18L18 6M6 6l12 12" />
@@ -313,17 +329,18 @@
                 </button>
             </div>
 
-            <div class="flex p-1 bg-gray-100 rounded-lg mb-6 w-full">
-                <button type="button" @click="eventType = 'offline'"
+            <div class="flex p-1 bg-gray-100 rounded-lg mb-6 w-full"
+                :class="{ 'opacity-50 pointer-events-none': isPublished }">
+                <button type="button" @click="eventType = 'offline'" :disabled="isPublished"
                     :class="eventType === 'offline' ? 'bg-white text-blue-600 shadow-sm' :
                         'text-gray-500 hover:text-gray-700'"
-                    class="flex-1 px-4 py-2 text-sm font-medium rounded-md transition-all duration-200 flex justify-center items-center gap-2">
+                    class="flex-1 px-4 py-2 text-sm font-medium rounded-md transition-all duration-200 flex justify-center items-center gap-2 disabled:cursor-not-allowed">
                     Offline
                 </button>
-                <button type="button" @click="eventType = 'online'"
+                <button type="button" @click="eventType = 'online'" :disabled="isPublished"
                     :class="eventType === 'online' ? 'bg-white text-blue-600 shadow-sm' :
                         'text-gray-500 hover:text-gray-700'"
-                    class="flex-1 px-4 py-2 text-sm font-medium rounded-md transition-all duration-200 flex justify-center items-center gap-2">
+                    class="flex-1 px-4 py-2 text-sm font-medium rounded-md transition-all duration-200 flex justify-center items-center gap-2 disabled:cursor-not-allowed">
                     Online
                 </button>
             </div>
@@ -333,15 +350,15 @@
                 </div>
                 <div class="mb-4">
                     <label class="block text-sm font-medium text-gray-700 mb-1">Detail Alamat</label>
-                    <textarea x-model="tempAddress" readonly rows="2"
-                        class="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-50 text-sm resize-none text-gray-600"></textarea>
+                    <textarea x-model="tempAddress" readonly rows="2" :disabled="isPublished"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-50 text-sm resize-none text-gray-600 disabled:opacity-50"></textarea>
                 </div>
                 <!-- Input Venue Manual di Modal -->
                 <div class="mb-4">
                     <label class="block text-sm font-medium text-gray-700 mb-1">Venue</label>
-                    <input type="text" x-model="tempVenue"
+                    <input type="text" x-model="tempVenue" :disabled="isPublished"
                         placeholder="Masukkan nama venue (mis: Gedung Serbaguna)"
-                        class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 text-sm">
+                        class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 text-sm disabled:opacity-50 disabled:cursor-not-allowed">
                 </div>
             </div>
 
@@ -369,16 +386,16 @@
                     </ul>
 
                     <label class="block text-sm font-medium text-gray-700 mb-1">Link Streaming</label>
-                    <input type="url" x-model="tempLink" placeholder="https://..."
-                        class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500">
+                    <input type="url" x-model="tempLink" :disabled="isPublished" placeholder="https://..."
+                        class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 disabled:opacity-50 disabled:cursor-not-allowed">
                 </div>
             </div>
 
-            <div class="flex justify-end gap-3 pt-4 bo  rder-t border-gray-100">
+            <div class="flex justify-end gap-3 pt-4 border-t border-gray-100">
                 <button type="button" @click="showLocationModal = false"
                     class="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50">Batal</button>
-                <button type="button" @click="saveLocation()"
-                    class="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg text-sm font-medium">Simpan</button>
+                <button type="button" @click="saveLocation()" :disabled="isPublished"
+                    class="px-4 py-2 bg-blue-500 hover:bg-blue-600 disabled:bg-blue-300 disabled:cursor-not-allowed text-white rounded-lg text-sm font-medium">Simpan</button>
             </div>
         </div>
     </div>

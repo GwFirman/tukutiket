@@ -1,4 +1,4 @@
-<div class="bg-gradient-to-b from-white to-indigo-50 ">
+<div class="bg-gradient-to-b from-white to-indigo-50 mt-4">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="text-center mb-10 md:mb-16">
             <div

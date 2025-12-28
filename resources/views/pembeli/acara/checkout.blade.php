@@ -4,9 +4,9 @@
         <!-- Hidden input untuk acara_id -->
         <input type="hidden" name="acara_id" value="{{ $acara->id }}">
 
-        <div class="px-6 pb-6 sm:px-6 lg:px-12 py-0 md:py-12">
+        <div class="px-6 pb-6 sm:px-6 lg:px-24 py-0 md:py-12 ">
             <div class="md:flex gap-2">
-                <div class="bg-white shadow-sm sm:rounded-lg col-span-8">
+                <div class="bg-white  sm:rounded-lg col-span-8 flex-1">
                     @include('pembeli.acara.partials.chekcout.detail-acara')
 
                     <div class="border-t border-gray-200 my-4"></div>
@@ -15,7 +15,7 @@
                 </div>
 
                 {{-- sidebar --}}
-                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg col-span-4 p-6">
+                <div class="bg-white overflow-hidden  sm:rounded-lg col-span-4 p-6">
                     <!-- Header dengan counter tiket -->
                     <div class="flex items-center justify-between mb-4">
                         <p class="text-gray-800 font-medium">Informasi Pemesan</p>

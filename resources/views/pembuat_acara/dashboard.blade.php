@@ -45,6 +45,51 @@
             @endif
 
             <!-- Stats Cards -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 mb-6 sm:mb-8 p-6 rounded-lg "
+                style="background-image: url('{{ asset('images/blue-gradient.jpg') }}'); background-size: cover; background-position: center;">
+                <!-- Total Acara -->
+                <div class="bg-white/50 backdrop-blur-3xl rounded-lg p-4">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-xs font-medium text-gray-600">Total Acara</p>
+                            <p class="text-2xl sm:text-3xl font-bold text-gray-900 mt-1">{{ count($acaras) }}</p>
+                        </div>
+                        <div class="w-10 h-10 bg-indigo-50 rounded-md flex items-center justify-center">
+                            <i data-lucide="calendar" class="w-5 h-5 text-indigo-600"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Published -->
+                <div class="bg-white/50 backdrop-blur-3xl rounded-lg p-4">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-xs font-medium text-gray-600">Published</p>
+                            <p class="text-2xl sm:text-3xl font-bold text-gray-900 mt-1">
+                                {{ $acaras->where('status', 'published')->count() }}</p>
+                        </div>
+                        <div class="w-10 h-10 bg-green-50 rounded-md flex items-center justify-center">
+                            <i data-lucide="check-circle" class="w-5 h-5 text-green-600"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Draft -->
+                <div class="bg-white/50 backdrop-blur-3xl rounded-lg p-4 sm:col-span-2 lg:col-span-1">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-xs font-medium text-gray-600">Draft</p>
+                            <p class="text-2xl sm:text-3xl font-bold text-gray-900 mt-1">
+                                {{ $acaras->where('status', 'draft')->count() }}</p>
+                        </div>
+                        <div class="w-10 h-10 bg-amber-50 rounded-md flex items-center justify-center">
+                            <i data-lucide="clock" class="w-5 h-5 text-amber-600"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Stats Cards -->
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
                 <!-- Acara Terbaru Card -->
                 @if ($acaraTerbaru)
@@ -92,7 +137,7 @@
                                         <div class="flex items-center gap-1.5 sm:gap-2">
                                             <i data-lucide="calendar" class="size-3.5 sm:size-4 flex-shrink-0"></i>
                                             <span
-                                                class="text-[11px] sm:text-xs">{{ \Carbon\Carbon::parse($acaraTerbaru->waktu_mulai)->format('d M Y, H:i') }}</span>
+                                                class="text-[11px] sm:text-xs">{{ \Carbon\Carbon::parse($acaraTerbaru->waktu_mulai)->format('d M Y') }}</span>
                                         </div>
                                     </div>
                                 </div>
@@ -164,165 +209,8 @@
                     </div>
                 </div>
             </div>
-            <!-- Stats Cards -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 mb-6 sm:mb-8">
-                <!-- Total Acara -->
-                <div class="bg-white border-2 border-indigo-100 rounded-lg p-4">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-xs font-medium text-gray-600">Total Acara</p>
-                            <p class="text-2xl sm:text-3xl font-bold text-gray-900 mt-1">{{ count($acaras) }}</p>
-                        </div>
-                        <div class="w-10 h-10 bg-indigo-50 rounded-md flex items-center justify-center">
-                            <i data-lucide="calendar" class="w-5 h-5 text-indigo-600"></i>
-                        </div>
-                    </div>
-                </div>
 
-                <!-- Published -->
-                <div class="bg-white border-2 border-indigo-100 rounded-lg p-4">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-xs font-medium text-gray-600">Published</p>
-                            <p class="text-2xl sm:text-3xl font-bold text-gray-900 mt-1">
-                                {{ $acaras->where('status', 'published')->count() }}</p>
-                        </div>
-                        <div class="w-10 h-10 bg-green-50 rounded-md flex items-center justify-center">
-                            <i data-lucide="check-circle" class="w-5 h-5 text-green-600"></i>
-                        </div>
-                    </div>
-                </div>
 
-                <!-- Draft -->
-                <div class="bg-white border-2 border-indigo-100 rounded-lg p-4 sm:col-span-2 lg:col-span-1">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-xs font-medium text-gray-600">Draft</p>
-                            <p class="text-2xl sm:text-3xl font-bold text-gray-900 mt-1">
-                                {{ $acaras->where('status', 'draft')->count() }}</p>
-                        </div>
-                        <div class="w-10 h-10 bg-amber-50 rounded-md flex items-center justify-center">
-                            <i data-lucide="clock" class="w-5 h-5 text-amber-600"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <!-- Quick Actions & Info -->
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-4">
-                <!-- Quick Actions -->
-                <div class="bg-white rounded-xl border-2 border-indigo-100 p-5 sm:p-6 ">
-                    <div class="flex items-center gap-2 mb-4">
-                        <i data-lucide="zap" class="w-5 h-5 text-indigo-600"></i>
-                        <h3 class="font-semibold text-base text-gray-900">Aksi Cepat</h3>
-                    </div>
-                    <div class="space-y-2">
-                        <a href="{{ route('pembuat.acara.create') }}"
-                            class="flex items-center px-3 border-2 border-indigo-50 py-2.5 text-gray-700 hover:bg-indigo-50 hover:text-indigo-700 rounded-lg transition-colors text-sm">
-                            <i data-lucide="plus-circle" class="w-4 h-4 text-indigo-600 mr-2"></i>
-                            <span class="font-medium">Buat Acara Baru</span>
-                        </a>
-                        <a href="{{ route('pembuat.acara.index') }}"
-                            class="flex items-center px-3 border-2 border-indigo-50 py-2.5 text-gray-700 hover:bg-indigo-50 hover:text-indigo-700 rounded-lg transition-colors text-sm">
-                            <i data-lucide="list" class="w-4 h-4 text-indigo-600 mr-2"></i>
-                            <span class="font-medium">Lihat Semua Acara</span>
-                        </a>
-                        <a href="{{ route('pembuat.profile') }}"
-                            class="flex items-center px-3 border-2 border-indigo-50 py-2.5 text-gray-700 hover:bg-indigo-50 hover:text-indigo-700 rounded-lg transition-colors text-sm">
-                            <i data-lucide="user-cog" class="w-4 h-4 text-indigo-600 mr-2"></i>
-                            <span class="font-medium">Pengaturan Profil</span>
-                        </a>
-                    </div>
-                </div>
-
-                <!-- Statistics Overview -->
-                <div class="bg-white rounded-xl border-2 border-indigo-100 p-5 sm:p-6 ">
-                    <div class="flex items-center gap-2 mb-4">
-                        <i data-lucide="bar-chart-3" class="w-5 h-5 text-indigo-600"></i>
-                        <h3 class="font-semibold text-base text-gray-900">Ringkasan Penjualan</h3>
-                    </div>
-                    <div class="space-y-4">
-                        <div>
-                            <div class="flex justify-between mb-2">
-                                <span class="text-sm text-gray-600 font-medium">Tiket Terjual</span>
-                                <span class="text-sm font-bold text-indigo-600">{{ $totalTiketTerjual }}</span>
-                            </div>
-                            <div class="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
-                                <div class="bg-indigo-600 h-2 rounded-full transition-all duration-500"
-                                    style="width: 65%"></div>
-                            </div>
-                        </div>
-                        <div>
-                            <div class="flex justify-between mb-2">
-                                <span class="text-sm text-gray-600 font-medium">Acara Aktif</span>
-                                <span class="text-sm font-bold text-indigo-600">{{ $totalAcara }}</span>
-                            </div>
-                            <div class="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
-                                <div class="bg-indigo-600 h-2 rounded-full transition-all duration-500"
-                                    style="width: 75%"></div>
-                            </div>
-                        </div>
-                        <div>
-                            <div class="flex justify-between mb-2">
-                                <span class="text-sm text-gray-600 font-medium">Tingkat Konversi</span>
-                                <span class="text-sm font-bold text-indigo-600">42%</span>
-                            </div>
-                            <div class="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
-                                <div class="bg-indigo-600 h-2 rounded-full transition-all duration-500"
-                                    style="width: 42%"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Recent Activity -->
-                <div class="bg-white rounded-xl border-2 border-indigo-100 p-5 sm:p-6 ">
-                    <div class="flex items-center gap-2 mb-4">
-                        <i data-lucide="activity" class="w-5 h-5 text-indigo-600"></i>
-                        <h3 class="font-semibold text-base text-gray-900">Aktivitas Terbaru</h3>
-                    </div>
-                    <div class="space-y-3">
-                        <div class="flex items-start gap-3 p-2 rounded-lg hover:bg-gray-50 transition-colors">
-                            <div
-                                class="w-8 h-8 rounded-lg bg-indigo-50 flex items-center justify-center flex-shrink-0">
-                                <i data-lucide="check-circle-2" class="w-4 h-4 text-indigo-600"></i>
-                            </div>
-                            <div class="flex-1 min-w-0">
-                                <p class="text-sm font-medium text-gray-900">Tiket baru terjual</p>
-                                <p class="text-xs text-gray-500 flex items-center gap-1 mt-0.5">
-                                    <i data-lucide="clock" class="w-3 h-3"></i>
-                                    5 menit lalu
-                                </p>
-                            </div>
-                        </div>
-                        <div class="flex items-start gap-3 p-2 rounded-lg hover:bg-gray-50 transition-colors">
-                            <div
-                                class="w-8 h-8 rounded-lg bg-indigo-50 flex items-center justify-center flex-shrink-0">
-                                <i data-lucide="user-plus" class="w-4 h-4 text-indigo-600"></i>
-                            </div>
-                            <div class="flex-1 min-w-0">
-                                <p class="text-sm font-medium text-gray-900">Pendaftar baru</p>
-                                <p class="text-xs text-gray-500 flex items-center gap-1 mt-0.5">
-                                    <i data-lucide="clock" class="w-3 h-3"></i>
-                                    15 menit lalu
-                                </p>
-                            </div>
-                        </div>
-                        <div class="flex items-start gap-3 p-2 rounded-lg hover:bg-gray-50 transition-colors">
-                            <div
-                                class="w-8 h-8 rounded-lg bg-indigo-50 flex items-center justify-center flex-shrink-0">
-                                <i data-lucide="credit-card" class="w-4 h-4 text-indigo-600"></i>
-                            </div>
-                            <div class="flex-1 min-w-0">
-                                <p class="text-sm font-medium text-gray-900">Pembayaran diterima</p>
-                                <p class="text-xs text-gray-500 flex items-center gap-1 mt-0.5">
-                                    <i data-lucide="clock" class="w-3 h-3"></i>
-                                    1 jam lalu
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
         </div>
     </div>
 </x-app-layout>

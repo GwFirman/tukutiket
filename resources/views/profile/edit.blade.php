@@ -1,6 +1,6 @@
 <x-app-layout>
     <x-slot name="header">
-        <div class="flex items-center gap-2">
+        <div class="flex max-w-4xl mx-auto items-center gap-2">
             <i data-lucide="user" class="size-5 text-gray-600"></i>
             <i data-lucide="chevron-right" class="size-4 text-gray-400"></i>
             <span class="font-semibold text-gray-800">{{ __('Profile') }}</span>
@@ -8,7 +8,7 @@
     </x-slot>
 
     <div class="py-6 sm:py-8">
-        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="max-w-4xl mx-auto px-6 lg:px-0">
 
             <!-- Header -->
             <div class="mb-6">
@@ -99,6 +99,43 @@
                                     </div>
                                 </div>
                             @endif
+                        </div>
+
+                        <!-- Nomor HP -->
+                        <div>
+                            <label for="nomor_hp" class="block text-sm font-medium text-gray-700 mb-2">
+                                {{ __('Nomor HP') }}
+                            </label>
+                            <div class="relative">
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <i data-lucide="phone" class="size-5 text-gray-400"></i>
+                                </div>
+                                <input id="nomor_hp" name="nomor_hp" type="tel"
+                                    value="{{ old('nomor_hp', $user->nomor_hp) }}"
+                                    class="w-full pl-11 pr-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition text-sm"
+                                    autocomplete="tel" placeholder="08xxxx-xxxx-xxxx" />
+                            </div>
+                            @error('nomor_hp')
+                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                            @enderror
+                        </div>
+
+                        <!-- Alamat -->
+                        <div>
+                            <label for="alamat" class="block text-sm font-medium text-gray-700 mb-2">
+                                {{ __('Alamat') }}
+                            </label>
+                            <div class="relative">
+                                <div class="absolute top-3 left-0 pl-3 pointer-events-none">
+                                    <i data-lucide="map-pin" class="size-5 text-gray-400"></i>
+                                </div>
+                                <textarea id="alamat" name="alamat"
+                                    class="w-full pl-11 pr-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition text-sm"
+                                    rows="3" autocomplete="street-address" placeholder="Masukkan alamat lengkap Anda">{{ old('alamat', $user->alamat) }}</textarea>
+                            </div>
+                            @error('alamat')
+                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                            @enderror
                         </div>
                     </div>
 

@@ -2,14 +2,14 @@
     <!-- Section Title -->
     <div class="flex items-center gap-2 p-5">
         <i data-lucide="square-user" class="size-5 text-indigo-600"></i>
-        <h3 class="text-lg font-semibold text-gray-900">Informasi Narahubung</h3>
+        <h3 class="text-lg font-semibold text-gray-900">Informasi Narahubung <span class="text-red-400">*</span></h3>
     </div>
     <div class="border-t border-gray-100 p-5 space-y-4  ">
 
         <!-- Nama Narahubung -->
         <div>
             <label class="block text-sm font-medium text-gray-700 mb-2">
-                Nama Narahubung
+                Nama Narahubung <span class="text-red-400">*</span>
             </label>
             <div class="relative">
                 <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">

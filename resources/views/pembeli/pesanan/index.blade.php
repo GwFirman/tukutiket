@@ -8,18 +8,20 @@
     </x-slot>
 
     {{-- Inisialisasi Alpine Data untuk Tabs --}}
-    <div class="py-6 sm:py-8" x-data="{ activeTab: 'all' }">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="py-6 md:py-0" x-data="{ activeTab: 'all' }">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
 
             {{-- ================= TABS NAVIGATION ================= --}}
             <div class="flex gap-4 border-b border-gray-200 mb-6 overflow-x-auto">
                 @php
                     $tabs = [
                         'all' => 'Semua',
-                        'pending' => 'Menunggu',
+                        'pending' => 'Menunggu Konfirmasi Pembayaran',
+                        'unpaid' => 'Belum Dibayar',
                         'paid' => 'Lunas',
                         'failed' => 'Gagal',
                         'expired' => 'Kedaluwarsa',
+                        'rejected' => 'Ditolak',
                     ];
                 @endphp
 
@@ -45,24 +47,30 @@
                                 $badgeClass = match ($status) {
                                     'paid' => 'bg-green-50 text-green-700 border-green-200',
                                     'pending' => 'bg-yellow-50 text-yellow-700 border-yellow-200',
+                                    'unpaid' => 'bg-orange-50 text-orange-700 border-orange-200',
                                     'failed' => 'bg-red-50 text-red-700 border-red-200',
                                     'expired' => 'bg-gray-50 text-gray-700 border-gray-200',
+                                    'rejected' => 'bg-red-50 text-red-700 border-red-200',
                                     default => 'bg-indigo-50 text-indigo-700 border-indigo-200',
                                 };
 
                                 $statusText = match ($status) {
                                     'paid' => 'Lunas',
-                                    'pending' => 'Menunggu Pembayaran',
+                                    'pending' => 'Menunggu Konfirmasi Pembayaran',
+                                    'unpaid' => 'Belum Dibayar',
                                     'failed' => 'Gagal',
                                     'expired' => 'Kedaluwarsa',
+                                    'rejected' => 'Ditolak',
                                     default => ucfirst($status),
                                 };
 
                                 $statusIcon = match ($status) {
                                     'paid' => 'check-circle',
                                     'pending' => 'clock',
+                                    'unpaid' => 'alert-circle',
                                     'failed' => 'x-circle',
                                     'expired' => 'alert-circle',
+                                    'rejected' => 'ban',
                                     default => 'info',
                                 };
                             @endphp
@@ -130,11 +138,23 @@
                                             <span>Hubungi Kreator</span>
                                         </button>
 
-                                        @if ($status === 'pending')
+                                        @if ($status === 'unpaid')
                                             <a href="{{ route('pembeli.pembayaran.show', $p->kode_pesanan) }}"
                                                 class="inline-flex items-center justify-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors text-sm font-medium">
                                                 <i data-lucide="credit-card" class="size-4"></i>
                                                 <span>Bayar Sekarang</span>
+                                            </a>
+                                        @elseif ($status === 'pending')
+                                            <a href="{{ route('pembeli.pembayaran.show', $p->kode_pesanan) }}"
+                                                class="inline-flex items-center justify-center gap-2 px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition-colors text-sm font-medium">
+                                                <i data-lucide="eye" class="size-4"></i>
+                                                <span>Lihat Pembayaran</span>
+                                            </a>
+                                        @elseif ($status === 'rejected')
+                                            <a href="{{ route('pembeli.pembayaran.show', $p->kode_pesanan) }}"
+                                                class="inline-flex items-center justify-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-sm font-medium">
+                                                <i data-lucide="eye" class="size-4"></i>
+                                                <span>Ulangi Pembayaran</span>
                                             </a>
                                         @endif
                                     </div>

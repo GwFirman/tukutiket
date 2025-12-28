@@ -12,7 +12,8 @@
             <!-- Kreator Grid -->
             <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6 sm:gap-8">
                 @foreach ($kreatorsPopuler as $kreator)
-                    <a href="#" class="group flex flex-col items-center text-center">
+                    <a href="{{ route('beranda.kreator', $kreator->slug) }}"
+                        class="group flex flex-col items-center text-center">
                         <!-- Logo Kreator -->
                         <div class="relative mb-3">
                             @if ($kreator->logo)

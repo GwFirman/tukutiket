@@ -44,7 +44,7 @@ class PembayaranController extends Controller
         ]);
 
         return redirect()
-            ->route('pembeli.tiket-saya')
+            ->route('pembeli.pembayaran.show', $pesanan->kode_pesanan)
             ->with('success', 'Bukti pembayaran berhasil diupload! Pesanan Anda sedang dalam proses verifikasi.');
     }
 
@@ -105,6 +105,7 @@ class PembayaranController extends Controller
         $pesanan = \App\Models\Pesanan::where('kode_pesanan', $id)->with('detailPesanan', 'detailPesanan.jenisTiket', 'detailPesanan.jenisTiket.acara')->firstOrFail();
         // dd($pesanan);
         $namaAcara = optional($pesanan->detailPesanan->first()->jenisTiket->acara)->nama_acara;
+        $isOnline = optional($pesanan->detailPesanan->first()->jenisTiket->acara)->is_online;
         $lokasi = optional($pesanan->detailPesanan->first()->jenisTiket->acara)->lokasi;
         $waktuMulai = optional($pesanan->detailPesanan->first()->jenisTiket->acara)->waktu_mulai;
         $waktuMulai = $waktuMulai ? \Carbon\Carbon::parse($waktuMulai)->locale('id')->translatedFormat('d F Y') : null;
@@ -119,7 +120,7 @@ class PembayaranController extends Controller
         });
         // dd($daftarTiket);
 
-        return view('pembeli.acara.bayar', compact('pesanan', 'namaAcara', 'lokasi', 'waktuMulai', 'daftarTiket'));
+        return view('pembeli.acara.bayar', compact('pesanan', 'namaAcara', 'lokasi', 'waktuMulai', 'daftarTiket', 'isOnline'));
     }
 
     /**

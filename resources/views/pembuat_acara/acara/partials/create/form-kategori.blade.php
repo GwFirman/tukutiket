@@ -39,7 +39,7 @@
 }">
     <div class="flex items-center gap-2 p-5">
         <i data-lucide="calendars" class="size-5 text-indigo-600"></i>
-        <h3 class="text-lg font-semibold text-gray-900">Kategori acara</h3>
+        <h3 class="text-lg font-semibold text-gray-900">Kategori acara <span class="text-red-400">*</span></h3>
     </div>
 
     <input type="hidden" name="id_kategori" x-model="selectedCategory" required>

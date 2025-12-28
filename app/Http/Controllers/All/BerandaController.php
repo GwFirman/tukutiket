@@ -30,6 +30,45 @@ class BerandaController extends Controller
     }
 
     /**
+     * Display all events with filters.
+     */
+    public function allAcara(Request $request)
+    {
+        $query = Acara::with('jenisTiket')->where('status', 'published');
+
+        // Filter berdasarkan search (nama acara)
+        if ($request->has('search') && $request->search) {
+            $query->where('nama_acara', 'like', '%'.$request->search.'%');
+        }
+
+        // Filter berdasarkan tanggal
+        if ($request->has('tanggal') && $request->tanggal) {
+            $query->whereDate('waktu_mulai', $request->tanggal);
+        }
+
+        // Filter berdasarkan lokasi
+        if ($request->has('lokasi') && $request->lokasi) {
+            $query->where('lokasi', $request->lokasi);
+        }
+
+        // Sorting - urutkan berdasarkan waktu mulai (yang paling dekat)
+        $query->orderBy('waktu_mulai', 'asc');
+
+        // Pagination
+        $acaras = $query->paginate(12);
+
+        // Get unique locations untuk filter dropdown
+        $lokasis = Acara::where('status', 'published')
+            ->distinct()
+            ->pluck('lokasi')
+            ->filter()
+            ->sort()
+            ->values();
+
+        return view('beranda.all-acara', compact('acaras', 'lokasis'));
+    }
+
+    /**
      * Show the form for creating a new resource.
      */
     public function create()
@@ -61,6 +100,23 @@ class BerandaController extends Controller
             ->exists();
 
         return view('pembeli.acara.show', compact('acara', 'alreadyBought'));
+    }
+
+    /**
+     * Display kreator profile with published events.
+     */
+    public function showKreator(\App\Models\Kreator $kreator)
+    {
+        $kreator->load('user');
+
+        // Ambil acara yang published oleh kreator ini
+        $acaras = Acara::where('id_kreator', $kreator->id)
+            ->where('status', 'published')
+            ->with('jenisTiket')
+            ->orderBy('waktu_mulai', 'desc')
+            ->get();
+
+        return view('beranda.kreator.show', compact('kreator', 'acaras'));
     }
 
     /**

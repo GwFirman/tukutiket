@@ -115,7 +115,7 @@
                 </div>
             @else
                 {{-- Form Upload --}}
-                <div class="bg-white overflow-hidden shadow-xl sm:rounded-2xl border border-gray-100">
+                <div class="bg-white overflow-hidden  sm:rounded-2xl border border-gray-100">
                     <div class="bg-gradient-to-r from-indigo-500 to-purple-600 px-8 py-6">
                         <h3 class="text-lg font-bold text-white">Upload Dokumen Verifikasi</h3>
                         <p class="text-indigo-100 text-sm mt-1">Lengkapi dokumen berikut untuk verifikasi akun kreator

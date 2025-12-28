@@ -23,6 +23,7 @@ class Pesanan extends Model
         'status',
         'status_pembayaran',
         'kode_pesanan',
+        'catatan_admin',
     ];
 
     protected $casts = [

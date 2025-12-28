@@ -28,7 +28,7 @@
                 </div>
                 <div class="flex items-center gap-2 bg-white/10 px-3 py-1.5 rounded-lg backdrop-blur-sm">
                     <i data-lucide="calendar" class="size-4"></i>
-                    <span>{{ \Carbon\Carbon::parse($acara->waktu_mulai)->format('d M Y, H:i') }}</span>
+                    <span>{{ \Carbon\Carbon::parse($acara->waktu_mulai)->format('d M Y') }}</span>
                 </div>
             </div>
         </div>

@@ -1,6 +1,14 @@
 <x-app-layout>
-    <div class="max-w-6xl mx-auto pb-6 md:py-10">
-        <div class="mx-auto px-6 lg:px-8">
+    <x-slot name="header">
+        <div class="flex items-center gap-2 mx-auto max-w-5xl">
+            <i data-lucide="calendar" class="size-5 text-gray-600"></i>
+            <i data-lucide="chevron-right" class="size-4 font-medium text-gray-400"></i>
+            <p class="text-gray-400 ">Daftar peserta <span
+                    class="font-medium text-gray-600">{{ $acara->nama_acara }}</span></p>
+        </div>
+    </x-slot>
+    <div class="max-w-5xl mx-auto pb-6 md:py-10">
+        <div class="mx-auto px-6 lg:px-0">
             <!-- Header -->
             <div class="relative rounded-xl px-6 py-12 mb-6 text-white overflow-hidden">
                 {{-- Background banner_acara --}}
@@ -20,6 +28,12 @@
                             Daftar Peserta
                         </div>
                         <h1 class="text-2xl font-bold">{{ $acara->nama_acara }}</h1>
+                        @if ($acara->is_online)
+                            <div class="flex items-center gap-2 text-indigo-200 text-sm mt-2">
+                                <i data-lucide="video" class="size-4"></i>
+                                Acara Online
+                            </div>
+                        @endif
                     </div>
                     <div class="bg-white/20 backdrop-blur-sm rounded-lg px-4 py-2">
                         <span class="text-sm">Total Peserta</span>
@@ -28,26 +42,27 @@
                 </div>
             </div>
 
-            <!-- Search & Filter -->
-            <div class="bg-white rounded-xl shadow-sm p-4 mb-6">
-                <div class="flex flex-col md:flex-row gap-4">
-                    <div class="flex-1 relative">
-                        <i data-lucide="search"
-                            class="size-5 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
-                        <input type="text" id="searchInput" placeholder="Cari nama peserta atau kode tiket..."
-                            class="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
-                    </div>
-                    <select id="filterStatus"
-                        class="px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
-                        <option value="">Semua Status</option>
-                        <option value="sudah_digunakan">Sudah Check-in</option>
-                        <option value="belum_digunakan">Belum Check-in</option>
-                    </select>
-                </div>
-            </div>
-
             <!-- Table -->
             <div class="bg-white overflow-hidden shadow-sm rounded-xl">
+                <!-- Search & Filter di atas tabel -->
+                <div class="px-4 md:px-6 py-4 border-b border-gray-100 bg-gray-50">
+                    <div class="flex flex-col md:flex-row gap-4">
+                        <div class="flex-1 relative">
+                            <i data-lucide="search"
+                                class="size-5 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                            <input type="text" id="searchInput" placeholder="Cari nama peserta atau kode tiket..."
+                                class="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                        </div>
+                        @if (!$acara->is_online)
+                            <select id="filterStatus"
+                                class="px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 md:w-48">
+                                <option value="">Semua Status</option>
+                                <option value="sudah_digunakan">Sudah Check-in</option>
+                                <option value="belum_digunakan">Belum Check-in</option>
+                            </select>
+                        @endif
+                    </div>
+                </div>
                 <!-- Mobile Card View -->
                 <div class="block md:hidden">
                     @forelse ($peserta as $item)
@@ -66,21 +81,23 @@
                                         <p class="text-xs text-indigo-600 font-medium mt-1">{{ $item->jenis_tiket }}</p>
                                     </div>
                                 </div>
-                                <div class="flex-shrink-0 ml-3">
-                                    @if ($item->status_checkin == 'sudah_digunakan')
-                                        <span
-                                            class="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700">
-                                            <i data-lucide="check-circle" class="size-3"></i>
-                                            Check-in
-                                        </span>
-                                    @else
-                                        <span
-                                            class="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-700">
-                                            <i data-lucide="clock" class="size-3"></i>
-                                            Pending
-                                        </span>
-                                    @endif
-                                </div>
+                                @if (!$acara->is_online)
+                                    <div class="flex-shrink-0 ml-3">
+                                        @if ($item->status_checkin == 'sudah_digunakan')
+                                            <span
+                                                class="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700">
+                                                <i data-lucide="check-circle" class="size-3"></i>
+                                                Check-in
+                                            </span>
+                                        @else
+                                            <span
+                                                class="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-700">
+                                                <i data-lucide="clock" class="size-3"></i>
+                                                Pending
+                                            </span>
+                                        @endif
+                                    </div>
+                                @endif
                             </div>
                         </div>
                     @empty
@@ -114,12 +131,14 @@
                                         Jenis Tiket
                                     </div>
                                 </th>
-                                <th class="px-6 py-3 text-right text-sm font-medium text-gray-700">
-                                    <div class="flex items-center justify-end gap-2">
-                                        <i data-lucide="check-circle" class="size-4"></i>
-                                        Status Check-in
-                                    </div>
-                                </th>
+                                @if (!$acara->is_online)
+                                    <th class="px-6 py-3 text-right text-sm font-medium text-gray-700">
+                                        <div class="flex items-center justify-end gap-2">
+                                            <i data-lucide="check-circle" class="size-4"></i>
+                                            Status Check-in
+                                        </div>
+                                    </th>
+                                @endif
                             </tr>
                         </thead>
                         <tbody class="bg-white divide-y divide-gray-200" id="pesertaTableBody">
@@ -143,25 +162,27 @@
                                     <td class="px-6 py-4 whitespace-nowrap text-center">
                                         <p class="text-sm font-medium text-indigo-700">{{ $item->jenis_tiket }}</p>
                                     </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-right">
-                                        @if ($item->status_checkin == 'sudah_digunakan')
-                                            <span
-                                                class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700">
-                                                <i data-lucide="check-circle" class="size-3"></i>
-                                                Sudah Check-in
-                                            </span>
-                                        @else
-                                            <span
-                                                class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-700">
-                                                <i data-lucide="clock" class="size-3"></i>
-                                                Belum Check-in
-                                            </span>
-                                        @endif
-                                    </td>
+                                    @if (!$acara->is_online)
+                                        <td class="px-6 py-4 whitespace-nowrap text-right">
+                                            @if ($item->status_checkin == 'sudah_digunakan')
+                                                <span
+                                                    class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700">
+                                                    <i data-lucide="check-circle" class="size-3"></i>
+                                                    Sudah Check-in
+                                                </span>
+                                            @else
+                                                <span
+                                                    class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-700">
+                                                    <i data-lucide="clock" class="size-3"></i>
+                                                    Belum Check-in
+                                                </span>
+                                            @endif
+                                        </td>
+                                    @endif
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="3" class="px-6 py-12 text-center">
+                                    <td colspan="{{ $acara->is_online ? 2 : 3 }}" class="px-6 py-12 text-center">
                                         <div class="flex flex-col items-center">
                                             <div
                                                 class="h-16 w-16 rounded-full bg-indigo-100 flex items-center justify-center mb-4">
@@ -185,18 +206,20 @@
                             class="flex flex-col md:flex-row md:items-center justify-between text-sm text-gray-600 gap-3">
                             <span>Menampilkan <span id="visibleCount">{{ count($peserta) }}</span> dari
                                 {{ count($peserta) }} peserta</span>
-                            <div class="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4">
-                                <span class="flex items-center gap-2">
-                                    <span class="h-2 w-2 rounded-full bg-green-500"></span>
-                                    <span class="text-xs sm:text-sm">Sudah Check-in:
-                                        {{ collect($peserta)->where('status_checkin', 'sudah_digunakan')->count() }}</span>
-                                </span>
-                                <span class="flex items-center gap-2">
-                                    <span class="h-2 w-2 rounded-full bg-yellow-500"></span>
-                                    <span class="text-xs sm:text-sm">Belum Check-in:
-                                        {{ collect($peserta)->where('status_checkin', '!=', 'sudah_digunakan')->count() }}</span>
-                                </span>
-                            </div>
+                            @if (!$acara->is_online)
+                                <div class="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4">
+                                    <span class="flex items-center gap-2">
+                                        <span class="h-2 w-2 rounded-full bg-green-500"></span>
+                                        <span class="text-xs sm:text-sm">Sudah Check-in:
+                                            {{ collect($peserta)->where('status_checkin', 'sudah_digunakan')->count() }}</span>
+                                    </span>
+                                    <span class="flex items-center gap-2">
+                                        <span class="h-2 w-2 rounded-full bg-yellow-500"></span>
+                                        <span class="text-xs sm:text-sm">Belum Check-in:
+                                            {{ collect($peserta)->where('status_checkin', '!=', 'sudah_digunakan')->count() }}</span>
+                                    </span>
+                                </div>
+                            @endif
                         </div>
                     </div>
                 @endif
@@ -213,7 +236,7 @@
 
             function filterTable() {
                 const searchTerm = searchInput.value.toLowerCase();
-                const statusFilter = filterStatus.value;
+                const statusFilter = filterStatus ? filterStatus.value : '';
                 let count = 0;
 
                 rows.forEach(row => {
@@ -238,7 +261,9 @@
             }
 
             searchInput.addEventListener('input', filterTable);
-            filterStatus.addEventListener('change', filterTable);
+            if (filterStatus) {
+                filterStatus.addEventListener('change', filterTable);
+            }
         });
     </script>
 </x-app-layout>

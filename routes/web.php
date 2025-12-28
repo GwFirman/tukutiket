@@ -1,6 +1,7 @@
-<?php
+    <?php
 
 use App\Http\Controllers\Admin\AdminController;
+use App\Http\Controllers\Admin\ModEventController;
 use App\Http\Controllers\Admin\ModKretorController;
 use App\Http\Controllers\All\BerandaController;
 use App\Http\Controllers\PembayaranController;
@@ -20,13 +21,16 @@ use App\Http\Controllers\PembuatAcara\LaporanPenjualanController;
 // use App\Http\Controllers\PembuatAcaraController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ScanController;
+use App\Http\Controllers\VerifikasiAcaraController;
 use App\Http\Controllers\VerifikasiKreatorController;
 use App\Models\Kreator;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [BerandaController::class, 'index'])->name('beranda');
+Route::get('/all-acara', [BerandaController::class, 'allAcara'])->name('beranda.all-acara');
 Route::get('/acara/{acara}', [BerandaController::class, 'show'])->name('beranda.acara');
+Route::get('/show-kreator/{kreator}', [BerandaController::class, 'showKreator'])->name('beranda.kreator');
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/dashboard', function () {
@@ -56,9 +60,19 @@ Route::middleware(['auth', 'role:admin'])
         Route::post('/mod-kreator/{id}/approve', [ModKretorController::class, 'approve'])->name('mod-kreator.approve');
         Route::post('/mod-kreator/{id}/reject', [ModKretorController::class, 'reject'])->name('mod-kreator.reject');
 
+        Route::get('/mod-event', [ModEventController::class, 'index'])->name('mod-event.index');
+        Route::get('/mod-event/{acara}', [ModEventController::class, 'show'])->name('mod-event.show');
+        Route::post('/mod-event/{acara}/takedown', [ModEventController::class, 'takedown'])->name('mod-event.takedown');
+        Route::post('/mod-event/{acara}/reject', [ModEventController::class, 'reject'])->name('mod-event.reject');
+
+        Route::get('/mod-izin', [ModEventController::class, 'indexVerifikasi'])->name('mod-izin.index');
+        Route::get('/mod-izin/{acara}', [ModEventController::class, 'showVerifikasi'])->name('mod-izin.show');
+        Route::post('/mod-event/{acara}/approve', [ModEventController::class, 'approve'])->name('mod-event.approve');
+        Route::post('/mod-event/{acara}/reject-verification', [ModEventController::class, 'rejectVerification'])->name('mod-event.reject-verification');
+
     });
 
-Route::middleware(['auth', 'role:kreator'])
+Route::middleware(['auth', 'role:kreator', 'kreator.verified'])
     ->prefix('kreator')
     ->name('pembuat.')
     ->group(function () {
@@ -73,9 +87,14 @@ Route::middleware(['auth', 'role:kreator'])
 
         Route::get('/acara/transaksi/{acara}', [kelolaTransaksiController::class, 'index'])->name('transaksi.index');
 
+        Route::get('/acara/verifikasi/{acara}', [VerifikasiAcaraController::class, 'show'])->name('verifikasi.show');
+        Route::post('/acara/verifikasi/{acara}', [VerifikasiAcaraController::class, 'store'])->name('verifikasi.store');
+        Route::delete('/acara/verifikasi/{verifikasi}', [VerifikasiAcaraController::class, 'destroy'])->name('verifikasi.destroy');
+
         Route::get('/acara/transaksi/{acara}/{kodePesanan}', [kelolaTransaksiController::class, 'Acc'])->name('transaksi.acc');
 
         Route::post('/acara/transaksi/{acara}/{kodePesanan}', [kelolaTransaksiController::class, 'store'])->name('transaksi.acc.store');
+        Route::post('/acara/transaksi/{acara}/{kodePesanan}/reject', [kelolaTransaksiController::class, 'reject'])->name('transaksi.acc.reject');
 
         Route::get('/acara/scan/{acara}', [ScanController::class, 'index'])->name('scan.index');
         Route::post('/acara/scan/check/{acara}', [ScanController::class, 'check'])
@@ -104,11 +123,17 @@ Route::middleware(['auth', 'role:kreator'])
         Route::post('/profile/update', [KreatorController::class, 'update'])
             ->name('profile.update');
 
-        Route::resource('verifikasi-data', VerifikasiKreatorController::class);
-
         // Route::post('/scan/check')
     });
+// Route::resource('verifikasi-data', VerifikasiKreatorController::class);
 
+// Route untuk verifikasi kreator (tidak perlu middleware verified)
+Route::middleware(['auth', 'role:kreator'])
+    ->prefix('kreator')
+    ->name('pembuat.')
+    ->group(function () {
+        Route::resource('verifikasi-data', VerifikasiKreatorController::class);
+    });
 Route::post('/user/assign-role-pembuat', [PembeliController::class, 'assignRolePembuat'])->middleware('auth')->name('user.assign-role-pembuat');
 
 Route::middleware(['auth', 'role:pembeli'])

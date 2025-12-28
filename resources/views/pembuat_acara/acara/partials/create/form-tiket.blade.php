@@ -2,7 +2,8 @@
     <div class="mb-6">
         <div class="flex items-center gap-2 mb-2">
             <i data-lucide="ticket" class="size-5 text-indigo-600"></i>
-            <h3 class="text-lg font-semibold text-gray-900">Jenis Tiket</h3>
+            <h3 class="text-lg font-semibold text-gray-900">Jenis Tiket <span class="text-red-400">*</span></h3>
+
         </div>
         <p class="text-sm text-gray-600">Kelola kategori tiket untuk acara Anda</p>
     </div>
@@ -11,6 +12,7 @@
         showModal: false,
         editIndex: null,
         currentType: 'gratis',
+        isPublished: {{ isset($acara) && $acara->status === 'published' ? 'true' : 'false' }},
     
         // Variabel baru untuk menyimpan batas tanggal acara (Snapshot)
         minDateAcara: '',
@@ -195,8 +197,9 @@
                             </div>
                         </div>
                         <div class="flex items-center gap-1 flex-shrink-0">
-                            <button type="button" @click="editKategori(index)"
-                                class="p-2 text-gray-500 hover:text-indigo-600 hover:bg-indigo-100 rounded-lg transition-colors">
+                            <button type="button" @click="editKategori(index)" :disabled="isPublished"
+                                :class="{ 'opacity-50 cursor-not-allowed': isPublished }"
+                                class="p-2 text-gray-500 hover:text-indigo-600 hover:bg-indigo-100 rounded-lg transition-colors disabled:hover:text-gray-500 disabled:hover:bg-transparent">
                                 <i data-lucide="edit-3" class="size-4"><svg xmlns="http://www.w3.org/2000/svg"
                                         width="14" height="14" viewBox="0 0 24 24" fill="none"
                                         stroke="currentColor" stroke-width="2" stroke-linecap="round"
@@ -206,8 +209,9 @@
                                         <path d="m15 5 4 4" />
                                     </svg></i>
                             </button>
-                            <button type="button" @click="hapusKategori(index)"
-                                class="p-2 text-gray-500 hover:text-red-600 hover:bg-red-100 rounded-lg transition-colors">
+                            <button type="button" @click="hapusKategori(index)" :disabled="isPublished"
+                                :class="{ 'opacity-50 cursor-not-allowed': isPublished }"
+                                class="p-2 text-gray-500 hover:text-red-600 hover:bg-red-100 rounded-lg transition-colors disabled:hover:text-gray-500 disabled:hover:bg-transparent">
                                 <i data-lucide="trash-2" class="size-4"><svg xmlns="http://www.w3.org/2000/svg"
                                         width="14" height="14" viewBox="0 0 24 24" fill="none"
                                         stroke="currentColor" stroke-width="2" stroke-linecap="round"
@@ -260,14 +264,14 @@
         </div>
 
         <!-- Tombol Tambah -->
-        <div class="grid grid-cols-2 gap-3 pt-2">
-            <button type="button" @click="openAddModal('gratis')"
-                class="flex justify-center items-center gap-2 px-4 py-3 bg-green-50 hover:bg-green-100 text-green-700 border border-green-200 rounded-xl transition-all font-medium text-sm">
+        <div class="grid grid-cols-2 gap-3 pt-2" :class="{ 'opacity-60 pointer-events-none': isPublished }">
+            <button type="button" @click="openAddModal('gratis')" :disabled="isPublished"
+                class="flex justify-center items-center gap-2 px-4 py-3 bg-green-50 hover:bg-green-100 text-green-700 border border-green-200 rounded-xl transition-all font-medium text-sm disabled:opacity-50 disabled:cursor-not-allowed">
                 <i data-lucide="plus" class="size-4"></i>
                 <span>Tiket Gratis</span>
             </button>
-            <button type="button" @click="openAddModal('berbayar')"
-                class="flex justify-center items-center gap-2 px-4 py-3 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 rounded-xl transition-all font-medium text-sm">
+            <button type="button" @click="openAddModal('berbayar')" :disabled="isPublished"
+                class="flex justify-center items-center gap-2 px-4 py-3 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 rounded-xl transition-all font-medium text-sm disabled:opacity-50 disabled:cursor-not-allowed">
                 <i data-lucide="plus" class="size-4"></i>
                 <span>Tiket Berbayar</span>
             </button>
@@ -276,7 +280,7 @@
         <!-- Modal -->
         <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4"
             x-show="showModal" x-transition x-cloak style="display: none;">
-            <div class="bg-white rounded-2xl  w-full max-w-md" @click.outside="showModal = false">
+            <div class="bg-white rounded-2xl w-full max-w-md" @click.stop>
                 <!-- Header -->
                 <div class="flex items-center justify-between p-6 border-b border-gray-100">
                     <div class="flex items-center gap-3">
@@ -327,6 +331,7 @@
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-2">Mulai Jual</label>
                             <input type="date" x-model="kategoriBaru.penjualan_mulai" :min="today"
+                                :max="maxDateAcara"
                                 @change="if (kategoriBaru.penjualan_selesai && new Date(kategoriBaru.penjualan_selesai) < new Date(kategoriBaru.penjualan_mulai)) kategoriBaru.penjualan_selesai = ''"
                                 class="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors text-sm">
                         </div>

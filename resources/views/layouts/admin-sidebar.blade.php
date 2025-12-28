@@ -4,20 +4,29 @@
         <i data-lucide="home" class="size-5 mr-2"></i>
         {{ __('Dashboard') }}
     </x-nav-link>
-
+    <x-nav-link :href="route('beranda')" :active="request()->routeIs('beranda')" class="group">
+        <i data-lucide="compass" class="size-5 mr-2"></i>
+        {{ __('Jelajahi Acara') }}
+    </x-nav-link>
     <div class="border-t border-gray-200 dark:border-gray-200 my-3 mx-2"></div>
     <h3 class="mx-3 text-gray-500 font-medium">Moderasi</h3>
 
     <!-- Moderasi Event -->
-    <x-nav-link :href="route('admin.mod-kreator')" :active="request()->routeIs('admin.moderasi.event.*')" class="mt-1 group">
+    <x-nav-link :href="route('admin.mod-event.index')" :active="request()->routeIs('admin.mod-event.*')" class="mt-1 group">
         <i data-lucide="calendar" class="size-5 mr-2"></i>
         {{ __('Moderasi Event') }}
     </x-nav-link>
 
     <!-- Moderasi Kreator -->
-    <x-nav-link :href="route('admin.mod-kreator')" :active="request()->routeIs('admin.mod-kreator')" class="mt-1 group">
+    <x-nav-link :href="route('admin.mod-kreator')" :active="request()->routeIs('admin.mod-kreator.*')" class="mt-1 group">
         <i data-lucide="users" class="size-5 mr-2"></i>
         {{ __('Moderasi Kreator') }}
+    </x-nav-link>
+
+    <!-- Verifikasi Acara -->
+    <x-nav-link :href="route('admin.mod-izin.index')" :active="request()->routeIs('admin.mod-izin.index')" class="mt-1 group">
+        <i data-lucide="shield-check" class="size-5 mr-2"></i>
+        {{ __('Verifikasi Acara') }}
     </x-nav-link>
 
     {{-- <div class="border-t border-gray-200 dark:border-gray-200 my-3 mx-2"></div>

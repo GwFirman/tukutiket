@@ -41,8 +41,10 @@
 
                         @include('pembuat_acara.acara.partials.create.form-acara')
 
+                        @include('pembuat_acara.acara.partials.create.profile-kreator')
                         <div class="lg:flex gap-5 mt-5 px-5 pb-5 space-y-4">
-                            @include('pembuat_acara.acara.partials.create.profile-kreator')
+
+                            @include('pembuat_acara.acara.partials.create.form-jam')
 
                             @include('pembuat_acara.acara.partials.create.form-tanggal')
 
@@ -97,7 +99,7 @@
                     <div class="flex justify-between mt-4 px-5">
                         <div class="flex gap-3 justify-end w-full">
                             <button type="submit" name="status" value="draft"
-                                class="bg-gray-200 text-gray-800 px-4 py-2 rounded-lg hover:bg-gray-300 transition">
+                                class="bg-gray-100 border-2 border-gray-300 text-gray-500 px-4 py-2 rounded-lg hover:bg-gray-300 transition">
                                 Simpan Draft
                             </button>
                             <button id="publishBtn" type="submit" name="status" value="publish"
@@ -117,7 +119,7 @@
             const publishBtn = document.getElementById('publishBtn');
             if (!form || !publishBtn) return;
 
-            // Tandai field wajib dengan required bila belum
+            // Tandai field wajib
             const requiredSelectors = [
                 'input[name="nama_acara"]',
                 'input[name="id_kreator"]',
@@ -127,22 +129,39 @@
                 'input[name="lokasi"]',
                 'textarea[name="deskripsi_acara"]',
                 'input[name="info_narahubung"]',
-                'input[name="email_narahubung"]',
-                // Minimal 1 tiket
-                'input[name="has_tickets"]'
+                'input[name="email_narahubung"]'
             ];
             requiredSelectors.forEach(sel => {
                 const el = form.querySelector(sel);
                 if (el) el.setAttribute('required', 'required');
             });
 
+            // Hidden input yang di-set oleh Alpine untuk menandai adanya tiket
+            const hasTicketsInput = form.querySelector('input[name="has_tickets"]');
+            // Hidden input lokasi (di-set oleh modal lokasi)
+            const lokasiInput = form.querySelector('input[name="lokasi"]');
+
+            const hasTicketsValid = () => {
+                return hasTicketsInput ? String(hasTicketsInput.value).trim() !== '' : true;
+            };
+            const lokasiValid = () => {
+                return lokasiInput ? String(lokasiInput.value).trim() !== '' : true;
+            };
+
             const checkValidity = () => {
-                publishBtn.disabled = !form.checkValidity();
+                const nativeValid = form.checkValidity();
+                publishBtn.disabled = !(nativeValid && hasTicketsValid() && lokasiValid());
             };
 
             form.addEventListener('input', checkValidity, true);
             form.addEventListener('change', checkValidity, true);
+            if (hasTicketsInput) hasTicketsInput.addEventListener('input', checkValidity);
+            if (lokasiInput) lokasiInput.addEventListener('input', checkValidity);
+            // Event yang dipanggil dari modal lokasi ketika lokasi disimpan
+            window.addEventListener('location-updated', checkValidity);
             document.addEventListener('DOMContentLoaded', checkValidity);
+            // Jaga-jaga sinkronisasi dengan Alpine
+            setTimeout(checkValidity, 300);
         })();
     </script>
     </div>

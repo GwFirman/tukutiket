@@ -224,11 +224,11 @@
                                     <div class="ml-6 space-y-2 text-xs sm:text-sm text-gray-600">
                                         <div class="flex items-start gap-2">
                                             <span class="text-indigo-600 font-medium">Mulai:</span>
-                                            <span>{{ \Carbon\Carbon::parse($acara->waktu_mulai)->translatedFormat('d F Y, H:i') }}</span>
+                                            <span>{{ \Carbon\Carbon::parse($acara->waktu_mulai)->translatedFormat('d F Y') }}</span>
                                         </div>
                                         <div class="flex items-start gap-2">
                                             <span class="text-indigo-600 font-medium">Selesai:</span>
-                                            <span>{{ \Carbon\Carbon::parse($acara->waktu_selesai)->translatedFormat('d F Y, H:i') }}</span>
+                                            <span>{{ \Carbon\Carbon::parse($acara->waktu_selesai)->translatedFormat('d F Y') }}</span>
                                         </div>
                                     </div>
                                 </div>
@@ -241,9 +241,32 @@
                                         <i data-lucide="map-pin" class="size-4 sm:size-5 text-indigo-600"></i>
                                         Lokasi
                                     </p>
-                                    <p class="ml-6 text-gray-600 text-xs sm:text-base leading-relaxed">
-                                        {{ $acara->lokasi }}
-                                    </p>
+                                    @if ($acara->is_online)
+                                        <div class="ml-6 bg-green-50 border border-green-200 rounded-lg p-3">
+                                            <div class="flex items-center gap-2 mb-2">
+                                                <i data-lucide="globe" class="size-4 text-green-600"></i>
+                                                <span class="text-sm font-semibold text-green-700">Acara Online</span>
+                                            </div>
+                                            @if ($acara->link_acara)
+                                                <p class="text-xs sm:text-sm text-gray-600">
+                                                    Link akan dibagikan melalui email sebelum acara dimulai
+                                                </p>
+                                                <a href="{{ $acara->link_acara }}" target="_blank"
+                                                    class="text-xs sm:text-sm text-green-600 hover:text-green-700 font-medium mt-2 flex items-center gap-1">
+                                                    {{ $acara->link_acara }}
+                                                    <i data-lucide="external-link" class="size-3"></i>
+                                                </a>
+                                            @else
+                                                <p class="text-xs sm:text-sm text-gray-600">
+                                                    Link akan diberikan sebelum acara dimulai
+                                                </p>
+                                            @endif
+                                        </div>
+                                    @else
+                                        <p class="ml-6 text-gray-600 text-xs sm:text-base leading-relaxed">
+                                            {{ $acara->lokasi }}
+                                        </p>
+                                    @endif
                                 </div>
 
                                 <div class="border-t border-gray-200 my-5"></div>

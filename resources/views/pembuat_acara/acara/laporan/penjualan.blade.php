@@ -1,5 +1,13 @@
 <x-app-layout>
-    <div class="max-w-6xl mx-auto pb-6 md:py-10 px-6">
+    <x-slot name="header">
+        <div class="flex items-center gap-2 mx-auto max-w-5xl">
+            <i data-lucide="calendar" class="size-5 text-gray-600"></i>
+            <i data-lucide="chevron-right" class="size-4 font-medium text-gray-400"></i>
+            <p class="text-gray-400 ">Laporan penjualan <span
+                    class="font-medium text-gray-600">{{ $acara->nama_acara }}</span></p>
+        </div>
+    </x-slot>
+    <div class="max-w-5xl mx-auto pb-6 md:py-10 ">
 
         {{-- Header --}}
         <div class="relative rounded-xl px-6 py-12 mb-8 text-white overflow-hidden">

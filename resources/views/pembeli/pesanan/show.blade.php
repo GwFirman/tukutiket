@@ -23,31 +23,47 @@
 
                     <!-- Status Badge -->
                     <div>
-                        @if ($pesanan->status_pembayaran === 'paid')
-                            <span
-                                class="inline-flex items-center gap-2 px-4 py-2 bg-green-100 text-green-800 rounded-lg font-semibold text-sm">
-                                <i data-lucide="check-circle" class="size-5"></i>
-                                Lunas
-                            </span>
-                        @elseif($pesanan->status_pembayaran === 'pending')
-                            <span
-                                class="inline-flex items-center gap-2 px-4 py-2 bg-yellow-100 text-yellow-800 rounded-lg font-semibold text-sm">
-                                <i data-lucide="clock" class="size-5"></i>
-                                Menunggu Pembayaran
-                            </span>
-                        @elseif($pesanan->status_pembayaran === 'failed')
-                            <span
-                                class="inline-flex items-center gap-2 px-4 py-2 bg-red-100 text-red-800 rounded-lg font-semibold text-sm">
-                                <i data-lucide="x-circle" class="size-5"></i>
-                                Gagal
-                            </span>
-                        @else
-                            <span
-                                class="inline-flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-800 rounded-lg font-semibold text-sm">
-                                <i data-lucide="info" class="size-5"></i>
-                                {{ ucfirst($pesanan->status_pembayaran) }}
-                            </span>
-                        @endif
+                        @php
+                            $status = strtolower($pesanan->status_pembayaran);
+                            $badgeConfig = [
+                                'paid' => [
+                                    'class' => 'bg-green-100 text-green-800',
+                                    'icon' => 'check-circle',
+                                    'label' => 'Lunas',
+                                ],
+                                'pending' => [
+                                    'class' => 'bg-yellow-100 text-yellow-800',
+                                    'icon' => 'clock',
+                                    'label' => 'Menunggu Konfirmasi Admin',
+                                ],
+                                'unpaid' => [
+                                    'class' => 'bg-orange-100 text-orange-800',
+                                    'icon' => 'alert-circle',
+                                    'label' => 'Belum Dibayar',
+                                ],
+                                'failed' => [
+                                    'class' => 'bg-red-100 text-red-800',
+                                    'icon' => 'x-circle',
+                                    'label' => 'Gagal',
+                                ],
+                                'expired' => [
+                                    'class' => 'bg-gray-100 text-gray-800',
+                                    'icon' => 'alert-circle',
+                                    'label' => 'Kedaluwarsa',
+                                ],
+                                'rejected' => [
+                                    'class' => 'bg-red-100 text-red-800',
+                                    'icon' => 'ban',
+                                    'label' => 'Ditolak',
+                                ],
+                            ];
+                            $config = $badgeConfig[$status] ?? $badgeConfig['pending'];
+                        @endphp
+                        <span
+                            class="inline-flex items-center gap-2 px-4 py-2 {{ $config['class'] }} rounded-lg font-semibold text-sm">
+                            <i data-lucide="{{ $config['icon'] }}" class="size-5"></i>
+                            {{ $config['label'] }}
+                        </span>
                     </div>
                 </div>
             </div>
@@ -90,13 +106,18 @@
                                                 <div class="flex flex-col gap-1 text-xs sm:text-sm text-gray-600">
                                                     <div class="flex items-center gap-2">
                                                         <i data-lucide="calendar" class="size-4"></i>
-                                                        <span>{{ \Carbon\Carbon::parse($detail->jenisTiket->acara->waktu_mulai)->format('d M Y, H:i') }}
+                                                        <span>{{ \Carbon\Carbon::parse($detail->jenisTiket->acara->waktu_mulai)->format('d M Y') }}
                                                             WIB</span>
                                                     </div>
                                                     <div class="flex items-center gap-2">
                                                         <i data-lucide="map-pin" class="size-4"></i>
-                                                        <span
-                                                            class="truncate">{{ $detail->jenisTiket->acara->lokasi }}</span>
+                                                        <span class="truncate">
+                                                            @if ($detail->jenisTiket->acara->is_online)
+                                                                Acara Online
+                                                            @else
+                                                                {{ $detail->jenisTiket->acara->lokasi }}
+                                                            @endif
+                                                        </span>
                                                     </div>
                                                 </div>
                                             </div>
@@ -214,11 +235,35 @@
                             Lihat Tiket Saya
                         </a>
                     @elseif($pesanan->status_pembayaran === 'pending')
+                        <button disabled
+                            class="block w-full text-center px-4 py-3 bg-yellow-300 text-yellow-700 rounded-lg font-medium cursor-not-allowed">
+                            <i data-lucide="hourglass" class="size-4 inline mr-2"></i>
+                            Menunggu Konfirmasi Admin
+                        </button>
+                    @elseif($pesanan->status_pembayaran === 'unpaid')
                         <a href="{{ route('pembeli.pembayaran.show', $pesanan->kode_pesanan) }}"
                             class="block w-full text-center px-4 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors font-medium">
                             <i data-lucide="credit-card" class="size-4 inline mr-2"></i>
                             Lanjutkan Pembayaran
                         </a>
+                    @elseif($pesanan->status_pembayaran === 'failed')
+                        <a href="{{ route('pembeli.pembayaran.show', $pesanan->kode_pesanan) }}"
+                            class="block w-full text-center px-4 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium">
+                            <i data-lucide="rotate-ccw" class="size-4 inline mr-2"></i>
+                            Coba Pembayaran Ulang
+                        </a>
+                    @elseif($pesanan->status_pembayaran === 'expired')
+                        <button disabled
+                            class="block w-full text-center px-4 py-3 bg-gray-300 text-gray-600 rounded-lg font-medium cursor-not-allowed">
+                            <i data-lucide="alert-circle" class="size-4 inline mr-2"></i>
+                            Pesanan Kedaluwarsa
+                        </button>
+                    @elseif($pesanan->status_pembayaran === 'rejected')
+                        <button disabled
+                            class="block w-full text-center px-4 py-3 bg-red-300 text-red-700 rounded-lg font-medium cursor-not-allowed">
+                            <i data-lucide="ban" class="size-4 inline mr-2"></i>
+                            Pesanan Ditolak
+                        </button>
                     @endif
                 </div>
             </div>

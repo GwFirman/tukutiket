@@ -109,9 +109,10 @@ class AcaraController extends Controller
     public function store(Request $request)
     {
         // dd($request);
+        // 1. Cek Draft
         $isDraft = $request->input('status') === 'draft';
 
-        // Jika bukan draft → jalankan validasi penuh
+        // 2. Validasi Penuh (Jika bukan draft)
         if (! $isDraft) {
             $request->validate([
                 'banner_acara' => 'nullable|image|mimes:jpg,jpeg,png',
@@ -120,6 +121,12 @@ class AcaraController extends Controller
                 'id_kategori' => 'required|exists:kategori,id',
                 'waktu_mulai' => 'required|date',
                 'waktu_selesai' => 'required|date',
+
+                // --- Penambahan Validasi Jam ---
+                'jam_mulai' => 'required|date_format:H:i',
+                'jam_selesai' => 'required|date_format:H:i|after:jam_mulai', // Opsional: pastikan selesai > mulai
+                // --------------------------------
+
                 'lokasi' => 'required|string',
                 'deskripsi_acara' => 'required|string',
                 'satu_transaksi_per_akun' => 'boolean',
@@ -130,36 +137,72 @@ class AcaraController extends Controller
                 'venue' => 'nullable|string',
                 'latitude' => 'nullable|numeric',
                 'longitude' => 'nullable|numeric',
+                // Validasi tiket
+                'kategori_tiket' => 'required|array',
+                'kategori_tiket.*.kuota' => 'required|integer',
+                'kategori_tiket.*.harga' => 'nullable|numeric',
             ]);
         }
 
-        $acara = new Acara;
-        // Wajib isi id_pembuat
-        $acara->id_pembuat = Auth::id();
+        // 3. LOGIKA PENENTUAN STATUS
+        $status = 'draft';
+        $pesanFlash = 'Draft acara berhasil disimpan!';
+        $redirectRoute = 'pembuat.acara.index';
+        $redirectParams = [];
+        $flashType = 'success';
 
-        // Isi field hanya jika tersedia (untuk draft boleh kosong)
+        if (! $isDraft) {
+            $totalKuota = 0;
+            $isBerbayar = false;
+
+            if ($request->has('kategori_tiket') && is_array($request->kategori_tiket)) {
+                foreach ($request->kategori_tiket as $tiket) {
+                    $totalKuota += intval($tiket['kuota'] ?? 0);
+                    if (intval($tiket['harga'] ?? 0) > 0) {
+                        $isBerbayar = true;
+                    }
+                }
+            }
+
+            $isOffline = ! $request->boolean('is_online');
+
+            if ($isOffline || $isBerbayar || $totalKuota > 500) {
+                $status = 'pending_verifikasi';
+                $pesanFlash = 'Acara berhasil dibuat namun memerlukan verifikasi karena bersifat Offline, Berbayar, atau >500 peserta. Mohon unggah surat izin.';
+                $flashType = 'warning';
+            } else {
+                $status = 'published';
+                $pesanFlash = 'Acara berhasil dipublish!';
+            }
+        }
+
+        // 4. Simpan Data Acara
+        $acara = new Acara;
+        $acara->id_pembuat = Auth::id();
+        $acara->status = $status;
+
         $acara->nama_acara = $request->input('nama_acara');
         $acara->id_kreator = $request->input('id_kreator');
         $acara->deskripsi = $request->input('deskripsi_acara');
         $acara->lokasi = $request->input('lokasi');
         $acara->waktu_mulai = $request->input('waktu_mulai');
         $acara->waktu_selesai = $request->input('waktu_selesai');
-        $acara->no_telp_narahubung = $request->input('no_telp_narahubang');
+
+        // --- Penambahan Simpan Jam ---
+        $acara->jam_mulai = $request->input('jam_mulai');
+        $acara->jam_selesai = $request->input('jam_selesai');
+        // -----------------------------
+
+        $acara->no_telp_narahubung = $request->input('no_telp_narahubung');
         $acara->info_narahubung = $request->input('info_narahubung');
         $acara->email_narahubung = $request->input('email_narahubung');
         $acara->is_online = $request->input('is_online');
         $acara->venue = $request->input('venue');
         $acara->latitude = $request->input('latitude');
         $acara->longitude = $request->input('longitude');
-
-        // Status mengikuti tombol
-        $acara->status = $isDraft ? 'draft' : 'published';
-
-        // Opsi transaksi (boleh kosong saat draft)
         $acara->satu_transaksi_per_akun = $request->boolean('satu_transaksi_per_akun');
         $acara->maks_tiket_per_transaksi = $request->input('maks_tiket_per_transaksi');
 
-        // Banner (opsional)
         if ($request->hasFile('banner_acara')) {
             $path = $request->file('banner_acara')->store('banner_acara', 'public');
             $acara->banner_acara = $path;
@@ -167,7 +210,7 @@ class AcaraController extends Controller
 
         $acara->save();
 
-        // Relasi kategori hanya jika bukan draft dan kategori tersedia
+        // 5. Simpan Relasi (Kategori & Tiket)
         if (! $isDraft && $request->filled('id_kategori')) {
             EventKategori::create([
                 'id_acara' => $acara->id,
@@ -175,7 +218,6 @@ class AcaraController extends Controller
             ]);
         }
 
-        // Jenis tiket: simpan jika dikirim; untuk draft semua field tiket boleh null
         if ($request->has('kategori_tiket') && is_array($request->kategori_tiket)) {
             foreach ($request->kategori_tiket as $kategori) {
                 $jenisTiket = new \App\Models\JenisTiket;
@@ -192,9 +234,16 @@ class AcaraController extends Controller
             }
         }
 
+        // 6. Tentukan Redirect
+        if ($status === 'pending_verifikasi') {
+            return redirect()
+                ->route('pembuat.acara.show', $acara->slug)
+                ->with($flashType, $pesanFlash);
+        }
+
         return redirect()
             ->route('pembuat.acara.index')
-            ->with('success', $isDraft ? 'Draft acara berhasil disimpan!' : 'Acara berhasil dipublish!');
+            ->with($flashType, $pesanFlash);
     }
 
     /**
@@ -238,43 +287,118 @@ class AcaraController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $isDraft = $request->input('status') === 'draft';
+        // 1. Cek Draft
+        $isDraftInput = $request->input('status') === 'draft';
 
-        // Validasi kondisional seperti store
-        if (! $isDraft) {
+        // 2. Validasi (Jika bukan draft)
+        if (! $isDraftInput) {
             $request->validate([
-                'banner_acara' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
                 'nama_acara' => 'required|string|max:255',
                 'id_kategori' => 'required|exists:kategori,id',
                 'waktu_mulai' => 'required|date',
                 'waktu_selesai' => 'required|date|after_or_equal:waktu_mulai',
+
+                // Validasi Jam
+                'jam_mulai' => 'required|date_format:H:i',
+                'jam_selesai' => 'required|date_format:H:i|after:jam_mulai',
+
                 'lokasi' => 'required|string',
                 'deskripsi_acara' => 'required|string',
-                'satu_transaksi_per_akun' => 'boolean',
-                'maks_tiket_per_transaksi' => 'required|integer|min:1',
-                'info_narahubung' => 'nullable|string',
-                'email_narahubung' => 'nullable|email',
-                'no_telp_narahubung' => 'nullable|string',
-                'is_online' => 'nullable|boolean',
-                'venue' => 'nullable|string',
-                'latitude' => 'nullable|numeric',
-                'longitude' => 'nullable|numeric',
+                'kategori_tiket' => 'required|array',
+                'kategori_tiket.*.kuota' => 'required|integer',
+                // ... validasi lainnya
             ]);
         }
 
+        // 3. Ambil Data Lama
         $acara = Acara::findOrFail($id);
 
         if ($acara->id_pembuat !== Auth::id()) {
-            abort(403, 'Kamu tidak memiliki izin untuk mengubah acara ini.');
+            abort(403, 'Unauthorized.');
         }
 
-        // Update field utama (boleh kosong untuk draft)
+        // ============================================================
+        // 4. LOGIKA STATUS (HANDLING REJECTED / PENDING / DRAFT TO PUBLISH)
+        // ============================================================
+
+        $redirectRoute = 'pembuat.acara.index';
+        $redirectParams = [];
+        $flashType = 'success';
+
+        if ($isDraftInput) {
+            // A. Jika User klik "Simpan Draft"
+            $finalStatus = 'draft';
+            $pesanFlash = 'Draft acara berhasil diperbarui!';
+
+        } else {
+            // B. Jika User klik "Update / Publish"
+
+            if ($acara->status == 'rejected') {
+                // KASUS 1: Sebelumnya DITOLAK
+                $finalStatus = 'pending_verifikasi';
+                $pesanFlash = 'Revisi berhasil dikirim. Menunggu verifikasi admin ulang.';
+                // Redirect ke detail agar bisa upload surat jika perlu
+                $redirectRoute = 'pembuat.acara.show';
+                $redirectParams = ['acara' => $acara->slug];
+
+            } elseif ($acara->status == 'pending_verifikasi') {
+                // KASUS 2: Sedang MENUNGGU VERIFIKASI
+                $finalStatus = 'pending_verifikasi';
+                $pesanFlash = 'Perubahan data berhasil disimpan. Masih menunggu verifikasi admin.';
+                $redirectRoute = 'pembuat.acara.show';
+                $redirectParams = ['acara' => $acara->slug];
+
+            } elseif ($acara->status == 'draft') {
+                // KASUS 3: DRAFT -> PUBLISH (Cek Risiko di sini!)
+
+                $totalKuota = 0;
+                $isBerbayar = false;
+
+                if ($request->has('kategori_tiket') && is_array($request->kategori_tiket)) {
+                    foreach ($request->kategori_tiket as $tiket) {
+                        $totalKuota += intval($tiket['kuota'] ?? 0);
+                        if (intval($tiket['harga'] ?? 0) > 0) {
+                            $isBerbayar = true;
+                        }
+                    }
+                }
+                $isOffline = ! $request->boolean('is_online');
+
+                // Cek Risiko: Offline OR Berbayar OR > 500 Peserta
+                if ($isOffline || $isBerbayar || $totalKuota > 500) {
+                    $finalStatus = 'pending_verifikasi';
+                    $pesanFlash = 'Acara berhasil disimpan namun memerlukan verifikasi (Offline/Berbayar/>500). Mohon unggah surat izin.';
+                    $flashType = 'warning';
+
+                    // Redirect ke detail acara untuk upload surat izin
+                    $redirectRoute = 'pembuat.acara.show';
+                    $redirectParams = ['acara' => $acara->slug];
+                } else {
+                    $finalStatus = 'published';
+                    $pesanFlash = 'Acara berhasil dipublish!';
+                    $redirectRoute = 'pembuat.acara.index'; // Aman, kembali ke list
+                }
+
+            } else {
+                // KASUS 4: Sudah PUBLISHED (Edit data minor)
+                // Logika: Langsung tayang (tanpa deteksi risiko ulang, sesuai request sebelumnya)
+                $finalStatus = 'published';
+                $pesanFlash = 'Acara berhasil diperbarui dan ditayangkan!';
+            }
+        }
+
+        // 5. Update Data (Fill)
         $acara->fill([
             'nama_acara' => $request->nama_acara,
             'deskripsi' => $request->deskripsi_acara,
             'lokasi' => $request->lokasi,
             'waktu_mulai' => $request->waktu_mulai,
             'waktu_selesai' => $request->waktu_selesai,
+
+            // Update Jam
+            'jam_mulai' => $request->input('jam_mulai'),
+            'jam_selesai' => $request->input('jam_selesai'),
+
             'no_telp_narahubung' => $request->no_telp_narahubung,
             'info_narahubung' => $request->info_narahubung,
             'email_narahubung' => $request->email_narahubung,
@@ -282,12 +406,14 @@ class AcaraController extends Controller
             'venue' => $request->input('venue'),
             'latitude' => $request->input('latitude'),
             'longitude' => $request->input('longitude'),
-            'status' => $isDraft ? 'draft' : 'published',
             'satu_transaksi_per_akun' => $request->boolean('satu_transaksi_per_akun'),
             'maks_tiket_per_transaksi' => $request->maks_tiket_per_transaksi,
+
+            // Update Status berdasarkan logika di poin 4
+            'status' => $finalStatus,
         ]);
 
-        // Banner handling seperti sebelumnya
+        // Banner handling
         if ($request->hasFile('banner_acara')) {
             if ($acara->banner_acara && Storage::disk('public')->exists($acara->banner_acara)) {
                 Storage::disk('public')->delete($acara->banner_acara);
@@ -296,10 +422,16 @@ class AcaraController extends Controller
             $acara->banner_acara = $path;
         }
 
+        // Simpan dulu agar Slug terupdate (jika ada perubahan nama) sebelum redirect
         $acara->save();
 
-        // Relasi kategori: Hanya jika bukan draft dan ada id_kategori
-        if (! $isDraft && $request->filled('id_kategori')) {
+        // Update redirect params jika slug berubah dan route mengarah ke 'show'
+        if (isset($redirectParams['acara'])) {
+            $redirectParams['acara'] = $acara->slug;
+        }
+
+        // 6. Update Relasi Kategori
+        if (! $isDraftInput && $request->filled('id_kategori')) {
             EventKategori::where('id_acara', $acara->id)->delete();
             EventKategori::create([
                 'id_acara' => $acara->id,
@@ -307,14 +439,14 @@ class AcaraController extends Controller
             ]);
         }
 
-        // Jenis tiket: Tetap seperti sekarang (kelola existing)
+        // 7. Update Tiket Logic
         if ($request->has('kategori_tiket') && is_array($request->kategori_tiket)) {
             $existingIds = [];
             foreach ($request->kategori_tiket as $kategori) {
                 if (! empty($kategori['id'])) {
+                    // Update
                     $jenisTiket = \App\Models\JenisTiket::where('id', $kategori['id'])
-                        ->where('id_acara', $acara->id)
-                        ->first();
+                        ->where('id_acara', $acara->id)->first();
                     if ($jenisTiket) {
                         $jenisTiket->update([
                             'nama_jenis' => $kategori['nama'],
@@ -329,6 +461,7 @@ class AcaraController extends Controller
                         $existingIds[] = $jenisTiket->id;
                     }
                 } else {
+                    // Create
                     $new = \App\Models\JenisTiket::create([
                         'id_acara' => $acara->id,
                         'nama_jenis' => $kategori['nama'],
@@ -343,14 +476,14 @@ class AcaraController extends Controller
                     $existingIds[] = $new->id;
                 }
             }
-            \App\Models\JenisTiket::where('id_acara', $acara->id)
-                ->whereNotIn('id', $existingIds)
-                ->delete();
+            \App\Models\JenisTiket::where('id_acara', $acara->id)->whereNotIn('id', $existingIds)->delete();
         } else {
             \App\Models\JenisTiket::where('id_acara', $acara->id)->delete();
         }
 
-        return redirect()->route('pembuat.acara.index')->with('success', $isDraft ? 'Draft acara berhasil diperbarui!' : 'Acara berhasil diperbarui!');
+        return redirect()
+            ->route($redirectRoute, $redirectParams)
+            ->with($flashType, $pesanFlash);
     }
 
     /**

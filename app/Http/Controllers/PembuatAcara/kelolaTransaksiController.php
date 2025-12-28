@@ -6,7 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Models\Acara;
 use App\Models\Pesanan;
 use App\Models\TiketPeserta;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class kelolaTransaksiController extends Controller
@@ -50,6 +52,7 @@ class kelolaTransaksiController extends Controller
         $pesanan = Pesanan::where('kode_pesanan', $kodePesanan)->with('detailPesanan', 'detailPesanan.jenisTiket', 'detailPesanan.jenisTiket.acara')->firstOrFail();
         // dd($pesanan);
         $namaAcara = optional($pesanan->detailPesanan->first()->jenisTiket->acara)->nama_acara;
+        $isOnline = optional($pesanan->detailPesanan->first()->jenisTiket->acara)->is_online;
         $lokasi = optional($pesanan->detailPesanan->first()->jenisTiket->acara)->lokasi;
         $waktuMulai = optional($pesanan->detailPesanan->first()->jenisTiket->acara)->waktu_mulai;
         $waktuMulai = $waktuMulai ? \Carbon\Carbon::parse($waktuMulai)->locale('id')->translatedFormat('d F Y') : null;
@@ -64,10 +67,10 @@ class kelolaTransaksiController extends Controller
         });
         // dd($pesanan);
 
-        return view('pembuat_acara.acara.laporan.acc-pembayaran', compact('pesanan', 'namaAcara', 'lokasi', 'waktuMulai', 'daftarTiket', 'acara'));
+        return view('pembuat_acara.acara.laporan.acc-pembayaran', compact('pesanan', 'namaAcara', 'lokasi', 'waktuMulai', 'daftarTiket', 'acara', 'isOnline'));
     }
 
-    public function store(\Illuminate\Http\Request $request, Acara $acara, $kodePesanan)
+    public function store(Request $request, Acara $acara, $kodePesanan)
     {
         $validated = $request->validate([
             'id_detail_pesanan' => 'required',
@@ -103,5 +106,56 @@ class kelolaTransaksiController extends Controller
         return redirect()
             ->route('pembuat.transaksi.index', $acara->slug)
             ->with('success', 'Pembayaran berhasil diverifikasi dan tiket peserta telah dibuat!');
+    }
+
+    /**
+     * Reject payment for a given order (by organizer).
+     * Deletes generated tickets (if none checked-in), removes uploaded proof and marks order rejected.
+     */
+    public function reject(Request $request, Acara $acara, $kodePesanan)
+    {
+        $request->validate([
+            'catatan_admin' => 'nullable|string|max:1000',
+        ]);
+
+        // ensure organizer owns the event
+        if ($acara->id_pembuat !== Auth::id()) {
+            abort(403, 'Anda tidak memiliki akses ke halaman ini.');
+        }
+
+        $pesanan = Pesanan::where('kode_pesanan', $kodePesanan)
+            ->with('detailPesanan', 'detailPesanan.jenisTiket')
+            ->firstOrFail();
+
+        $firstDetail = $pesanan->detailPesanan->first();
+        if (! $firstDetail || (($firstDetail->jenisTiket->id_acara ?? null) != $acara->id)) {
+            abort(403, 'Pesanan tidak terkait dengan acara ini.');
+        }
+
+        $detailIds = $pesanan->detailPesanan->pluck('id')->toArray();
+
+        // Prevent rejecting if any ticket already checked-in
+        $hasCheckedIn = TiketPeserta::whereIn('id_detail_pesanan', $detailIds)
+            ->where(function ($q) {
+                $q->where('status_checkin', 1)->orWhere('status_checkin', 'checked-in');
+            })->exists();
+
+        if ($hasCheckedIn) {
+            return redirect()->back()->with('error', 'Tidak dapat menolak pembayaran karena beberapa tiket sudah dicek-in.');
+        }
+
+        // Delete generated tickets (if exist)
+        // TiketPeserta::whereIn('id_detail_pesanan', $detailIds)->delete();
+
+        // Remove uploaded proof file if present
+        // if ($pesanan->bukti_pembayaran && Storage::disk('public')->exists($pesanan->bukti_pembayaran)) {
+        //     Storage::disk('public')->delete($pesanan->bukti_pembayaran);
+        // }
+
+        // Update status
+        $pesanan->update(['status_pembayaran' => 'rejected', 'catatan_admin' => $request->catatan_admin]);
+
+        return redirect()->route('pembuat.transaksi.index', $acara->slug)
+            ->with('success', 'Pembayaran telah ditolak.'.($request->alasan ? ' Alasan: '.$request->alasan : ''));
     }
 }

@@ -32,7 +32,7 @@
         </div>
     </x-slot:header>
 
-    <div class="p-6 space-y-6 max-w-7xl mx-auto">
+    <div class="px-10 py-6 space-y-6 max-w-6xl mx-auto">
         <!-- Flash Message -->
         @if (session('error'))
             <div class="bg-rose-50 border border-rose-200 text-rose-800 px-4 py-3 rounded-lg flex items-center gap-2">
@@ -41,72 +41,9 @@
             </div>
         @endif
 
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
             <!-- Left Column - Info Kreator -->
-            <div class="lg:col-span-1 space-y-6">
-                <!-- Profile Card -->
-                <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                    <div class="bg-gradient-to-r from-indigo-500 to-purple-600 px-6 py-8 text-center">
-                        <div
-                            class="w-20 h-20 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center text-white text-2xl font-bold mx-auto mb-3">
-                            {{ strtoupper(substr($verifikasi->kreator->user->name ?? 'N', 0, 1)) }}
-                        </div>
-                        <h3 class="text-white font-bold text-lg">{{ $verifikasi->kreator->user->name ?? 'N/A' }}</h3>
-                        <p class="text-indigo-100 text-sm">{{ $verifikasi->kreator->user->email ?? 'N/A' }}</p>
-                    </div>
-                    <div class="p-6 space-y-4">
-                        <div class="flex items-center gap-3">
-                            <div class="bg-indigo-100 p-2 rounded-lg">
-                                <i data-lucide="user" class="w-4 h-4 text-indigo-600"></i>
-                            </div>
-                            <div>
-                                <p class="text-xs text-gray-500">Nama Kreator</p>
-                                <p class="text-sm font-medium text-gray-900">
-                                    {{ $verifikasi->kreator->nama_kreator ?? 'N/A' }}</p>
-                            </div>
-                        </div>
-                        <div class="flex items-center gap-3">
-                            <div class="bg-indigo-100 p-2 rounded-lg">
-                                <i data-lucide="phone" class="w-4 h-4 text-indigo-600"></i>
-                            </div>
-                            <div>
-                                <p class="text-xs text-gray-500">Nomor Telepon</p>
-                                <p class="text-sm font-medium text-gray-900">
-                                    {{ $verifikasi->kreator->no_telepon ?? 'N/A' }}</p>
-                            </div>
-                        </div>
-                        <div class="flex items-center gap-3">
-                            <div class="bg-indigo-100 p-2 rounded-lg">
-                                <i data-lucide="calendar" class="w-4 h-4 text-indigo-600"></i>
-                            </div>
-                            <div>
-                                <p class="text-xs text-gray-500">Tanggal Submit</p>
-                                <p class="text-sm font-medium text-gray-900">
-                                    {{ $verifikasi->created_at->format('d M Y, H:i') }}</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Catatan Admin (jika sudah di-review) -->
-                @if ($verifikasi->status !== 'pending')
-                    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-                        <div class="flex items-center gap-2">
-                            <div class="bg-indigo-100 p-2 rounded-lg">
-                                <i data-lucide="message-square" class="w-4 h-4 text-indigo-600"></i>
-                            </div>
-                            <h3 class="text-sm font-bold text-gray-900">Catatan Admin</h3>
-                        </div>
-                        <div class="bg-gray-50 p-4 rounded-lg border border-gray-100">
-                            <p class="text-gray-700 text-sm leading-relaxed">
-                                {{ $verifikasi->catatan_admin ?? 'Tidak ada catatan' }}</p>
-                        </div>
-                    </div>
-                @endif
-            </div>
-
-            <!-- Right Column - Dokumen & Action -->
-            <div class="lg:col-span-2 space-y-6">
+            <div class="lg:col-span-7 space-y-6">
                 <!-- Dokumen -->
                 <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
                     <div class="px-6 py-4 border-b border-gray-200 bg-gradient-to-r from-indigo-50 to-white">
@@ -116,7 +53,7 @@
                         </h3>
                     </div>
                     <div class="p-6">
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="grid grid-cols-1 gap-6">
                             <!-- Foto KTP -->
                             <div class="group h-full">
                                 <div class=" rounded-xl p-4 bg-indigo-50 transition-colors h-full flex flex-col">
@@ -216,101 +153,164 @@
                         </div>
                     </div>
                 </div>
+            </div>
 
-                <!-- Action Buttons -->
-                @if ($verifikasi->status === 'pending')
-                    <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                        <div class="px-6 py-4 border-b border-gray-200 bg-gradient-to-r from-indigo-50 to-white">
-                            <h3 class="text-lg font-bold text-gray-900 flex items-center gap-2">
-                                <i data-lucide="clipboard-check" class="w-5 h-5 text-indigo-600"></i>
-                                Aksi Review
-                            </h3>
+            <!-- Right Column - Dokumen & Action -->
+            <div class="lg:col-span-5 space-y-6">
+                <!-- Profile Card -->
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                    <div class="bg-gradient-to-r from-indigo-500 to-purple-600 px-6 py-8 text-center">
+                        <div
+                            class="w-20 h-20 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center text-white text-2xl font-bold mx-auto mb-3">
+                            {{ strtoupper(substr($verifikasi->kreator->user->name ?? 'N', 0, 1)) }}
                         </div>
-                        <div class="p-6">
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <h3 class="text-white font-bold text-lg">{{ $verifikasi->kreator->user->name ?? 'N/A' }}</h3>
+                        <p class="text-indigo-100 text-sm">{{ $verifikasi->kreator->user->email ?? 'N/A' }}</p>
+                    </div>
+                    <div class="px-6 pt-6 pb-2 space-y-4">
+                        <div class="flex items-center gap-3">
+                            <div class="bg-indigo-100 p-2 rounded-lg">
+                                <i data-lucide="user" class="w-4 h-4 text-indigo-600"></i>
+                            </div>
+                            <div>
+                                <p class="text-xs text-gray-500">Nama Kreator</p>
+                                <p class="text-sm font-medium text-gray-900">
+                                    {{ $verifikasi->kreator->nama_kreator ?? 'N/A' }}</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <div class="bg-indigo-100 p-2 rounded-lg">
+                                <i data-lucide="phone" class="w-4 h-4 text-indigo-600"></i>
+                            </div>
+                            <div>
+                                <p class="text-xs text-gray-500">Nomor Telepon</p>
+                                <p class="text-sm font-medium text-gray-900">
+                                    {{ $verifikasi->kreator->no_telepon ?? 'N/A' }}</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <div class="bg-indigo-100 p-2 rounded-lg">
+                                <i data-lucide="calendar" class="w-4 h-4 text-indigo-600"></i>
+                            </div>
+                            <div>
+                                <p class="text-xs text-gray-500">Tanggal Submit</p>
+                                <p class="text-sm font-medium text-gray-900">
+                                    {{ $verifikasi->created_at->format('d M Y, H:i') }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-2">
+                        @if ($verifikasi->status === 'pending')
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 p-6">
                                 <!-- Form Setujui -->
                                 <form action="{{ route('admin.mod-kreator.approve', $verifikasi->id) }}"
                                     method="POST">
                                     @csrf
                                     <button type="submit"
-                                        class="w-full px-6 py-4 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white rounded-xl hover:from-emerald-600 hover:to-emerald-700 font-medium inline-flex items-center justify-center gap-3 transition-all shadow-lg shadow-emerald-500/25 hover:shadow-emerald-500/40">
-                                        <div class="bg-white/20 p-2 rounded-lg">
-                                            <i data-lucide="check-circle" class="w-5 h-5"></i>
+                                        class="w-full p-4 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white rounded-xl hover:from-emerald-600 hover:to-emerald-700 font-medium inline-flex items-center justify-center gap-3 transition-all ">
+                                        <div class="">
+                                            <i data-lucide="check" class="w-5 h-5"></i>
                                         </div>
                                         <div class="text-left">
-                                            <span class="block font-semibold">Setujui Verifikasi</span>
-                                            <span class="block text-xs text-emerald-100">Kreator akan dapat membuat
-                                                event</span>
+                                            <span class="block font-semibold text-sm">Setujui Verifikasi</span>
                                         </div>
                                     </button>
                                 </form>
 
                                 <!-- Tombol Tolak -->
-                                <div x-data="{ showRejectForm: false }">
-                                    <button @click="showRejectForm = true" x-show="!showRejectForm"
-                                        class="w-full px-6 py-4 bg-gradient-to-r from-rose-500 to-rose-600 text-white rounded-xl hover:from-rose-600 hover:to-rose-700 font-medium inline-flex items-center justify-center gap-3 transition-all shadow-lg shadow-rose-500/25 hover:shadow-rose-500/40">
-                                        <div class="bg-white/20 p-2 rounded-lg">
+                                <div x-data="{ showRejectModal: false }" x-init="@if ($errors->has('catatan_admin')) showRejectModal = true; @endif">
+                                    <button @click="showRejectModal = true"
+                                        class="w-full p-4 bg-gradient-to-r from-rose-500 to-rose-600 text-white rounded-xl hover:from-rose-600 hover:to-rose-700 font-medium inline-flex items-center justify-center gap-3 transition-all ">
+                                        <div class="">
                                             <i data-lucide="x-circle" class="w-5 h-5"></i>
                                         </div>
                                         <div class="text-left">
-                                            <span class="block font-semibold">Tolak Verifikasi</span>
-                                            <span class="block text-xs text-rose-100">Kreator harus upload ulang
-                                                dokumen</span>
+                                            <span class="block font-semibold text-sm">Tolak Verifikasi</span>
                                         </div>
                                     </button>
 
-                                    <!-- Form Tolak Expanded -->
-                                    <form action="{{ route('admin.mod-kreator.reject', $verifikasi->id) }}"
-                                        method="POST" x-show="showRejectForm" x-transition
-                                        class="bg-rose-50 p-5 rounded-xl border border-rose-200 space-y-4">
-                                        @csrf
-                                        <div class="flex items-center justify-between">
-                                            <label class="text-sm font-semibold text-gray-900 flex items-center gap-2">
-                                                <i data-lucide="message-circle" class="w-4 h-4 text-rose-600"></i>
-                                                Alasan Penolakan
-                                            </label>
-                                            <button type="button" @click="showRejectForm = false"
-                                                class="text-gray-400 hover:text-gray-600 transition-colors">
-                                                <i data-lucide="x" class="w-5 h-5"></i>
-                                            </button>
+                                    <!-- Modal Tolak Popup -->
+                                    <div x-show="showRejectModal" x-cloak x-transition.opacity
+                                        class="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
+                                        @click="showRejectModal = false">
+                                        <div @click.stop
+                                            class="bg-white rounded-xl w-full max-w-lg mx-4 p-6 border border-rose-200">
+                                            <form action="{{ route('admin.mod-kreator.reject', $verifikasi->id) }}"
+                                                method="POST" class="space-y-4">
+                                                @csrf
+                                                <div class="flex items-center justify-between mb-4">
+                                                    <div class="flex items-center gap-2">
+                                                        <div class="bg-rose-100 p-2 rounded-lg">
+                                                            <i data-lucide="message-circle"
+                                                                class="w-5 h-5 text-rose-600"></i>
+                                                        </div>
+                                                        <h3 class="text-lg font-bold text-gray-900">Alasan Penolakan
+                                                        </h3>
+                                                    </div>
+                                                    <button type="button" @click="showRejectModal = false"
+                                                        class="text-gray-400 hover:text-gray-600 transition-colors">
+                                                        <i data-lucide="x" class="w-6 h-6"></i>
+                                                    </button>
+                                                </div>
+
+                                                <p class="text-sm text-gray-600">Jelaskan secara detail alasan mengapa
+                                                    verifikasi ditolak. Pesan ini akan dikirim ke kreator.</p>
+
+                                                <textarea name="catatan_admin"
+                                                    placeholder="Contoh: Foto KTP tidak jelas, silakan upload ulang dengan resolusi lebih tinggi..."
+                                                    class="w-full px-4 py-3 border border-rose-200 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-rose-500 bg-white resize-none"
+                                                    rows="5">{{ old('catatan_admin') }}</textarea>
+                                                @error('catatan_admin')
+                                                    <p class="text-rose-600 text-sm flex items-center gap-1">
+                                                        <i data-lucide="alert-circle" class="w-4 h-4"></i>
+                                                        {{ $message }}
+                                                    </p>
+                                                @enderror
+
+                                                <div class="flex gap-3 pt-4 border-t border-gray-200">
+                                                    <button type="button" @click="showRejectModal = false"
+                                                        class="flex-1 px-4 py-2.5 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 font-medium text-sm transition-colors">
+                                                        Batal
+                                                    </button>
+                                                    <button type="submit"
+                                                        class="flex-1 px-4 py-2.5 bg-rose-600 text-white rounded-lg hover:bg-rose-700 font-medium text-sm transition-colors inline-flex items-center justify-center gap-2">
+                                                        <i data-lucide="send" class="w-4 h-4"></i>
+                                                        Kirim Penolakan
+                                                    </button>
+                                                </div>
+                                            </form>
                                         </div>
-                                        <textarea name="catatan_admin" placeholder="Jelaskan alasan penolakan secara detail..."
-                                            class="w-full px-4 py-3 border border-rose-200 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-rose-500 bg-white resize-none"
-                                            rows="4">{{ old('catatan_admin') }}</textarea>
-                                        @error('catatan_admin')
-                                            <p class="text-rose-600 text-sm flex items-center gap-1">
-                                                <i data-lucide="alert-circle" class="w-4 h-4"></i>
-                                                {{ $message }}
-                                            </p>
-                                        @enderror
-                                        <div class="flex gap-3">
-                                            <button type="submit"
-                                                class="flex-1 px-4 py-2.5 bg-rose-600 text-white rounded-lg hover:bg-rose-700 font-medium text-sm transition-colors inline-flex items-center justify-center gap-2">
-                                                <i data-lucide="send" class="w-4 h-4"></i>
-                                                Kirim Penolakan
-                                            </button>
-                                            <button type="button" @click="showRejectForm = false"
-                                                class="px-4 py-2.5 bg-white text-gray-700 rounded-lg hover:bg-gray-50 font-medium text-sm border border-gray-200 transition-colors">
-                                                Batal
-                                            </button>
-                                        </div>
-                                    </form>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
+                        @else
+                            <div class="text-center py-4 border-t border-gray-400 px-4">
+                                <div class="flex justify-center items-center gap-4  ">
+                                    <div class="bg-amber-100 p-2 rounded-full w-fit ">
+                                        <i data-lucide="info" class="w-6 h-6 text-amber-400"></i>
+                                    </div>
+
+                                    <p class="text-gray-700 font-medium mb-1">Verifikasi Sudah Di-Review</p>
+
+                                </div>
+                            </div>
+                        @endif
                     </div>
-                @else
-                    <div
-                        class="bg-gradient-to-r from-indigo-50 to-purple-50 border border-indigo-200 rounded-xl p-6 text-center">
-                        <div class="bg-white p-3 rounded-full w-fit mx-auto mb-3 shadow-sm">
-                            @if ($verifikasi->status === 'approved')
-                                <i data-lucide="badge-check" class="w-8 h-8 text-emerald-600"></i>
-                            @else
-                                <i data-lucide="badge-x" class="w-8 h-8 text-rose-600"></i>
-                            @endif
+                </div>
+
+                <!-- Catatan Admin (jika sudah di-review) -->
+                @if ($verifikasi->status !== 'pending')
+                    <div class="bg-white rounded-xl  border border-gray-200 p-6 space-y-4">
+                        <div class="flex items-center gap-2">
+                            <div class="bg-indigo-100 p-2 rounded-lg">
+                                <i data-lucide="message-square" class="w-4 h-4 text-indigo-600"></i>
+                            </div>
+                            <h3 class="text-sm font-bold text-gray-900">Catatan Admin</h3>
                         </div>
-                        <p class="text-gray-700 font-medium">Verifikasi ini sudah di-review</p>
-                        <p class="text-gray-500 text-sm mt-1">Status tidak dapat diubah lagi</p>
+                        <div class="bg-gray-50 p-4 rounded-lg border border-gray-100">
+                            <p class="text-gray-700 text-sm leading-relaxed">
+                                {{ $verifikasi->catatan_admin ?? 'Tidak ada catatan' }}</p>
+                        </div>
                     </div>
                 @endif
             </div>

@@ -33,7 +33,7 @@ class CheckinController extends Controller
 
         $kodeTiket = $request->kode_tiket;
 
-        // 2. Ambil Data Tiket Lengkap
+        // 2. Ambil Data Tiket Lengkap (Termasuk masa berlaku dari jenis tiket)
         $tiketData = DB::table('tiket_peserta as tp')
             ->join('detail_pesanan as dp', 'tp.id_detail_pesanan', '=', 'dp.id')
             ->join('pesanan as p', 'dp.id_pesanan', '=', 'p.id')
@@ -53,6 +53,8 @@ class CheckinController extends Controller
                 'p.email_pemesan',
                 'jt.nama_jenis',
                 'jt.harga',
+                'jt.berlaku_mulai',  // Ambil kolom masa berlaku
+                'jt.berlaku_sampai', // Ambil kolom masa berlaku
                 'a.id as id_acara',
                 'a.nama_acara'
             )
@@ -76,7 +78,36 @@ class CheckinController extends Controller
             ], 404);
         }
 
-        // 4. Validasi Pembayaran
+        // 4. Validasi Masa Berlaku Tiket (PENAMBAHAN BARU)
+        $today = now()->toDateString();
+        $berlakuMulai = $tiketData->berlaku_mulai;
+        $berlakuSampai = $tiketData->berlaku_sampai;
+
+        $isTooEarly = $berlakuMulai && $today < $berlakuMulai;
+        $isTooLate = $berlakuSampai && $today > $berlakuSampai;
+
+        if ($isTooEarly || $isTooLate) {
+            $catatan = $isTooEarly
+                ? 'Tiket belum berlaku (Mulai: '.\Carbon\Carbon::parse($berlakuMulai)->format('d-m-Y').')'
+                : 'Tiket sudah kedaluwarsa (Sampai: '.\Carbon\Carbon::parse($berlakuSampai)->format('d-m-Y').')';
+
+            DB::table('log_checkin_tiket')->insert([
+                'nomor_tiket' => $tiketData->kode_tiket,
+                'id_acara' => $acara->id,
+                'id_petugas' => Auth::id(),
+                'tipe' => 'IN',
+                'status_scan' => 'invalid',
+                'catatan' => $catatan,
+                'waktu_scan' => now(),
+            ]);
+
+            return response()->json([
+                'status' => 'error',
+                'message' => '⏳ '.$catatan,
+            ], 403);
+        }
+
+        // 5. Validasi Pembayaran
         if ($tiketData->status_pembayaran !== 'paid') {
             return response()->json([
                 'status' => 'error',
@@ -84,7 +115,7 @@ class CheckinController extends Controller
             ], 403);
         }
 
-        // 5. Cek log terakhir yang valid (untuk mendukung keluar/masuk area)
+        // 6. Cek log terakhir yang valid (untuk mendukung keluar/masuk area)
         $lastValidLog = DB::table('log_checkin_tiket')
             ->where('nomor_tiket', $tiketData->kode_tiket)
             ->where('id_acara', $acara->id)
@@ -111,7 +142,7 @@ class CheckinController extends Controller
             ], 409);
         }
 
-        // 6. Simpan Log Check-in (VALID)
+        // 7. Simpan Log Check-in (VALID)
         DB::table('log_checkin_tiket')->insert([
             'nomor_tiket' => $tiketData->kode_tiket,
             'id_acara' => $acara->id,
@@ -122,7 +153,7 @@ class CheckinController extends Controller
             'waktu_scan' => now(),
         ]);
 
-        // 7. Update Status Tiket (Mirror State)
+        // 8. Update Status Tiket (Mirror State)
         DB::table('tiket_peserta')
             ->where('id', $tiketData->id_tiket)
             ->update([
@@ -131,7 +162,7 @@ class CheckinController extends Controller
                 'updated_at' => now(),
             ]);
 
-        // 8. Response Berhasil
+        // 9. Response Berhasil
         return response()->json([
             'status' => 'valid',
             'tipe' => 'IN',

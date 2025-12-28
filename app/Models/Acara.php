@@ -72,4 +72,12 @@ class Acara extends Model
     {
         return $this->hasMany(EventKategori::class, 'id_acara');
     }
+
+    /**
+     * Relationship with VerifikasiAcara model
+     */
+    public function verifikasiAcara()
+    {
+        return $this->hasMany(VerifikasiAcara::class, 'id_acara');
+    }
 }

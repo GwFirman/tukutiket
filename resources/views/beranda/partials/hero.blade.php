@@ -30,7 +30,7 @@
                 </p>
 
                 <!-- Search Bar with Filters -->
-                <form action="{{ route('beranda') }}" method="GET"
+                <form action="{{ route('beranda.all-acara') }}" method="GET"
                     class="animate-fade-in-up animation-delay-300 px-2 sm:px-0" x-data="{ filterOpen: false }">
                     <div class="bg-white rounded-xl sm:rounded-2xl shadow-xl p-2 flex gap-2">
                         <!-- Search Input -->
@@ -51,26 +51,7 @@
 
                         <!-- Desktop Filters -->
                         <div class="hidden sm:flex gap-2">
-                            <!-- Location Filter -->
-                            <div class="relative flex-1">
-                                <div class="absolute inset-y-0 left-3 sm:left-4 flex items-center pointer-events-none">
-                                    <i data-lucide="map-pin" class="w-4 h-4 sm:w-5 sm:h-5 text-gray-400"></i>
-                                </div>
-                                <select name="lokasi"
-                                    class="w-full pl-10 sm:pl-12 pr-8 sm:pr-10 py-3 sm:py-4 rounded-lg sm:rounded-xl border-0 bg-gray-50 focus:ring-2 focus:ring-indigo-500 text-gray-700 appearance-none cursor-pointer text-sm sm:text-base">
-                                    <option value="">Semua Lokasi</option>
-                                    @foreach ($lokasis ?? [] as $lokasi)
-                                        <option value="{{ $lokasi }}"
-                                            {{ request('lokasi') == $lokasi ? 'selected' : '' }}>
-                                            {{ $lokasi }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                                <div
-                                    class="absolute inset-y-0 right-2 sm:right-3 flex items-center pointer-events-none">
-                                    <i data-lucide="chevron-down" class="w-4 h-4 text-gray-400"></i>
-                                </div>
-                            </div>
+
 
                             <!-- Date Filter -->
                             <div class="relative flex-1 sm:max-w-[200px]">
@@ -138,9 +119,9 @@
 
                         <!-- Apply Button -->
                         <button type="submit"
-                            class="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-semibold py-3 px-4 rounded-lg transition-all duration-300 shadow-lg hover:shadow-xl flex items-center justify-center gap-2">
+                            class="text-xs w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-semibold py-3 px-4 rounded-lg transition-all duration-300 shadow-lg hover:shadow-xl flex items-center justify-center gap-2">
                             <i data-lucide="search" class="w-4 h-4"></i>
-                            Terapkan Filter
+                            Cari Acara
                         </button>
                     </div>
 

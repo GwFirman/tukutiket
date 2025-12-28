@@ -26,8 +26,12 @@
 
 <body class="font-sans antialiased">
     <div x-data="{ sidebarOpen: true }" class="min-h-screen">
+        <!-- Mobile Overlay -->
+        <div x-show="sidebarOpen" @click="sidebarOpen = false" class="fixed inset-0 z-20 bg-black/50 lg:hidden" x-cloak>
+        </div>
+
         <!-- Sidebar -->
-        <div class="fixed inset-y-0 left-0 z-30 w-64 bg-indigo-100/10 border-r border-gray-100 transform transition-transform duration-300"
+        <div class="fixed inset-y-0 left-0 z-30 w-64 bg-white border-r border-gray-100 transform transition-transform duration-300"
             :class="{ 'translate-x-0': sidebarOpen, '-translate-x-full': !sidebarOpen }">
             <!-- Logo -->
             <div class="flex items-center justify-start h-16 px-4 border-b gap-4 border-gray-300">
@@ -51,7 +55,7 @@
         <!-- Content -->
         <div class="lg:pl-64">
             <!-- Mobile header -->
-            <div class="sticky top-0 z-20 px-4 py-4 bg-white sm:px-6 border-b lg:hidden">
+            <div class="sticky top-0 z-20 px-4 py-4 bg-white sm:px-6  lg:hidden">
                 <button @click="sidebarOpen = true"
                     class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -65,7 +69,7 @@
             <main class="">
                 <!-- Page Heading -->
                 @isset($header)
-                    <header class="bg-white">
+                    <header class="bg-indigo-50/50">
                         <div class="mx-auto pt-5 px-24">
                             {{ $header }}
                         </div>
@@ -73,7 +77,7 @@
                 @endisset
 
                 <!-- Page Content -->
-                <div class="h-full">
+                <div class="h-screen bg-indigo-50/50">
                     {{ $slot }}
                 </div>
             </main>

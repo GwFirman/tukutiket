@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Pembeli;
 use App\Http\Controllers\Controller;
 use App\Models\Acara;
 use App\Models\DetailPesanan;
+use App\Models\JenisTiket;
 use App\Models\Pesanan;
 use App\Models\TiketPeserta;
 use Illuminate\Http\Request;
@@ -62,7 +63,7 @@ class PesananController extends Controller
             // 'id_acara' => $request->acara_id,
             'kode_pesanan' => 'ORD-'.strtoupper(Str::random(8)),
             'total_harga' => $request->grand_total,
-            'status_pembayaran' => 'pending',
+            'status_pembayaran' => $request->grand_total == 0 ? 'paid' : 'unpaid', // Jika gratis langsung paid
             'metode_pembayaran' => $request->metode_pembayaran,
             'email_pemesan' => $request->email_pemesan,
             'nama_pemesan' => $request->nama_pemesan,
@@ -97,7 +98,7 @@ class PesananController extends Controller
             }
 
             // Simpan detail pesanan dengan data peserta yang digabung
-            DetailPesanan::create([
+            $detailPesanan = DetailPesanan::create([
                 'id_pesanan' => $pesanan->id,
                 'id_jenis_tiket' => $ticketId,
                 'jumlah' => $quantity,
@@ -106,19 +107,39 @@ class PesananController extends Controller
                 'email_peserta' => implode('; ', $emailPesertaList) ?: null,
                 'no_telp_peserta' => implode('; ', $telpPesertaList) ?: null,
             ]);
-        }
 
+            // Jika total harga = 0 (gratis), langsung generate tiket peserta
+            if ($request->grand_total == 0) {
+                // Generate tiket sesuai jumlah yang dibeli
+                for ($i = 0; $i < $quantity; $i++) {
+                    TiketPeserta::create([
+                        'id_detail_pesanan' => $detailPesanan->id,
+                        'nomor_tiket' => strtoupper(Str::random(10)),
+                        'nama_peserta' => $namaPesertaList[$i] ?? $request->nama_pemesan,
+                        'email_peserta' => $emailPesertaList[$i] ?? $request->email_pemesan,
+                        'no_telp_peserta' => $telpPesertaList[$i] ?? $request->no_telp_pemesan,
+                        'kode_tiket' => strtoupper(Str::random(10)),
+                    ]);
+                }
+            }
+        }
         // Update kuota tiket
         foreach ($request->tickets as $ticket) {
-            $jenisTiket = \App\Models\JenisTiket::find($ticket['id']);
+            $jenisTiket = JenisTiket::find($ticket['id']);
             if ($jenisTiket) {
                 $jenisTiket->kuota -= $ticket['quantity'];
                 $jenisTiket->save();
             }
         }
 
-        return redirect()->route('pembeli.pembayaran.show', $pesanan->kode_pesanan)
-            ->with('success', 'Pesanan berhasil dibuat! Silakan lakukan pembayaran.');
+        // Redirect berdasarkan status pembayaran
+        if ($request->grand_total == 0) {
+            return redirect()->route('pembeli.tiket-saya')
+                ->with('success', 'Pesanan berhasil dibuat! Tiket Anda sudah tersedia.');
+        } else {
+            return redirect()->route('pembeli.pembayaran.show', $pesanan->kode_pesanan)
+                ->with('success', 'Pesanan berhasil dibuat! Silakan lakukan pembayaran.');
+        }
     }
 
     /**

@@ -46,41 +46,73 @@
             <div
                 class="bg-gradient-to-br from-gray-50 to-indigo-50 p-8 sm:p-12 border-b-2 border-dashed border-gray-300">
                 <div class="max-w-md mx-auto text-center space-y-6">
-                    <!-- QR Code - Large and Centered -->
-                    <div class="inline-block p-6 bg-white rounded-lg">
-                        @php
-                            $qr = base64_encode(
-                                QrCode::format('png')->size(400)->errorCorrection('H')->generate($tiket->kode_tiket),
-                            );
-                        @endphp
-                        <img src="data:image/png;base64, {{ $qr }}" alt="QR Code"
-                            class="w-48 h-48 sm:w-64 sm:h-64 lg:w-72 lg:h-72">
-                    </div>
+                    @if ($tiket->is_online)
+                        <!-- Online Event Link -->
+                        <div class="space-y-4">
+                            <div
+                                class="inline-block p-6 bg-gradient-to-br from-green-50 to-emerald-50 rounded-lg border-2 border-green-200">
+                                <i data-lucide="video" class="w-16 h-16 text-green-600 mx-auto mb-3"></i>
+                                <p class="text-sm font-semibold text-green-700 mb-2">Acara Online</p>
+                                <p class="text-xs text-green-600">Klik link di bawah untuk bergabung</p>
+                            </div>
 
-                    <!-- Ticket Code -->
-                    <div class="bg-white rounded-2xl p-4 border-2 border-indigo-200">
-                        <div class="flex items-center justify-center gap-2 text-indigo-600 mb-3">
-                            <i data-lucide="scan" class="w-5 h-5"></i>
-                            <span class="text-xs font-semibold uppercase tracking-wide">Kode Tiket</span>
+                            <!-- Online Event Link Button -->
+                            @if ($tiket->lokasi)
+                                <a href="{{ $tiket->lokasi }}" target="_blank" rel="noopener noreferrer"
+                                    class="inline-flex items-center justify-center gap-2 w-full px-6 py-4 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white rounded-xl font-semibold transition-all shadow-lg hover:shadow-xl">
+                                    <i data-lucide="external-link" class="w-5 h-5"></i>
+                                    <span>Buka Link Acara</span>
+                                </a>
+                                <p class="text-xs text-gray-600 break-all">{{ $tiket->lokasi }}</p>
+                            @else
+                                <div class="bg-yellow-50 border-2 border-yellow-300 rounded-xl p-4">
+                                    <p class="text-sm font-semibold text-yellow-900">Link akan diberikan kemudian</p>
+                                    <p class="text-xs text-yellow-800 mt-1">Organisator akan mengirim link acara sebelum
+                                        acara dimulai</p>
+                                </div>
+                            @endif
                         </div>
-                        <p class="text-xl sm:text-3xl font-mono font-bold text-gray-900 tracking-widest break-all">
-                            {{ $tiket->kode_tiket }}
-                        </p>
-                    </div>
+                    @else
+                        <!-- QR Code for Offline Event -->
+                        <div class="inline-block p-6 bg-white rounded-lg">
+                            @php
+                                $qr = base64_encode(
+                                    QrCode::format('png')
+                                        ->size(400)
+                                        ->errorCorrection('H')
+                                        ->generate($tiket->kode_tiket),
+                                );
+                            @endphp
+                            <img src="data:image/png;base64, {{ $qr }}" alt="QR Code"
+                                class="w-48 h-48 sm:w-64 sm:h-64 lg:w-72 lg:h-72">
+                        </div>
 
-                    <!-- Important Notice -->
-                    <div class="bg-yellow-50 border-2 border-yellow-300 rounded-xl p-5 ">
-                        <div class="flex items-start gap-3">
-                            <i data-lucide="shield-alert" class="w-6 h-6 text-yellow-600 flex-shrink-0 mt-0.5"></i>
-                            <div class="text-left">
-                                <p class="text-sm font-semibold text-yellow-900 mb-1">Penting!</p>
-                                <p class="text-xs text-yellow-800 leading-relaxed">
-                                    Tunjukkan QR Code ini di pintu masuk. Jangan bagikan ke orang lain untuk keamanan
-                                    tiket Anda.
-                                </p>
+                        <!-- Ticket Code -->
+                        <div class="bg-white rounded-2xl p-4 border-2 border-indigo-200">
+                            <div class="flex items-center justify-center gap-2 text-indigo-600 mb-3">
+                                <i data-lucide="scan" class="w-5 h-5"></i>
+                                <span class="text-xs font-semibold uppercase tracking-wide">Kode Tiket</span>
+                            </div>
+                            <p class="text-xl sm:text-3xl font-mono font-bold text-gray-900 tracking-widest break-all">
+                                {{ $tiket->kode_tiket }}
+                            </p>
+                        </div>
+
+                        <!-- Important Notice -->
+                        <div class="bg-yellow-50 border-2 border-yellow-300 rounded-xl p-5 ">
+                            <div class="flex items-start gap-3">
+                                <i data-lucide="shield-alert" class="w-6 h-6 text-yellow-600 flex-shrink-0 mt-0.5"></i>
+                                <div class="text-left">
+                                    <p class="text-sm font-semibold text-yellow-900 mb-1">Penting!</p>
+                                    <p class="text-xs text-yellow-800 leading-relaxed">
+                                        Tunjukkan QR Code ini di pintu masuk. Jangan bagikan ke orang lain untuk
+                                        keamanan
+                                        tiket Anda.
+                                    </p>
+                                </div>
                             </div>
                         </div>
-                    </div>
+                    @endif
                 </div>
             </div>
 

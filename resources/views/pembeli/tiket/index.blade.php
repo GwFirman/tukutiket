@@ -180,36 +180,73 @@
                                     </div>
                                 </div>
 
-                                {{-- Lokasi --}}
+                                {{-- Lokasi / Tipe Acara --}}
                                 <div class="flex items-center text-sm text-gray-600">
-                                    <i data-lucide="map-pin" class="size-4 mr-2 text-blue-600 shrink-0"></i>
-                                    <span class="truncate">{{ $acara->lokasi }}</span>
+                                    @if ($acara->is_online)
+                                        {{-- Jika Online --}}
+                                        <i data-lucide="video" class="size-4 mr-2 text-blue-600 shrink-0"></i>
+                                        <span class="truncate">Acara Online</span>
+                                    @else
+                                        {{-- Jika Offline --}}
+                                        <i data-lucide="map-pin" class="size-4 mr-2 text-blue-600 shrink-0"></i>
+                                        <span class="truncate">{{ $acara->lokasi }}</span>
+                                    @endif
                                 </div>
                             </div>
 
                             {{-- FOOTER ACTION --}}
                             <div class="flex gap-2 mt-auto">
-                                {{-- Tombol Detail --}}
-                                <a href="{{ route('pembeli.tiket.preview', $tiket->id) }}"
+                                @php
+                                    // 1. Ambil Tanggal Hari Ini (Jam di-reset jadi 00:00:00)
+                                    $hariIni = \Carbon\Carbon::now()->startOfDay();
+
+                                    // 2. Ambil Tanggal Acara (Jam di-reset jadi 00:00:00)
+                                    $tanggalAcara = \Carbon\Carbon::parse($acara->waktu_mulai)->startOfDay();
+
+                                    // 3. LOGIKA SEDERHANA:
+                                    // Cek apakah Hari Ini "Kurang Dari" Tanggal Acara.
+                                    // Jika Hari Ini == Tanggal Acara, hasilnya FALSE (Berarti tombol AKTIF).
+                                    $isBelumHarinya = $hariIni->lessThan($tanggalAcara);
+
+                                    // Setup Disable Status
+                                    // Tombol Utama mati jika: Expired ATAU Belum Harinya
+                                    $isMainDisabled = $uiState === 'expired' || $isBelumHarinya;
+
+                                    // Tombol Download mati jika: Belum Harinya
+                                    $isDownloadDisabled = $isBelumHarinya;
+                                @endphp
+
+                                {{-- Tombol Detail / Gunakan --}}
+                                <a href="{{ $isMainDisabled ? '#' : route('pembeli.tiket.preview', $tiket->id) }}"
                                     class="flex-1 text-center py-2.5 rounded-lg transition font-medium text-sm flex items-center justify-center gap-2 
-                        {{ $uiState === 'expired'
-                            ? 'bg-gray-100 text-gray-400 cursor-not-allowed border border-gray-200'
-                            : 'bg-blue-600 text-white hover:bg-blue-700' }}">
+        {{ $isMainDisabled
+            ? 'bg-gray-100 text-gray-400 cursor-not-allowed border border-gray-200'
+            : 'bg-blue-600 text-white hover:bg-blue-700' }}"
+                                    @if ($isMainDisabled) onclick="return false;" @endif>
 
                                     @if ($uiState === 'expired')
                                         Tiket Hangus
+                                    @elseif ($isBelumHarinya)
+                                        <i data-lucide="lock" class="size-4"></i>
+                                        Belum Mulai
                                     @elseif($uiState === 'used')
                                         Lihat Detail
                                     @else
-                                        Gunakan Tiket
+                                        Lihat Tiket
                                     @endif
                                 </a>
 
-                                {{-- Tombol Download (Masih boleh download history walaupun expired) --}}
-                                <a href="{{ route('pembeli.tiket.download', $tiket->id) }}"
-                                    class="px-4 bg-gray-50 text-gray-700 rounded-lg hover:bg-gray-200 transition inline-flex items-center justify-center border border-gray-200"
-                                    title="Download PDF">
-                                    <i data-lucide="download" class="size-5"></i>
+                                {{-- Tombol Download --}}
+                                <a href="{{ $isDownloadDisabled ? '#' : route('pembeli.tiket.download', $tiket->id) }}"
+                                    class="px-4 rounded-lg transition inline-flex items-center justify-center border 
+        {{ $isDownloadDisabled
+            ? 'bg-gray-100 text-gray-400 cursor-not-allowed border-gray-200'
+            : 'bg-gray-50 text-gray-700 hover:bg-gray-200 border-gray-200' }}"
+                                    @if ($isDownloadDisabled) onclick="return false;" @endif
+                                    title="{{ $isDownloadDisabled ? 'Tiket dapat diunduh pada hari acara' : 'Download PDF' }}">
+
+                                    <i data-lucide="{{ $isDownloadDisabled ? 'lock' : 'download' }}"
+                                        class="size-5"></i>
                                 </a>
                             </div>
                         </div>

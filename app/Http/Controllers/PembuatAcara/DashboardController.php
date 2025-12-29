@@ -17,9 +17,14 @@ class DashboardController extends Controller
     public function index()
     {
         $userId = Auth::id();
+        $idPembuat = Auth::id(); // Variable redundant, tapi kita biarkan sesuai kode asli
+
+        // 1. Ambil List Acara
         $acaras = Acara::where('id_pembuat', $userId)->get();
-        $idPembuat = Auth::id();
+
+        // 2. Statistik Basic
         $totalAcara = $acaras->count();
+
         $totalPendapatan = Pesanan::whereHas('detailPesanan.jenisTiket.acara', function ($query) use ($idPembuat) {
             $query->where('id_pembuat', $idPembuat);
         })
@@ -43,10 +48,15 @@ class DashboardController extends Controller
             ->where('pesanan.status_pembayaran', 'paid')
             ->sum('detail_pesanan.jumlah');
 
+        // 3. ACARA TERBARU (YANG BELUM LEWAT)
         $acaraTerbaru = Acara::where('id_pembuat', $idPembuat)
             ->where('status', 'published')
-            ->latest('created_at')
+            // LOGIKA BARU: Hanya ambil jika waktu selesai >= sekarang (belum kedaluwarsa)
+            ->where('waktu_selesai', '>=', now())
+            ->latest('created_at') // Ambil yang paling baru dibuat
             ->first();
+
+        // 4. Pendapatan Terbaru
         $pendapatanTerbaru = Pesanan::whereHas('detailPesanan.jenisTiket.acara', function ($query) use ($idPembuat) {
             $query->where('id_pembuat', $idPembuat);
         })

@@ -69,22 +69,33 @@
                     </thead>
 
                     <tbody class="bg-white divide-y divide-gray-200">
-                        @foreach ($acaras as $acara)
-                            <tr class="hover:bg-gray-50 transition-colors">
+                        @foreach ($acaras->sortByDesc('waktu_mulai') as $acara)
+                            @php
+                                // Cek apakah waktu selesai sudah lewat
+                                $isFinished = \Carbon\Carbon::parse($acara->waktu_selesai)->isPast();
+                            @endphp
+
+                            <tr class="hover:bg-gray-50 transition-colors {{ $isFinished ? 'bg-gray-50/60' : '' }}">
+
+                                {{-- 1. Kolom Nama Acara --}}
                                 <td class="pl-6 pr-10 py-4 whitespace-nowrap">
                                     <div class="flex items-center">
+                                        {{-- Gambar (Grayscale jika selesai) --}}
                                         @if ($acara->banner_acara)
                                             <img src="{{ Storage::url($acara->banner_acara) }}"
-                                                class="h-16 w-16 rounded-lg object-cover shadow-md" />
+                                                class="h-16 w-16 rounded-lg object-cover shadow-md {{ $isFinished ? 'grayscale' : '' }}" />
                                         @else
                                             <div
-                                                class="h-16 w-16 rounded-lg bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center shadow-md">
+                                                class="h-16 w-16 rounded-lg bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center shadow-md {{ $isFinished ? 'grayscale' : '' }}">
                                                 <i data-lucide="image" class="text-white size-6"></i>
                                             </div>
                                         @endif
 
                                         <div class="ml-4">
-                                            <div class="text-sm font-bold text-gray-900">{{ $acara->nama_acara }}</div>
+                                            <div
+                                                class="text-sm font-bold {{ $isFinished ? 'text-gray-500' : 'text-gray-900' }}">
+                                                {{ $acara->nama_acara }}
+                                            </div>
                                             <div class="flex items-center gap-1 mt-1 text-xs text-gray-500">
                                                 <i data-lucide="map-pin" class="size-3 flex-shrink-0"></i>
                                                 <span class="truncate max-w-xs">{{ $acara->lokasi }}</span>
@@ -93,73 +104,53 @@
                                     </div>
                                 </td>
 
+                                {{-- 2. Kolom Waktu --}}
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     <div class="text-sm space-y-1">
-                                        <div class="flex items-center text-gray-900">
-                                            <span class="font-medium mr-2">Mulai:</span>
+                                        <div
+                                            class="flex items-center {{ $isFinished ? 'text-gray-500' : 'text-gray-900' }}">
+                                            <span class="font-medium mr-2 text-xs text-gray-400 w-12">Mulai:</span>
                                             <span>{{ \Carbon\Carbon::parse($acara->waktu_mulai)->format('d M Y') }}</span>
                                         </div>
                                         <div class="flex items-center text-gray-500">
-                                            <span class="font-medium mr-2">Selesai:</span>
+                                            <span class="font-medium mr-2 text-xs text-gray-400 w-12">Selesai:</span>
                                             <span>{{ \Carbon\Carbon::parse($acara->waktu_selesai)->format('d M Y') }}</span>
                                         </div>
                                     </div>
                                 </td>
 
+                                {{-- 3. Kolom Status (MODIFIED) --}}
                                 <td class="px-6 py-4 whitespace-nowrap">
-                                    <span
-                                        class="inline-flex px-2 py-1 text-xs font-semibold rounded-full 
-                                        @if ($acara->status === 'published') bg-green-100 text-green-800
-                                        @elseif($acara->status === 'draft') bg-yellow-100 text-yellow-800
-                                        @elseif($acara->status === 'archived') bg-red-100 text-red-800
-                                        @else bg-gray-100 text-gray-800 @endif">
-                                        {{ ucfirst($acara->status) }}
-                                    </span>
+                                    @if ($acara->status === 'published' && $isFinished)
+                                        {{-- KONDISI: Published tapi Tanggal Lewat -> Tampil "Selesai" --}}
+                                        <span
+                                            class="inline-flex px-2.5 py-1 text-xs font-semibold rounded-full bg-slate-100 text-slate-600 border border-slate-200">
+                                            Selesai
+                                        </span>
+                                    @else
+                                        {{-- KONDISI: Status Normal --}}
+                                        <span
+                                            class="inline-flex px-2.5 py-1 text-xs font-semibold rounded-full 
+                        @if ($acara->status === 'published') bg-green-100 text-green-800
+                        @elseif($acara->status === 'draft') bg-yellow-100 text-yellow-800
+                        @elseif($acara->status === 'archived') bg-red-100 text-red-800
+                        @else bg-gray-100 text-gray-800 @endif">
+                                            {{ ucfirst($acara->status) }}
+                                        </span>
+                                    @endif
                                 </td>
 
+                                {{-- 4. Kolom Aksi --}}
                                 <td class="px-6 py-4 whitespace-nowrap text-center">
                                     <div class="flex justify-center space-x-3">
                                         <a href="{{ route('pembuat.acara.show', $acara->slug) }}"
-                                            class="text-blue-600 hover:text-blue-800">
+                                            class="text-blue-600 hover:text-blue-800" title="Lihat Detail">
                                             <i data-lucide="eye" class="size-5"></i>
                                         </a>
-
                                         <a href="{{ route('pembuat.acara.edit', $acara->slug) }}"
-                                            class="text-yellow-600 hover:text-yellow-800">
+                                            class="text-yellow-600 hover:text-yellow-800" title="Edit Acara">
                                             <i data-lucide="edit-3" class="size-5"></i>
                                         </a>
-
-                                        {{-- Archive / Publish / Restore
-                                        @if ($acara->status !== 'archived')
-                                            @if ($acara->status !== 'published')
-                                                <form action="{{ route('pembuat.acara.publish', $acara->id) }}"
-                                                    method="POST" class="inline"
-                                                    onsubmit="return confirm('Yakin ingin publish acara ini?')">
-                                                    @csrf @method('PATCH')
-                                                    <button type="submit" class="text-green-600 hover:text-green-800">
-                                                        <i data-lucide="send" class="size-5"></i>
-                                                    </button>
-                                                </form>
-                                            @endif
-
-                                            <form action="{{ route('pembuat.acara.archive', $acara->id) }}"
-                                                method="POST" class="inline"
-                                                onsubmit="return confirm('Yakin ingin mengarsipkan acara ini?')">
-                                                @csrf @method('PATCH')
-                                                <button type="submit" class="text-orange-600 hover:text-orange-800">
-                                                    <i data-lucide="archive" class="size-5"></i>
-                                                </button>
-                                            </form>
-                                        @else
-                                            <form action="{{ route('pembuat.acara.restore', $acara->id) }}"
-                                                method="POST" class="inline"
-                                                onsubmit="return confirm('Yakin ingin merestore acara ini?')">
-                                                @csrf @method('PATCH')
-                                                <button type="submit" class="text-green-600 hover:text-green-800">
-                                                    <i data-lucide="rotate-ccw" class="size-5"></i>
-                                                </button>
-                                            </form>
-                                        @endif --}}
                                     </div>
                                 </td>
                             </tr>

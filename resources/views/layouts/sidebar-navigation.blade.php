@@ -88,37 +88,57 @@
         @if (request()->is('kreator/acara/*') && !request()->routeIs('pembuat.acara.create') && $isVerified)
             <div class="ml-4 mt-1 space-y-1">
                 @php
-                    // Ambil parameter 'acara' dari route saat ini
                     $routeAcara = request()->route('acara');
+                    $acaraId = null;
+                    $acaraNama = null;
+                    $acaraSlug = null;
 
-                    // Cek apakah parameter berupa Model atau ID
+                    // Inisialisasi status waktu
+                    $isFinished = false;
+                    $hasStarted = false;
+
                     if (is_object($routeAcara)) {
-                        // Jika Route Model Binding aktif, $routeAcara adalah instance Model Acara
                         $acaraId = $routeAcara->id;
                         $acaraNama = $routeAcara->nama_acara;
                         $acaraSlug = $routeAcara->slug;
+
+                        // --- LOGIKA WAKTU ---
+                        $now = \Carbon\Carbon::now();
+                        $start = \Carbon\Carbon::parse($routeAcara->waktu_mulai);
+                        $end = \Carbon\Carbon::parse($routeAcara->waktu_selesai);
+
+                        $hasStarted = $now->greaterThanOrEqualTo($start); // Sudah mulai?
+                        $isFinished = $now->greaterThan($end); // Sudah selesai?
                     } else {
-                        // Jika tidak, $routeAcara adalah ID (integer/string)
                         $acaraId = $routeAcara;
-                        $acaraNama = null;
-                        $acaraSlug = null;
                     }
                 @endphp
 
                 @if ($acaraId)
-                    <div class="mt-2     border-t border-gray-200">
+                    <div class="mt-2 border-t border-gray-200">
+                        {{-- 1. LINK JUDUL ACARA --}}
                         @if ($acaraSlug)
                             <x-nav-link :href="route('pembuat.acara.show', $acaraSlug)" :active="request()->routeIs('pembuat.acara.show')" class="mt-1 group">
-                                {{-- <i data-lucide="eye" class="size-4 mr-2"></i> --}}
                                 {{ $acaraNama }}
                             </x-nav-link>
                         @endif
 
-                        <x-nav-link :href="route('pembuat.acara.edit', $acaraSlug)" :active="request()->routeIs('pembuat.acara.edit')" class="mt-1 group">
-                            <i data-lucide="edit" class="size-4 mr-2"></i>
-                            {{ __('Edit Acara') }}
-                        </x-nav-link>
+                        {{-- 2. LINK EDIT ACARA (Disable jika sudah selesai) --}}
+                        @if ($isFinished)
+                            <div class="mt-1 group flex items-center px-3 py-2 text-gray-400 cursor-not-allowed opacity-50"
+                                title="Acara telah selesai, tidak dapat diedit">
+                                <i data-lucide="edit" class="size-4 mr-2"></i>
+                                {{ __('Edit Acara') }}
+                                <i data-lucide="lock" class="size-3 ml-auto"></i>
+                            </div>
+                        @else
+                            <x-nav-link :href="route('pembuat.acara.edit', $acaraSlug)" :active="request()->routeIs('pembuat.acara.edit')" class="mt-1 group">
+                                <i data-lucide="edit" class="size-4 mr-2"></i>
+                                {{ __('Edit Acara') }}
+                            </x-nav-link>
+                        @endif
 
+                        {{-- 3. LINK UPLOAD SURAT IZIN (Pending Only) --}}
                         @if ($routeAcara->status === 'pending_verifikasi')
                             <x-nav-link :href="route('pembuat.verifikasi.show', $acaraSlug)" :active="request()->routeIs('verifikasi-izin.show')"
                                 class="mt-1 group bg-yellow-50 border border-yellow-200 text-yellow-700">
@@ -130,6 +150,7 @@
                     </div>
                 @endif
 
+                {{-- 4. LAPORAN PENJUALAN --}}
                 @if (isset($routeAcara) && $routeAcara->status === 'pending_verifikasi')
                     <div class="group pl-4 flex items-center px-3 py-2 text-gray-400 cursor-not-allowed opacity-50">
                         <i data-lucide="chart-no-axes-combined" class="size-4 mr-2"></i>
@@ -142,6 +163,7 @@
                     </x-nav-link>
                 @endif
 
+                {{-- 5. DAFTAR PESERTA --}}
                 @if (isset($routeAcara) && $routeAcara->status === 'pending_verifikasi')
                     <div class="group pl-4 flex items-center px-3 py-2 text-gray-400 cursor-not-allowed opacity-50">
                         <i data-lucide="ticket-check" class="size-4 mr-2"></i>
@@ -154,23 +176,47 @@
                     </x-nav-link>
                 @endif
 
+                {{-- 6. CHECK IN / CHECK OUT (Logic Waktu) --}}
                 @if (!$routeAcara->is_online)
-                    @if (isset($routeAcara) && $routeAcara->status === 'pending_verifikasi')
-                        <div class="group pl-4 flex items-center px-3 py-2 text-gray-400 cursor-not-allowed opacity-50">
+                    @php
+                        // Kondisi Disable: Status Pending ATAU Belum Mulai ATAU Sudah Selesai
+                        $disableCheckIn = $routeAcara->status === 'pending_verifikasi' || !$hasStarted || $isFinished;
+
+                        // Pesan Tooltip
+                        $tooltipText = '';
+                        if ($routeAcara->status === 'pending_verifikasi') {
+                            $tooltipText = 'Menunggu verifikasi';
+                        } elseif (!$hasStarted) {
+                            $tooltipText = 'Acara belum dimulai';
+                        } elseif ($isFinished) {
+                            $tooltipText = 'Acara telah selesai';
+                        }
+                    @endphp
+
+                    @if ($disableCheckIn)
+                        {{-- Disabled Check In --}}
+                        <div class="group pl-4 flex items-center px-3 py-2 text-gray-400 cursor-not-allowed opacity-50"
+                            title="{{ $tooltipText }}">
                             <i data-lucide="user-round-check" class="size-4 mr-2"></i>
                             {{ __('Check in peserta') }}
+                            <i data-lucide="lock" class="size-3 ml-auto"></i>
                         </div>
 
-                        <div class="group pl-4 flex items-center px-3 py-2 text-gray-400 cursor-not-allowed opacity-50">
+                        {{-- Disabled Check Out --}}
+                        <div class="group pl-4 flex items-center px-3 py-2 text-gray-400 cursor-not-allowed opacity-50"
+                            title="{{ $tooltipText }}">
                             <i data-lucide="user-round-minus" class="size-4 mr-2"></i>
                             {{ __('Check out peserta') }}
+                            <i data-lucide="lock" class="size-3 ml-auto"></i>
                         </div>
                     @else
+                        {{-- Active Check In --}}
                         <x-nav-link :href="route('pembuat.checkin.index', $acaraSlug)" :active="request()->routeIs('pembuat.checkin.index')" class="group pl-4">
                             <i data-lucide="user-round-check" class="size-4 mr-2"></i>
                             {{ __('Check in peserta') }}
                         </x-nav-link>
 
+                        {{-- Active Check Out --}}
                         <x-nav-link :href="route('pembuat.checkout.index', $acaraSlug)" :active="request()->routeIs('pembuat.checkout.index')" class="group pl-4">
                             <i data-lucide="user-round-minus" class="size-4 mr-2"></i>
                             {{ __('Check out peserta') }}
@@ -178,6 +224,7 @@
                     @endif
                 @endif
 
+                {{-- 7. LAPORAN TRANSAKSI --}}
                 @if (isset($routeAcara) && $routeAcara->status === 'pending_verifikasi')
                     <div class="group pl-4 flex items-center px-3 py-2 text-gray-400 cursor-not-allowed opacity-50">
                         <i data-lucide="credit-card" class="size-4 mr-2"></i>

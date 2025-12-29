@@ -27,7 +27,7 @@ class Acara extends Model
         'info_narahubung',
         'email_narahubung',
         'status',
-        'maks_pembelian_per_akun',
+        'satu_transaksi_per_akun',
         'maks_tiket_per_transaksi',
         'is_online',
         'venue',

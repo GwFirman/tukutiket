@@ -23,7 +23,8 @@
                         </div>
                         <div>
                             <p class="font-bold">Status: Published</p>
-                            <p class="text-sm">Acara ini sudah dipublikasikan. Anda hanya dapat mengubah beberapa.</p>
+                            <p class="text-sm">Acara ini sudah dipublikasikan. Anda hanya dapat mengubah beberapa
+                                informasi.</p>
                         </div>
                     </div>
                 </div>
@@ -66,9 +67,9 @@
 
                         <div class="lg:flex gap-5 mt-5 px-5 pb-5 space-y-4">
 
-                            @include('pembuat_acara.acara.partials.create.form-jam')
-
                             @include('pembuat_acara.acara.partials.create.form-tanggal')
+
+                            @include('pembuat_acara.acara.partials.create.form-jam')
 
                             @include('pembuat_acara.acara.partials.create.form-lokasi')
 

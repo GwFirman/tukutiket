@@ -8,245 +8,184 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 
-<body class="bg-gradient-to-br from-gray-50 to-gray-100 min-h-screen py-8 px-4 sm:px-6 lg:px-8">
+<body class="bg-indigo-100 min-h-screen py-8 px-4 sm:px-6 lg:px-8 flex items-center justify-center">
 
-    <div class="max-w-4xl mx-auto">
-        <!-- Back Button -->
+    <div class="w-full max-w-5xl mx-auto">
         <div class="mb-6">
             <a href="{{ route('pembeli.tiket-saya') }}"
                 class="inline-flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors">
-                <i data-lucide="arrow-left" class="w-5 h-5"></i>
+                <i data-lucide="arrow-left" class="size-5"></i>
                 <span class="text-sm font-medium">Kembali ke Tiket Saya</span>
             </a>
         </div>
 
-        <!-- Ticket Container -->
-        <div class="bg-white rounded-2xl shadow-xl overflow-hidden">
+        <div class="bg-white rounded-2xl  overflow-hidden flex flex-col md:flex-row min-h-[500px]">
 
-            <!-- Header dengan Gradient -->
-            <div class="bg-gradient-to-r from-indigo-600 to-purple-600 p-6 sm:p-8 text-white relative overflow-hidden">
-                <!-- Decorative Elements -->
-                <div class="absolute top-0 right-0 w-64 h-64 bg-white opacity-5 rounded-full -mr-32 -mt-32"></div>
-                <div class="absolute bottom-0 left-0 w-48 h-48 bg-white opacity-5 rounded-full -ml-24 -mb-24"></div>
-
-                <div class="relative z-10 text-center">
-                    <div class="flex items-center justify-center gap-2 mb-4">
-                        <i data-lucide="ticket" class="w-6 h-6"></i>
-                        <span class="text-sm font-semibold uppercase tracking-wider opacity-90">E-Ticket</span>
-                    </div>
-                    <h1 class="text-2xl sm:text-3xl lg:text-4xl font-bold mb-2">{{ $tiket->nama_acara }}</h1>
-                    <div class="flex items-start lg:items-center justify-center gap-2 text-indigo-100">
-                        <i data-lucide="map-pin" class="w-12 h-12  lg:w-4 lg:h-4 "></i>
-                        <p class="text-sm sm:text-base">{{ $tiket->lokasi }}</p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- QR Code Section - Featured -->
             <div
-                class="bg-gradient-to-br from-gray-50 to-indigo-50 p-8 sm:p-12 border-b-2 border-dashed border-gray-300">
-                <div class="max-w-md mx-auto text-center space-y-6">
-                    @if ($tiket->is_online)
-                        <!-- Online Event Link -->
-                        <div class="space-y-4">
-                            <div
-                                class="inline-block p-6 bg-gradient-to-br from-green-50 to-emerald-50 rounded-lg border-2 border-green-200">
-                                <i data-lucide="video" class="w-16 h-16 text-green-600 mx-auto mb-3"></i>
-                                <p class="text-sm font-semibold text-green-700 mb-2">Acara Online</p>
-                                <p class="text-xs text-green-600">Klik link di bawah untuk bergabung</p>
-                            </div>
+                class="md:w-[380px] bg-gradient-to-b from-gray-50 to-indigo-50 border-r-2 border-dashed border-gray-300 relative flex flex-col">
 
-                            <!-- Online Event Link Button -->
-                            @if ($tiket->lokasi)
-                                <a href="{{ $tiket->lokasi }}" target="_blank" rel="noopener noreferrer"
-                                    class="inline-flex items-center justify-center gap-2 w-full px-6 py-4 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white rounded-xl font-semibold transition-all shadow-lg hover:shadow-xl">
-                                    <i data-lucide="external-link" class="w-5 h-5"></i>
-                                    <span>Buka Link Acara</span>
-                                </a>
-                                <p class="text-xs text-gray-600 break-all">{{ $tiket->lokasi }}</p>
-                            @else
-                                <div class="bg-yellow-50 border-2 border-yellow-300 rounded-xl p-4">
-                                    <p class="text-sm font-semibold text-yellow-900">Link akan diberikan kemudian</p>
-                                    <p class="text-xs text-yellow-800 mt-1">Organisator akan mengirim link acara sebelum
-                                        acara dimulai</p>
-                                </div>
-                            @endif
+                <div class="hidden md:block absolute -right-3 top-0 w-6 h-3 bg-indigo-100 rounded-b-full z-10"></div>
+                <div class="hidden md:block absolute -right-3 bottom-0 w-6 h-3 bg-indigo-100 rounded-t-full z-10"></div>
+
+                <div class="md:hidden bg-indigo-600 p-4 text-center text-white">
+                    <h1 class="text-xl font-bold">{{ $tiket->nama_acara }}</h1>
+                </div>
+
+                <div class="p-8 flex flex-col items-center justify-center flex-1 text-center space-y-6">
+
+                    @if ($tiket->is_online)
+                        <div class="p-6 bg-white rounded-2xl shadow-sm border border-green-100 w-full">
+                            <i data-lucide="video" class="size-12 text-green-600 mx-auto mb-3"></i>
+                            <h3 class="font-bold text-gray-900">Tiket Online</h3>
+                            <p class="text-xs text-gray-500 mt-1">Gunakan link di detail untuk masuk</p>
                         </div>
                     @else
-                        <!-- QR Code for Offline Event -->
-                        <div class="inline-block p-6 bg-white rounded-lg">
+                        <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
                             @php
                                 $qr = base64_encode(
                                     QrCode::format('png')
-                                        ->size(400)
+                                        ->size(250) // Ukuran pas untuk kolom kiri
+                                        ->margin(1)
                                         ->errorCorrection('H')
                                         ->generate($tiket->kode_tiket),
                                 );
                             @endphp
                             <img src="data:image/png;base64, {{ $qr }}" alt="QR Code"
-                                class="w-48 h-48 sm:w-64 sm:h-64 lg:w-72 lg:h-72">
+                                class="w-48 h-48 object-contain">
                         </div>
+                    @endif
 
-                        <!-- Ticket Code -->
-                        <div class="bg-white rounded-2xl p-4 border-2 border-indigo-200">
-                            <div class="flex items-center justify-center gap-2 text-indigo-600 mb-3">
-                                <i data-lucide="scan" class="w-5 h-5"></i>
-                                <span class="text-xs font-semibold uppercase tracking-wide">Kode Tiket</span>
-                            </div>
-                            <p class="text-xl sm:text-3xl font-mono font-bold text-gray-900 tracking-widest break-all">
+                    <div class="w-full">
+                        <p class="text-xs font-semibold text-gray-500 uppercase tracking-widest mb-1">Kode Tiket</p>
+                        <div class="bg-white border-2 border-indigo-100 rounded-lg py-3 px-4">
+                            <p class="text-2xl font-mono font-bold text-indigo-700 tracking-widest break-all">
                                 {{ $tiket->kode_tiket }}
                             </p>
                         </div>
+                    </div>
 
-                        <!-- Important Notice -->
-                        <div class="bg-yellow-50 border-2 border-yellow-300 rounded-xl p-5 ">
-                            <div class="flex items-start gap-3">
-                                <i data-lucide="shield-alert" class="w-6 h-6 text-yellow-600 flex-shrink-0 mt-0.5"></i>
-                                <div class="text-left">
-                                    <p class="text-sm font-semibold text-yellow-900 mb-1">Penting!</p>
-                                    <p class="text-xs text-yellow-800 leading-relaxed">
-                                        Tunjukkan QR Code ini di pintu masuk. Jangan bagikan ke orang lain untuk
-                                        keamanan
-                                        tiket Anda.
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                    @endif
+                    <div class="flex gap-2 items-start text-xs text-yellow-700 bg-yellow-50 p-3 rounded-lg text-left">
+                        <i data-lucide="shield-alert" class="size-4 shrink-0 mt-0.5"></i>
+                        <p>Tunjukkan QR Code ini kepada petugas di pintu masuk.</p>
+                    </div>
                 </div>
             </div>
 
-            <!-- Ticket Details Section -->
-            <div class="">
+            <div class="flex-1 bg-white flex flex-col">
 
-                <!-- Ticket Details Section -->
-                <div class="p-6 sm:p-8 space-y-6">
-
-                    <!-- Date & Time -->
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                        <div class="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-5 border border-blue-100">
-                            <div class="flex items-center gap-2 text-blue-600 mb-3">
-                                <i data-lucide="calendar" class="w-5 h-5"></i>
-                                <span class="text-xs font-semibold uppercase tracking-wide">Jadwal Acara</span>
-                            </div>
-                            <div class="text-gray-900">
-                                <p class="text-xl font-bold mb-1">
-                                    {{ \Carbon\Carbon::parse($tiket->waktu_mulai)->format('d M Y') }}
-                                </p>
-                                <p class="text-sm text-gray-600">
-                                    {{ \Carbon\Carbon::parse($tiket->waktu_mulai)->format('H:i') }} -
-                                    {{ \Carbon\Carbon::parse($tiket->waktu_selesai)->format('H:i') }} WIB
-                                </p>
-                            </div>
-                        </div>
-
-                        <div
-                            class="bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl p-5 border border-purple-100">
-                            <div class="flex items-center gap-2 text-purple-600 mb-3">
-                                <i data-lucide="user" class="w-5 h-5"></i>
-                                <span class="text-xs font-semibold uppercase tracking-wide">Pemegang Tiket</span>
-                            </div>
-                            <p class="text-xl font-bold text-gray-900">{{ $tiket->nama_peserta }}</p>
-                        </div>
-                    </div>
-
-                    <!-- Contact Info & Ticket Type -->
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                <div class="hidden md:block p-8 pb-4 border-b border-gray-100">
+                    <div class="flex justify-between items-start">
                         <div>
-                            <div class="flex items-center gap-2 text-gray-500 mb-2">
-                                <i data-lucide="mail" class="w-4 h-4"></i>
-                                <span class="text-xs font-semibold uppercase tracking-wide">Info Kontak</span>
-                            </div>
-                            <p class="text-sm font-medium text-gray-900 mb-1">{{ $tiket->email_peserta }}</p>
-                            <p class="text-sm text-gray-600">{{ $tiket->no_telp_peserta }}</p>
-                        </div>
-
-                        <div>
-                            <div class="flex items-center gap-2 text-gray-500 mb-2">
-                                <i data-lucide="tag" class="w-4 h-4"></i>
-                                <span class="text-xs font-semibold uppercase tracking-wide">Jenis Tiket</span>
-                            </div>
                             <span
-                                class="inline-flex items-center px-4 py-2 rounded-full text-sm font-bold bg-gradient-to-r from-blue-100 to-indigo-100 text-indigo-700 border border-indigo-200">
+                                class="inline-block px-3 py-1 rounded-full bg-indigo-100 text-indigo-700 text-xs font-bold mb-3">
                                 {{ $tiket->jenis_tiket }}
                             </span>
-                        </div>
-                    </div>
-
-                    <!-- Order Code & Price -->
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 pt-6 border-t border-gray-200">
-                        <div>
-                            <div class="flex items-center gap-2 text-gray-500 mb-2">
-                                <i data-lucide="hash" class="w-4 h-4"></i>
-                                <span class="text-xs font-semibold uppercase tracking-wide">Kode Order</span>
+                            <h1 class="text-3xl font-bold text-gray-900 leading-tight mb-2">{{ $tiket->nama_acara }}
+                            </h1>
+                            <div class="flex items-center gap-2 text-gray-500">
+                                <i data-lucide="map-pin" class="size-4"></i>
+                                <span class="text-sm">{{ $tiket->lokasi }}</span>
                             </div>
-                            <p class="text-sm font-mono font-bold text-gray-900 tracking-wider">
-                                #{{ $tiket->kode_pesanan }}</p>
                         </div>
-
-                        <div>
-                            <div class="flex items-center gap-2 text-gray-500 mb-2">
-                                <i data-lucide="credit-card" class="w-4 h-4"></i>
-                                <span class="text-xs font-semibold uppercase tracking-wide">Harga Tiket</span>
-                            </div>
-                            <p class="text-lg font-bold text-gray-900">Rp
-                                {{ number_format($tiket->harga_tiket, 0, ',', '.') }}</p>
+                        <div class="size-12 bg-gray-100 rounded-full flex items-center justify-center shrink-0">
+                            <i data-lucide="ticket" class="size-6 text-gray-400"></i>
                         </div>
                     </div>
                 </div>
 
-                <!-- Footer -->
-                <div class="bg-gray-50 border-t border-gray-200 px-6 py-4 sm:px-8">
-                    <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
-                        <p class="text-xs text-gray-500 text-center sm:text-left leading-relaxed">
-                            Tiket ini sah dan diterbitkan secara elektronik. Simpan bukti tiket ini untuk ditunjukkan
-                            kepada
-                            petugas.
-                        </p>
+                <div class="p-8 space-y-8">
 
-                        <!-- Action Buttons -->
-                        <div class="flex gap-3">
-                            <a href=""
-                                class="inline-flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium rounded-lg transition-colors shadow-md">
-                                <i data-lucide="download" class="w-4 h-4"></i>
-                                Download PDF
-                            </a>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <div class="flex items-center gap-2 text-gray-400 mb-1">
+                                <i data-lucide="clock" class="size-4"></i>
+                                <span class="text-xs font-bold uppercase tracking-wider">Waktu Acara</span>
+                            </div>
+                            <p class="font-semibold text-gray-900">
+                                {{ \Carbon\Carbon::parse($tiket->waktu_mulai)->translatedFormat('d F Y') }}
+                            </p>
+                            <p class="text-sm text-gray-600">
+                                {{ \Carbon\Carbon::parse($tiket->waktu_mulai)->format('H:i') }} -
+                                {{ \Carbon\Carbon::parse($tiket->waktu_selesai)->format('H:i') }} WIB
+                            </p>
+                        </div>
+
+                        @php
+                            $start = $tiket->berlaku_mulai;
+                            $end = $tiket->berlaku_sampai;
+                        @endphp
+                        @if ($start || $end)
+                            <div>
+                                <div class="flex items-center gap-2 text-orange-500 mb-1">
+                                    <i data-lucide="calendar-check" class="size-4"></i>
+                                    <span class="text-xs font-bold uppercase tracking-wider">Masa Berlaku Tiket</span>
+                                </div>
+                                <div class="text-sm">
+                                    @if ($start)
+                                        <p class="text-gray-600">Mulai: <span
+                                                class="font-medium text-gray-900">{{ \Carbon\Carbon::parse($start)->translatedFormat('d M Y') }}</span>
+                                        </p>
+                                    @endif
+                                    @if ($end)
+                                        <p class="text-gray-600">Sampai: <span
+                                                class="font-medium text-gray-900">{{ \Carbon\Carbon::parse($end)->translatedFormat('d M Y') }}</span>
+                                        </p>
+                                    @endif
+                                </div>
+                            </div>
+                        @endif
+                    </div>
+
+                    <div class="w-full h-px bg-gray-100"></div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div>
+                            <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Nama Peserta</p>
+                            <p class="font-semibold text-gray-900 truncate" title="{{ $tiket->nama_peserta }}">
+                                {{ $tiket->nama_peserta }}</p>
+                        </div>
+                        <div>
+                            <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Email</p>
+                            <p class="text-sm text-gray-600 truncate" title="{{ $tiket->email_peserta }}">
+                                {{ $tiket->email_peserta }}</p>
+                        </div>
+                        <div>
+                            <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">No. Telepon</p>
+                            <p class="text-sm text-gray-600">{{ $tiket->no_telp_peserta }}</p>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- Additional Info Card -->
-            <div class="mt-6 bg-white rounded-xl shadow-md p-6">
-                <div class="flex items-start gap-4">
-                    <div class="flex-shrink-0 w-10 h-10 bg-indigo-100 rounded-full flex items-center justify-center">
-                        <i data-lucide="shield-check" class="w-5 h-5 text-indigo-600"></i>
-                    </div>
-                    <div>
-                        <h3 class="text-sm font-semibold text-gray-900 mb-2">Tips Keamanan Tiket</h3>
-                        <ul class="space-y-1 text-sm text-gray-600">
-                            <li class="flex items-start gap-2">
-                                <span class="text-indigo-600 mt-1">•</span>
-                                <span>Jangan membagikan QR code atau kode tiket ke siapapun</span>
-                            </li>
-                            <li class="flex items-start gap-2">
-                                <span class="text-indigo-600 mt-1">•</span>
-                                <span>Simpan screenshot atau PDF tiket di perangkat Anda</span>
-                            </li>
-                            <li class="flex items-start gap-2">
-                                <span class="text-indigo-600 mt-1">•</span>
-                                <span>Datang lebih awal untuk menghindari antrian panjang</span>
-                            </li>
-                        </ul>
-                    </div>
+                <div
+                    class="mt-auto bg-gray-50 p-6 sm:px-8 border-t border-gray-100 flex flex-col sm:flex-row items-center justify-between gap-4">
+
+                    @if ($tiket->is_online && $tiket->lokasi)
+                        <a href="{{ $tiket->lokasi }}" target="_blank"
+                            class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-2.5 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg transition-colors">
+                            <i data-lucide="external-link" class="size-4"></i>
+                            Masuk Acara
+                        </a>
+                    @else
+                        <div class="flex items-center gap-2 text-sm text-gray-500">
+                            <i data-lucide="info" class="size-4 text-blue-500"></i>
+                            <span>Pastikan baterai HP cukup saat scan.</span>
+                        </div>
+                    @endif
+
+                    <a href="{{ route('pembeli.tiket.download', $tiket->id_tiket) }}"
+                        class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg transition-colors shadow-sm">
+                        <i data-lucide="download" class="size-4"></i>
+                        Download PDF
+                    </a>
                 </div>
             </div>
         </div>
+    </div>
 
-        <script src="https://unpkg.com/lucide@latest"></script>
-        <script>
-            lucide.createIcons();
-        </script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+        lucide.createIcons();
+    </script>
 </body>
 
 </html>

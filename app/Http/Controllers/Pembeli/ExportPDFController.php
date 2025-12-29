@@ -106,6 +106,8 @@ class ExportPDFController extends Controller
 
                 'jt.nama_jenis AS jenis_tiket',
                 'jt.harga AS harga_tiket',
+                'jt.berlaku_mulai AS berlaku_mulai',
+                'jt.berlaku_sampai AS berlaku_sampai',
 
                 'a.id AS id_acara',
                 'a.nama_acara',

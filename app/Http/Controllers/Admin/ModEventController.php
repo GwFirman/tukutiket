@@ -162,7 +162,8 @@ class ModEventController extends Controller
      */
     public function showVerifikasi(Acara $acara)
     {
-        $acara->load('kreator.user', 'jenisTiket', 'verifikasiAcara');
+        $acara->load('kreator.user', 'jenisTiket', 'verifikasiAcara', 'kategori');
+
 
         return view('admin.mod-izin.show', [
             'acara' => $acara,

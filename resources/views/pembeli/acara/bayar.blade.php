@@ -144,8 +144,8 @@
                         </div>
                     @else
                         <!-- Upload Payment Proof -->
-                        <div class="bg-white rounded-xl overflow-hidden">
-                            <div class="bg-gray-50 px-6 py-4 border-b">
+                        <div class="bg-white rounded-xl overflow-hidden border border-gray-300">
+                            <div class="bg-gray-50 px-6 py-4 border-b border-gray-300">
                                 <h3 class="text-lg font-bold text-gray-900">Upload Bukti Pembayaran</h3>
                                 <p class="text-sm text-gray-600 mt-1">Upload screenshot atau foto bukti transfer Anda
                                 </p>

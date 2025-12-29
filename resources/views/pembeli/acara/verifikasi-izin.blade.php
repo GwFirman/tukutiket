@@ -151,6 +151,7 @@
                                 <h3 class="font-semibold text-blue-900 mb-2">Informasi Penting</h3>
                                 <ul class="text-sm text-blue-800 space-y-1">
                                     <li>• Surat izin acara diperlukan untuk verifikasi keabsahan acara</li>
+                                    <li>• Pilih beberapa dokumen sekaligus (maksimal 5 file)</li>
                                     <li>• File harus dalam format PDF atau gambar (JPG, PNG)</li>
                                     <li>• Ukuran maksimal file: 10 MB</li>
                                     <li>• Tim admin akan melakukan review dalam 1-3 hari kerja</li>
@@ -200,7 +201,7 @@
                             class="space-y-6 @if ($isLocked) opacity-50 pointer-events-none @endif">
                             @csrf
 
-                            <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                            {{-- <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
                                 <div class="flex items-start gap-3">
                                     <i data-lucide="info" class="size-5 text-blue-600 flex-shrink-0 mt-0.5"></i>
                                     <div>
@@ -212,7 +213,7 @@
                                         </ul>
                                     </div>
                                 </div>
-                            </div>
+                            </div> --}}
 
                             <div class="space-y-4">
                                 <label class="block text-sm font-medium text-gray-700">
@@ -294,16 +295,25 @@
                         <div>
                             <p class="text-xs font-semibold text-gray-500 uppercase mb-3">Tanggal Acara</p>
                             <div class="space-y-2">
-                                <div class="flex items-center gap-2 text-sm">
-                                    <i data-lucide="calendar" class="size-4 text-indigo-600 flex-shrink-0"></i>
-                                    <span class="text-gray-700">
+                                <div class="flex items-start gap-2 text-sm">
+                                    <i data-lucide="calendar" class="size-4 text-indigo-600 flex-shrink-0 mt-0.5"></i>
+                                    <span class="text-gray-700 leading-tight">
                                         {{ \Carbon\Carbon::parse($acara->waktu_mulai)->locale('id')->translatedFormat('d F Y') }}
+
+                                        {{-- Cek apakah acara lebih dari 1 hari --}}
+                                        @if ($acara->waktu_mulai != $acara->waktu_selesai)
+                                            <span class="mx-1 text-gray-400">-</span>
+                                            {{ \Carbon\Carbon::parse($acara->waktu_selesai)->locale('id')->translatedFormat('d F Y') }}
+                                        @endif
                                     </span>
                                 </div>
+
                                 <div class="flex items-center gap-2 text-sm">
                                     <i data-lucide="clock" class="size-4 text-indigo-600 flex-shrink-0"></i>
                                     <span class="text-gray-700">
-                                        {{ \Carbon\Carbon::parse($acara->waktu_mulai)->format('H:i') }} WIB
+                                        {{ \Carbon\Carbon::parse($acara->jam_mulai)->format('H:i') }}
+                                        <span class="mx-1 text-gray-400">-</span>
+                                        {{ \Carbon\Carbon::parse($acara->jam_selesai)->format('H:i') }} WIB
                                     </span>
                                 </div>
                             </div>
@@ -424,7 +434,7 @@
                 const div = document.createElement('div');
                 div.className = 'bg-green-50 border border-green-200 rounded-lg p-4 flex items-center gap-3';
                 div.innerHTML = `
-                    <i data-lucide="check-circle" class="size-6 text-green-600 flex-shrink-0"></i>
+                    <i data-lucide="check-circle" class="size-6 text-green-600 flex-shrink-0"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-file-check-icon lucide-file-check"><path d="M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z"/><path d="M14 2v5a1 1 0 0 0 1 1h5"/><path d="m9 15 2 2 4-4"/></svg></i>
                     <div class="flex-1 min-w-0">
                         <p class="text-sm font-medium text-green-900 truncate">${file.name}</p>
                         <p class="text-xs text-green-700">${(file.size / 1024 / 1024).toFixed(2)} MB</p>

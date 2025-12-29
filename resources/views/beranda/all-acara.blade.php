@@ -129,11 +129,11 @@
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-8">
                             @foreach ($acaras as $acara)
                                 <a href="{{ route('beranda.acara', $acara) }}"
-                                    class="bg-white rounded-xl shadow-md hover:shadow-xl overflow-hidden transition-all duration-300 transform hover:-translate-y-2 group">
+                                    class="bg-white rounded-xl shadow-md  overflow-hidden  group">
                                     <!-- Event Image -->
                                     <div class="relative h-48 overflow-hidden bg-gray-200">
-                                        @if ($acara->gambar)
-                                            <img src="{{ asset('storage/' . $acara->gambar) }}"
+                                        @if ($acara->banner_acara)
+                                            <img src="{{ asset('storage/' . $acara->banner_acara) }}"
                                                 alt="{{ $acara->nama }}"
                                                 class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300">
                                         @else
@@ -155,7 +155,7 @@
                                     <div class="p-4">
                                         <h3
                                             class="text-lg font-bold text-gray-900 mb-2 group-hover:text-indigo-600 transition-colors line-clamp-2">
-                                            {{ $acara->nama }}
+                                            {{ $acara->nama_acara }}
                                         </h3>
 
                                         <div class="space-y-3 mb-4">

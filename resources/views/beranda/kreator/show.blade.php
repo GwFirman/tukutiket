@@ -12,7 +12,7 @@
             <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
                 <!-- Profile Section (Sidebar) -->
                 <div class="lg:col-span-1">
-                    <div class="bg-white rounded-lg shadow-md border border-gray-100 p-6 sticky top-24">
+                    <div class="bg-white rounded-lg border border-gray-100 p-6 sticky top-24">
                         <div class="flex flex-col items-center text-center">
                             <!-- Logo -->
                             @if ($kreator->logo)

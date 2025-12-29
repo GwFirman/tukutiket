@@ -64,51 +64,80 @@
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 @foreach ($tiketList as $tiket)
                     @php
-                        // 1. Ambil Data Penting
-                        $statusDB = $tiket->status_checkin; // 'belum_digunakan' atau 'sudah_digunakan'
+                        // 1. Inisialisasi Data
                         $acara = $tiket->detailPesanan->jenisTiket->acara;
+                        $jenisTiket = $tiket->detailPesanan->jenisTiket;
                         $waktuAcara = \Carbon\Carbon::parse($acara->waktu_mulai);
 
-                        // 2. Cek Kedaluwarsa (Expired)
-                        // Expired jika: Waktu sudah lewat DAN statusnya masih 'belum_digunakan'
-                        $isExpired = $waktuAcara->isPast() && $statusDB === 'belum_digunakan';
+                        // 2. Setup Waktu Sekarang & Masa Berlaku
+                        $now = \Carbon\Carbon::now();
 
-                        // 3. Tentukan Tampilan Badge
-                        if ($statusDB === 'sudah_digunakan') {
-                            $badgeClass = 'bg-gray-600 text-white';
-                            $badgeText = 'Sudah Digunakan';
-                        } elseif ($isExpired) {
-                            $badgeClass = 'bg-red-500 text-white';
-                            $badgeText = 'Kedaluwarsa';
+                        // Parse tanggal mulai (default null jika tidak ada)
+                        $berlakuMulai = $jenisTiket->berlaku_mulai
+                            ? \Carbon\Carbon::parse($jenisTiket->berlaku_mulai)->startOfDay()
+                            : null;
+
+                        // Parse tanggal selesai (PENTING: gunakan endOfDay agar valid sampai jam 23:59 di hari H)
+                        $berlakuSampai = $jenisTiket->berlaku_sampai
+                            ? \Carbon\Carbon::parse($jenisTiket->berlaku_sampai)->endOfDay()
+                            : null;
+
+                        // 3. LOGIKA PENENTUAN STATUS UI
+                        // Kita buat variabel baru $uiState untuk menentukan tampilan (bukan mengubah data DB)
+                        $statusCheckin = $tiket->status_checkin; // 'belum_digunakan' / 'sudah_digunakan'
+
+                        if ($statusCheckin === 'sudah_digunakan') {
+                            $uiState = 'used';
+                            $badgeColor = 'bg-gray-600 text-white';
+                            $badgeLabel = 'Sudah Digunakan';
+                        } elseif ($berlakuSampai && $now->greaterThan($berlakuSampai)) {
+                            // Jika sekarang > batas akhir = EXPIRED
+                            $uiState = 'expired';
+                            $badgeColor = 'bg-red-500 text-white';
+                            $badgeLabel = 'Kedaluwarsa';
+                        } elseif ($berlakuMulai && $now->lessThan($berlakuMulai)) {
+                            // Jika sekarang < batas awal = UPCOMING
+                            $uiState = 'upcoming';
+                            $badgeColor = 'bg-orange-500 text-white';
+                            $badgeLabel = 'Belum Berlaku';
                         } else {
-                            $badgeClass = 'bg-green-500 text-white';
-                            $badgeText = 'Belum Digunakan';
+                            // Normal (Active)
+                            $uiState = 'active';
+                            $badgeColor = 'bg-green-500 text-white';
+                            $badgeLabel = 'Siap Digunakan';
                         }
                     @endphp
 
                     {{-- CARD ITEM --}}
-                    <div class="bg-white rounded-xl  border border-gray-100 overflow-hidden flex flex-col h-full  duration-300"
-                        x-show="activeTab === 'all' || activeTab === '{{ $statusDB }}'"
+                    {{-- x-show: Filter tab tetap menggunakan status DB asli agar tidak hilang dari list --}}
+                    <div class="bg-white rounded-xl border border-gray-100 overflow-hidden flex flex-col h-full duration-300 shadow-sm hover:shadow-md"
+                        x-show="activeTab === 'all' || activeTab === '{{ $statusCheckin }}'"
                         x-transition.opacity.duration.300ms>
 
-                        <div class="h-48 bg-gradient-to-br from-blue-500 to-purple-600 relative shrink-0">
+                        {{-- HEADER GAMBAR --}}
+                        <div class="h-48 relative shrink-0">
                             @if ($acara->banner_acara)
                                 <img src="{{ asset('storage/' . $acara->banner_acara) }}" alt="{{ $acara->nama_acara }}"
-                                    class="w-full h-full object-cover">
+                                    class="w-full h-full object-cover {{ $uiState === 'expired' ? 'grayscale opacity-70' : '' }}">
                             @else
                                 <div class="w-full h-full flex items-center justify-center bg-gray-200">
                                     <i data-lucide="image" class="size-10 text-gray-400"></i>
                                 </div>
                             @endif
 
+                            {{-- Overlay Gradient untuk teks agar terbaca (opsional) --}}
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+
+                            {{-- Badge Status --}}
                             <div class="absolute top-4 right-4">
                                 <span
-                                    class="px-3 py-1 rounded-full text-xs font-semibold shadow-sm {{ $badgeClass }}">
-                                    {{ $badgeText }}
+                                    class="px-3 py-1 rounded-full text-xs font-semibold shadow-sm {{ $badgeColor }}">
+                                    {{ $badgeLabel }}
                                 </span>
                             </div>
                         </div>
 
+                        {{-- BODY CARD --}}
                         <div class="p-6 flex flex-col flex-1">
                             <h3 class="text-xl font-bold text-gray-800 mb-2 line-clamp-2"
                                 title="{{ $acara->nama_acara }}">
@@ -116,47 +145,72 @@
                             </h3>
 
                             <div class="space-y-3 mb-6 flex-1">
+                                {{-- Jenis Tiket --}}
                                 <div class="flex items-center text-sm text-gray-600">
                                     <i data-lucide="ticket" class="size-4 mr-2 text-blue-600 shrink-0"></i>
-                                    <span
-                                        class="truncate font-medium">{{ $tiket->detailPesanan->jenisTiket->nama_jenis }}</span>
+                                    <span class="truncate font-medium">{{ $jenisTiket->nama_jenis }}</span>
                                 </div>
 
+                                {{-- Nama Peserta --}}
                                 <div class="flex items-center text-sm text-gray-600">
                                     <i data-lucide="user" class="size-4 mr-2 text-blue-600 shrink-0"></i>
                                     <span class="truncate">{{ $tiket->nama_peserta }}</span>
                                 </div>
 
-                                <div class="flex items-center text-sm text-gray-600">
-                                    <i data-lucide="calendar" class="size-4 mr-2 text-blue-600 shrink-0"></i>
-                                    <span class="{{ $isExpired ? 'text-red-600 font-medium' : '' }}">
-                                        {{ $waktuAcara->format('d M Y') }}
-                                    </span>
+                                {{-- Tanggal Acara / Masa Berlaku --}}
+                                <div class="flex items-start text-sm text-gray-600">
+                                    <i data-lucide="calendar-days"
+                                        class="size-4 mr-2 text-blue-600 shrink-0 mt-0.5"></i>
+                                    <div class="flex flex-col">
+                                        {{-- Tampilkan Tanggal Acara --}}
+                                        <span class="font-medium text-gray-800">
+                                            {{ $waktuAcara->translatedFormat('d M Y') }}
+                                        </span>
+
+                                        {{-- Info Tambahan Masa Berlaku (Jika ada range khusus) --}}
+                                        @if ($uiState === 'expired')
+                                            <span class="text-xs text-red-500 mt-0.5">
+                                                Berlaku s/d {{ $berlakuSampai->translatedFormat('d M Y') }}
+                                            </span>
+                                        @elseif($uiState === 'upcoming')
+                                            <span class="text-xs text-orange-500 mt-0.5">
+                                                Berlaku mulai {{ $berlakuMulai->translatedFormat('d M Y') }}
+                                            </span>
+                                        @endif
+                                    </div>
                                 </div>
 
+                                {{-- Lokasi --}}
                                 <div class="flex items-center text-sm text-gray-600">
                                     <i data-lucide="map-pin" class="size-4 mr-2 text-blue-600 shrink-0"></i>
                                     <span class="truncate">{{ $acara->lokasi }}</span>
                                 </div>
                             </div>
 
+                            {{-- FOOTER ACTION --}}
                             <div class="flex gap-2 mt-auto">
+                                {{-- Tombol Detail --}}
                                 <a href="{{ route('pembeli.tiket.preview', $tiket->id) }}"
-                                    class="flex-1 bg-blue-600 text-white text-center py-2.5 rounded-lg hover:bg-blue-700 transition font-medium text-sm flex items-center justify-center gap-2 ">
-                                    Lihat Detail
+                                    class="flex-1 text-center py-2.5 rounded-lg transition font-medium text-sm flex items-center justify-center gap-2 
+                        {{ $uiState === 'expired'
+                            ? 'bg-gray-100 text-gray-400 cursor-not-allowed border border-gray-200'
+                            : 'bg-blue-600 text-white hover:bg-blue-700' }}">
+
+                                    @if ($uiState === 'expired')
+                                        Tiket Hangus
+                                    @elseif($uiState === 'used')
+                                        Lihat Detail
+                                    @else
+                                        Gunakan Tiket
+                                    @endif
                                 </a>
 
+                                {{-- Tombol Download (Masih boleh download history walaupun expired) --}}
                                 <a href="{{ route('pembeli.tiket.download', $tiket->id) }}"
-                                    class="px-4 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition inline-flex items-center justify-center border border-gray-200"
+                                    class="px-4 bg-gray-50 text-gray-700 rounded-lg hover:bg-gray-200 transition inline-flex items-center justify-center border border-gray-200"
                                     title="Download PDF">
                                     <i data-lucide="download" class="size-5"></i>
                                 </a>
-
-                                {{-- <a href="{{ route('pembeli.tiket.preview', $tiket->id) }}"
-                                        class="px-4 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition inline-flex items-center justify-center border border-gray-200"
-                                        title="Priview">
-                                        <i data-lucide="eye" class="size-5"></i>
-                                    </a> --}}
                             </div>
                         </div>
                     </div>

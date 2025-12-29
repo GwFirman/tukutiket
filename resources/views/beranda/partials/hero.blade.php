@@ -32,7 +32,7 @@
                 <!-- Search Bar with Filters -->
                 <form action="{{ route('beranda.all-acara') }}" method="GET"
                     class="animate-fade-in-up animation-delay-300 px-2 sm:px-0" x-data="{ filterOpen: false }">
-                    <div class="bg-white rounded-xl sm:rounded-2xl shadow-xl p-2 flex gap-2">
+                    <div class="bg-white rounded-full shadow-xl p-1  flex gap-2">
                         <!-- Search Input -->
                         <div class="flex-1 relative">
                             <div class="absolute inset-y-0 left-3 sm:left-4 flex items-center pointer-events-none">
@@ -40,7 +40,7 @@
                             </div>
                             <input type="text" name="search" value="{{ request('search') }}"
                                 placeholder="Cari acara, konser, workshop..."
-                                class="w-full pl-10 sm:pl-12 pr-4 py-3 sm:py-4 rounded-lg sm:rounded-xl border-0 focus:ring-2 focus:ring-indigo-500 text-gray-700 placeholder-gray-400 text-sm sm:text-base">
+                                class="w-full pl-10 sm:pl-12 pr-4 py-3 sm:py-4 rounded-full border-0 focus:ring-2 focus:ring-indigo-500 text-gray-700 placeholder-gray-400 text-sm sm:text-base">
                         </div>
 
                         <!-- Mobile Filter Button -->
@@ -51,8 +51,6 @@
 
                         <!-- Desktop Filters -->
                         <div class="hidden sm:flex gap-2">
-
-
                             <!-- Date Filter -->
                             <div class="relative flex-1 sm:max-w-[200px]">
                                 <div
@@ -67,7 +65,7 @@
 
                             <!-- Search Button -->
                             <button type="submit"
-                                class="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-semibold py-2 sm:py-2 px-6 sm:px-8 rounded-lg sm:rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl flex items-center justify-center gap-2 text-sm sm:text-base">
+                                class="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-semibold py-2 sm:py-2 px-6 sm:px-8 rounded-full transition-all duration-300 shadow-lg hover:shadow-xl flex items-center justify-center gap-2 text-sm sm:text-base">
                                 <i data-lucide="search" class="w-4 h-4 sm:w-5 sm:h-5"></i>
                             </button>
                         </div>
@@ -123,30 +121,6 @@
                             <i data-lucide="search" class="w-4 h-4"></i>
                             Cari Acara
                         </button>
-                    </div>
-
-                    <!-- Quick Filter Tags -->
-                    <div class="flex flex-wrap gap-2 mt-3 sm:mt-4 justify-center px-2 sm:px-0">
-                        <a href="{{ route('beranda', ['search' => 'konser']) }}"
-                            class="px-2.5 py-1 sm:px-3 sm:py-1.5 bg-white/80 hover:bg-indigo-100 text-gray-700 hover:text-indigo-700 rounded-full text-xs sm:text-sm transition-colors flex items-center gap-1 sm:gap-1.5">
-                            <i data-lucide="music" class="w-3 h-3 sm:w-4 sm:h-4"></i>
-                            Konser
-                        </a>
-                        <a href="{{ route('beranda', ['search' => 'workshop']) }}"
-                            class="px-2.5 py-1 sm:px-3 sm:py-1.5 bg-white/80 hover:bg-indigo-100 text-gray-700 hover:text-indigo-700 rounded-full text-xs sm:text-sm transition-colors flex items-center gap-1 sm:gap-1.5">
-                            <i data-lucide="briefcase" class="w-3 h-3 sm:w-4 sm:h-4"></i>
-                            Workshop
-                        </a>
-                        <a href="{{ route('beranda', ['search' => 'seminar']) }}"
-                            class="px-2.5 py-1 sm:px-3 sm:py-1.5 bg-white/80 hover:bg-indigo-100 text-gray-700 hover:text-indigo-700 rounded-full text-xs sm:text-sm transition-colors flex items-center gap-1 sm:gap-1.5">
-                            <i data-lucide="mic" class="w-3 h-3 sm:w-4 sm:h-4"></i>
-                            Seminar
-                        </a>
-                        <a href="{{ route('beranda', ['search' => 'festival']) }}"
-                            class="px-2.5 py-1 sm:px-3 sm:py-1.5 bg-white/80 hover:bg-indigo-100 text-gray-700 hover:text-indigo-700 rounded-full text-xs sm:text-sm transition-colors flex items-center gap-1 sm:gap-1.5">
-                            <i data-lucide="party-popper" class="w-3 h-3 sm:w-4 sm:h-4"></i>
-                            Festival
-                        </a>
                     </div>
                 </form>
             </div>

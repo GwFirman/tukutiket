@@ -1,7 +1,7 @@
 <x-admin>
     <x-slot:header>
         <div class="flex items-center justify-between">
-            <div class="flex items-center gap-2">
+            <div class="flex max-w-5xl items-center gap-2">
                 <i data-lucide="file-check" class="size-5 text-gray-600"></i>
                 <i data-lucide="chevron-right" class="size-4 font-medium text-gray-400"></i>
                 <p class="font-medium">Verifikasi Acara</p>
@@ -11,7 +11,7 @@
         </div>
     </x-slot:header>
 
-    <div class="p-6 space-y-6 max-w-6xl mx-auto">
+    <div class="p-6 space-y-6 max-w-5xl mx-auto">
         <!-- Header Info -->
         <div class="flex items-center justify-between">
             <div>
@@ -26,51 +26,109 @@
         </div>
 
         <!-- Event Details -->
-        <div class="bg-white rounded-xl border border-indigo-200 overflow-hidden">
-            <div class="px-6 py-4 border-b border-indigo-200 bg-gradient-to-r from-indigo-50 to-white">
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+            <div class="px-6 py-5 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
                 <h2 class="text-lg font-bold text-gray-900 flex items-center gap-2">
-                    <i data-lucide="info" class="w-5 h-5 text-indigo-600"></i>
-                    Informasi Acara
+                    <div class="p-2 bg-indigo-100 rounded-lg text-indigo-600">
+                        <i data-lucide="info" class="size-5"></i>
+                    </div>
+                    Detail Informasi Acara
                 </h2>
+                <span
+                    class="px-3 py-1 rounded-full text-xs font-semibold 
+            {{ $acara->status === 'published' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700' }}">
+                    {{ ucfirst($acara->status) }}
+                </span>
             </div>
+
             <div class="p-6">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div class="bg-indigo-50 rounded-lg p-4 border border-indigo-100">
-                        <h3 class="text-xs font-bold text-indigo-600 uppercase tracking-widest mb-2">Nama Acara</h3>
-                        <p class="text-lg font-semibold text-gray-900">{{ $acara->nama_acara }}</p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-y-8 gap-x-12">
+
+                    <div class="md:col-span-2">
+                        <label class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1 block">Nama
+                            Acara</label>
+                        <h3 class="text-xl font-bold text-gray-900 leading-tight">{{ $acara->nama_acara }}</h3>
                     </div>
-                    <div class="bg-indigo-50 rounded-lg p-4 border border-indigo-100">
-                        <h3 class="text-xs font-bold text-indigo-600 uppercase tracking-widest mb-2">Kreator</h3>
-                        <p class="text-lg font-semibold text-gray-900">{{ $acara->kreator->nama_kreator ?? 'N/A' }}</p>
-                        <p class="text-sm text-gray-600 mt-1">{{ $acara->kreator->user->email ?? 'N/A' }}</p>
+
+                    <div class="flex gap-4">
+                        <div class="shrink-0">
+                            <div class="size-10 rounded-full bg-blue-50 flex items-center justify-center text-blue-600">
+                                <i data-lucide="calendar" class="size-5"></i>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1 block">Waktu
+                                Pelaksanaan</label>
+
+                            <p class="font-medium text-gray-900">
+                                {{ \Carbon\Carbon::parse($acara->waktu_mulai)->locale('id')->translatedFormat('d M Y') }}
+                                @if ($acara->waktu_mulai != $acara->waktu_selesai)
+                                    <span class="text-gray-400 mx-1">-</span>
+                                    {{ \Carbon\Carbon::parse($acara->waktu_selesai)->locale('id')->translatedFormat('d M Y') }}
+                                @endif
+                            </p>
+
+                            <p class="text-sm text-gray-600 mt-0.5 flex items-center gap-1.5">
+                                <i data-lucide="clock" class="size-3.5"></i>
+                                {{ \Carbon\Carbon::parse($acara->jam_mulai)->format('H:i') }}
+                                -
+                                {{ \Carbon\Carbon::parse($acara->jam_selesai)->format('H:i') }} WIB
+                            </p>
+                        </div>
                     </div>
-                    <div class="bg-indigo-50 rounded-lg p-4 border border-indigo-100">
-                        <h3 class="text-xs font-bold text-indigo-600 uppercase tracking-widest mb-2">Tanggal & Waktu
-                        </h3>
-                        <p class="text-lg font-semibold text-gray-900">
-                            {{ \Carbon\Carbon::parse($acara->waktu_mulai)->locale('id')->translatedFormat('d M Y') }}
-                        </p>
-                        <p class="text-sm text-gray-600 mt-1">
-                            {{ \Carbon\Carbon::parse($acara->waktu_mulai)->format('H:i') }} -
-                            {{ \Carbon\Carbon::parse($acara->waktu_selesai)->format('H:i') }} WIB
-                        </p>
-                    </div>
-                    <div class="bg-indigo-50 rounded-lg p-4 border border-indigo-100">
-                        <h3 class="text-xs font-bold text-indigo-600 uppercase tracking-widest mb-2">Lokasi</h3>
-                        <div class="flex items-center gap-2 text-lg font-semibold text-gray-900">
-                            @if ($acara->is_online)
-                                <i data-lucide="globe" class="size-5 text-indigo-600"></i>
-                                <span>Online</span>
-                            @else
-                                <i data-lucide="map-pin" class="size-5 text-indigo-600"></i>
-                                <span>{{ $acara->lokasi }}</span>
+
+                    <div class="flex gap-4">
+                        <div class="shrink-0">
+                            <div
+                                class="size-10 rounded-full bg-orange-50 flex items-center justify-center text-orange-600">
+                                <i data-lucide="{{ $acara->is_online ? 'globe' : 'map-pin' }}" class="size-5"></i>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1 block">
+                                {{ $acara->is_online ? 'Platform Online' : 'Lokasi Venue' }}
+                            </label>
+                            <p class="font-medium text-gray-900">
+                                {{ $acara->is_online ? 'Online Event' : $acara->lokasi }}
+                            </p>
+                            @if (!$acara->is_online && $acara->venue)
+                                <p class="text-sm text-gray-500 mt-0.5">{{ $acara->venue }}</p>
                             @endif
                         </div>
                     </div>
-                    <div class="md:col-span-2 bg-indigo-50 rounded-lg p-4 border border-indigo-100">
-                        <h3 class="text-xs font-bold text-indigo-600 uppercase tracking-widest mb-2">Deskripsi</h3>
-                        <p class="text-gray-900 text-sm leading-relaxed">{!! Str::limit(strip_tags($acara->deskripsi), 200) !!}</p>
+
+                    <div class="flex gap-4">
+                        <div class="shrink-0">
+                            <div
+                                class="size-10 rounded-full bg-indigo-600 flex items-center justify-center text-white font-bold text-sm ring-4 ring-indigo-50">
+                                {{ substr($acara->kreator->nama_kreator ?? 'A', 0, 1) }}
+                            </div>
+                        </div>
+                        <div>
+                            <label
+                                class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1 block">Diselenggarakan
+                                Oleh</label>
+                            <p class="font-medium text-gray-900">
+                                {{ $acara->kreator->nama_kreator ?? 'Tidak Diketahui' }}</p>
+                            <p class="text-sm text-gray-500">{{ $acara->kreator->user->email ?? '-' }}</p>
+                        </div>
                     </div>
+
+                    <div class="md:col-span-2 pt-6 border-t border-gray-100">
+                        <label
+                            class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3 block flex items-center gap-2">
+                            <i data-lucide="align-left" class="size-4"></i>
+                            Deskripsi Acara
+                        </label>
+                        <div class="prose prose-sm prose-indigo text-gray-600 max-w-none">
+                            {!! Str::limit(strip_tags($acara->deskripsi), 300) !!}
+                        </div>
+                        @if (strlen(strip_tags($acara->deskripsi)) > 300)
+                            <button class="text-indigo-600 text-sm font-medium mt-2 hover:underline">Baca
+                                Selengkapnya</button>
+                        @endif
+                    </div>
+
                 </div>
             </div>
         </div>
@@ -141,7 +199,8 @@
                                     <div>
                                         <p class="text-sm font-semibold text-gray-900">{{ $verifikasi->nama_dokumen }}
                                         </p>
-                                        <p class="text-xs text-gray-600 mt-1">{{ $verifikasi->jenis_dokumen }} • Upload
+                                        <p class="text-xs text-gray-600 mt-1">{{ $verifikasi->jenis_dokumen }} •
+                                            Upload
                                             {{ $verifikasi->created_at->diffForHumans() }}</p>
                                     </div>
                                 </div>

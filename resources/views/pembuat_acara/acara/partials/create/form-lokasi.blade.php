@@ -210,11 +210,6 @@
 
     <label class="mb-2 block text-sm font-medium text-gray-700">
         Lokasi Acara <span class="text-red-400">*</span>
-        {{-- @if (isset($acara) && $acara->status === 'published')
-            <span class="ml-2 inline-block px-2 py-1 text-xs font-semibold text-orange-700 bg-orange-100 rounded">
-                Tidak bisa diubah (Acara Published)
-            </span>
-        @endif --}}
     </label>
 
     <input type="hidden" name="tipe_event" x-model="finalEventType">
@@ -350,8 +345,8 @@
                 </div>
                 <div class="mb-4">
                     <label class="block text-sm font-medium text-gray-700 mb-1">Detail Alamat</label>
-                    <textarea x-model="tempAddress" readonly rows="2" :disabled="isPublished"
-                        class="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-50 text-sm resize-none text-gray-600 disabled:opacity-50"></textarea>
+                    <textarea x-model="tempAddress" :readonly="isPublished" :disabled="isPublished" rows="2"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm resize-none text-gray-600 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-50 disabled:opacity-50"></textarea>
                 </div>
                 <!-- Input Venue Manual di Modal -->
                 <div class="mb-4">

@@ -79,7 +79,6 @@ class kelolaTransaksiController extends Controller
             'no_telp_peserta' => 'nullable',
             'kode_pesanan' => 'required|string',
         ]);
-
         // Simpan data ke tabel tiket_peserta
         foreach ($validated['id_detail_pesanan'] as $index => $idDetail) {
             // Ambil detail pesanan untuk mendapatkan jumlah tiket

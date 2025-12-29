@@ -217,7 +217,7 @@
                                 <div class="flex justify-between">
                                     <span class="text-gray-500">Telepon</span>
                                     <span
-                                        class="font-medium text-gray-900 text-right">{{ $pesanan->no_telp_pemesan ?? '-' }}</span>
+                                        class="font-medium text-gray-900 text-right">{{ $pesanan->no_telp_peserta ?? '-' }}</span>
                                 </div>
                                 <div class="flex justify-between">
                                     <span class="text-gray-500">Tanggal</span>
@@ -247,7 +247,7 @@
                                         <input type="hidden" name="id_detail_pesanan[]"
                                             value="{{ $detail->id }}">
                                         <input type="hidden" name="nama_peserta[]"
-                                            value="{{ $pesanan->nama_pemesan }}">
+                                            value="{{ $detail->nama_peserta }}">
                                         <input type="hidden" name="email_peserta[]"
                                             value="{{ $pesanan->email_pemesan }}">
                                         <input type="hidden" name="no_telp_peserta[]"

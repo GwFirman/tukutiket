@@ -8,7 +8,7 @@
     </x-slot>
 
     {{-- Inisialisasi Alpine Data untuk Tabs --}}
-    <div class="py-6 md:py-0" x-data="{ activeTab: 'all' }">
+    <div class="py-0 md:py-6" x-data="{ activeTab: 'all' }">
         <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
 
             {{-- ================= TABS NAVIGATION ================= --}}

@@ -44,9 +44,9 @@
                         @include('pembuat_acara.acara.partials.create.profile-kreator')
                         <div class="lg:flex gap-5 mt-5 px-5 pb-5 space-y-4">
 
-                            @include('pembuat_acara.acara.partials.create.form-jam')
-
                             @include('pembuat_acara.acara.partials.create.form-tanggal')
+
+                            @include('pembuat_acara.acara.partials.create.form-jam')
 
                             @include('pembuat_acara.acara.partials.create.form-lokasi')
 

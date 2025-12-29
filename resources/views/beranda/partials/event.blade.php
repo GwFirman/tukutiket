@@ -1,4 +1,4 @@
-<div class="bg-gradient-to-b from-white to-indigo-50 mt-4">
+<div class="bg-indigo-50 mt-10">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="text-center mb-10 md:mb-16">
             <div
@@ -6,7 +6,7 @@
                 <i data-lucide="calendar-check" class="w-3 h-3 sm:w-4 sm:h-4 mr-1.5 sm:mr-2"></i>
                 <span class="text-xs sm:text-sm font-semibold">Hot event </span>
             </div>
-            <h2 class="text-2xl sm:text-3xl md:text-4xl font-extrabold text-gray-900 mb-3 sm:mb-4">Acara Mendatang
+            <h2 class="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-3 sm:mb-4">Acara Mendatang
             </h2>
             <p class="text-gray-600 text-sm sm:text-base md:text-lg max-w-2xl mx-auto px-4">
                 Temukan dan pesan tiket untuk acara-acara menakjubkan di sekitar Anda
@@ -30,13 +30,6 @@
                                 <span class="text-gray-500 text-xs sm:text-sm">No Banner Available</span>
                             </div>
                         @endif
-                        <div
-                            class="absolute top-3 right-3 sm:top-4 sm:right-4 bg-white/90 backdrop-blur-sm px-2 py-0.5 sm:px-3 sm:py-1 rounded-full shadow-lg">
-                            <span class="text-xs font-bold text-indigo-600 flex items-center">
-                                <i data-lucide="trending-up" class="w-2.5 h-2.5 sm:w-3 sm:h-3 mr-1"></i>
-                                Hot
-                            </span>
-                        </div>
                     </div>
                     <div class="p-4 sm:p-5 md:p-6">
                         <h3 class="text-base sm:text-lg md:text-xl font-bold text-gray-900 mb-2 sm:mb-3 line-clamp-2 ">

@@ -170,15 +170,15 @@
                     <div class="relative flex justify-between items-start">
                         <div class="flex-1 min-w-0">
                             <div class="flex items-center mb-1 gap-1.5 sm:gap-2">
-                                <p class="text-xs sm:text-sm text-indigo-600 font-semibold">Pendapatan</p>
+                                <p class="text-xs sm:text-sm text-indigo-600 font-semibold">Penjualan</p>
                             </div>
                             <p class="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 mb-1 truncate">
                                 Rp {{ number_format($totalPendapatan, 0, ',', '.') }}
                             </p>
-                            <p class="text-xs text-gray-500">Total pendapatan</p>
+                            <p class="text-xs text-gray-500">Total Penjualan</p>
                             <div class="flex mt-1.5 sm:mt-2 items-center text-xs text-green-600 font-medium">
                                 <i data-lucide="plus" class="w-3 h-3"></i>
-                                <p class="ml-0.5">{{ $pendapatanTerbaru }}</p>
+                                <p class="ml-0.5">Rp {{ number_format($pendapatanTerbaru, 0, ',', '.') }}</p>
                             </div>
                         </div>
                     </div>

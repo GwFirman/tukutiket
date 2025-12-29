@@ -108,7 +108,7 @@
                             <th class="px-6 py-3 text-center text-sm font-medium text-gray-700">Terjual</th>
                             <th class="px-6 py-3 text-center text-sm font-medium text-gray-700">Sisa</th>
                             <th class="px-6 py-3 text-right text-sm font-medium text-gray-700">Pendapatan</th>
-                            <th class="px-6 py-3 text-center text-sm font-medium text-gray-700">Check-in</th>
+
                         </tr>
                     </thead>
 
@@ -134,9 +134,9 @@
                                 <td class="px-6 py-4 text-right font-medium text-green-600">
                                     Rp {{ number_format($jt->pendapatan, 0, ',', '.') }}
                                 </td>
-                                <td class="px-6 py-4 text-center text-blue-600 font-medium">
+                                {{-- <td class="px-6 py-4 text-center text-blue-600 font-medium">
                                     {{ $jt->checkin_count }}
-                                </td>
+                                </td> --}}
                             </tr>
                         @endforeach
                     </tbody>
@@ -153,8 +153,8 @@
                             <td class="px-6 py-4 text-right text-green-600">
                                 Rp {{ number_format($rekapJenisTiket->sum('pendapatan'), 0, ',', '.') }}
                             </td>
-                            <td class="px-6 py-4 text-center text-blue-600">
-                                {{ $rekapJenisTiket->sum('checkin_count') }}</td>
+                            {{-- <td class="px-6 py-4 text-center text-blue-600">
+                                {{ $rekapJenisTiket->sum('checkin_count') }}</td> --}}
                         </tr>
                     </tfoot>
                 </table>

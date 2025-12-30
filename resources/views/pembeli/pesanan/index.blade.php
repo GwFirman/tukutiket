@@ -123,11 +123,6 @@
                                             <i data-lucide="eye" class="size-4"></i>
                                             <span>Lihat Detail</span>
                                         </a>
-                                        <a href="{{ route('pembeli.tiket.download', $p->kode_pesanan) }}"
-                                            class="inline-flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900 font-medium transition-colors">
-                                            <i data-lucide="download" class="size-4"></i>
-                                            <span>Download PDF</span>
-                                        </a>
                                     </div>
 
                                     <!-- Main Actions -->

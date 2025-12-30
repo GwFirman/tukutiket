@@ -113,7 +113,7 @@ class VerifikasiAcaraController extends Controller
 
             $fileCount = count($uploadedFiles);
 
-            return redirect()->route('pembuat.acara.show', $acara->slug)
+            return redirect()->route('pembuat.verifikasi.show', $acara->slug)
                 ->with('success', "{$fileCount} dokumen berhasil diunggah: ".implode(', ', $uploadedFiles).'. Tim admin akan melakukan review dalam 1-3 hari kerja.');
         } catch (\Exception $e) {
             Log::error('Verifikasi Acara Bulk Upload Error: '.$e->getMessage());

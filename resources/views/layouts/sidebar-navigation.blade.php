@@ -1,4 +1,3 @@
-<!-- Navigation Links -->
 <nav
     class="mt-5 mb-4 px-2 flex-1 overflow-y-auto overflow-x-hidden scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 hover:scrollbar-thumb-gray-400">
     <x-nav-link :href="route('beranda')" :active="request()->routeIs('beranda')" class="group">
@@ -7,7 +6,6 @@
     </x-nav-link>
 
     @if (request()->routeIs('pembeli.*') || request()->routeIs('profile.*'))
-        <!-- Menu khusus untuk pembeli -->
         <x-nav-link :href="route('pembeli.pesanan-saya')" :active="request()->routeIs('pembeli.pesanan-saya')" class="mt-1 group">
             <i data-lucide="shopping-cart" class="size-5 mr-2"></i>
             {{ __('Pesanan Saya') }}
@@ -57,7 +55,6 @@
         <div class="border-t border-gray-200 dark:border-gray-200 my-3 mx-2"></div>
         <h3 class="mx-3 text-gray-500 font-medium">Acara</h3>
 
-        <!-- Menu default/pembuat -->
         @if ($isVerified)
             <x-nav-link :href="route('pembuat.dashboard')" :active="request()->routeIs('pembuat.dashboard')" class="group">
                 <i data-lucide="home" class="size-5 mr-2"></i>
@@ -94,7 +91,6 @@
                     $acaraSlug = null;
 
                     // Inisialisasi status waktu
-                    $isFinished = false;
                     $hasStarted = false;
 
                     if (is_object($routeAcara)) {
@@ -105,13 +101,17 @@
                         // --- LOGIKA WAKTU ---
                         $now = \Carbon\Carbon::now();
                         $start = \Carbon\Carbon::parse($routeAcara->waktu_mulai);
-                        $end = \Carbon\Carbon::parse($routeAcara->waktu_selesai);
 
-                        $hasStarted = $now->greaterThanOrEqualTo($start); // Sudah mulai?
-                        $isFinished = $now->greaterThan($end); // Sudah selesai?
+                        // Cek apakah sudah mulai
+                        $hasStarted = $now->greaterThanOrEqualTo($start);
                     } else {
                         $acaraId = $routeAcara;
                     }
+
+                    // HELPER: Cek apakah status acara terbatas (Pending ATAU Rejected)
+                    // Jika Rejected, user harus bisa akses Edit & Upload untuk perbaikan, tapi tidak bisa akses fitur lain.
+                    $isRestrictedStatus =
+                        isset($routeAcara) && in_array($routeAcara->status, ['pending_verifikasi', 'rejected']);
                 @endphp
 
                 @if ($acaraId)
@@ -123,23 +123,15 @@
                             </x-nav-link>
                         @endif
 
-                        {{-- 2. LINK EDIT ACARA (Disable jika sudah selesai) --}}
-                        @if ($isFinished)
-                            <div class="mt-1 group flex items-center px-3 py-2 text-gray-400 cursor-not-allowed opacity-50"
-                                title="Acara telah selesai, tidak dapat diedit">
-                                <i data-lucide="edit" class="size-4 mr-2"></i>
-                                {{ __('Edit Acara') }}
-                                <i data-lucide="lock" class="size-3 ml-auto"></i>
-                            </div>
-                        @else
-                            <x-nav-link :href="route('pembuat.acara.edit', $acaraSlug)" :active="request()->routeIs('pembuat.acara.edit')" class="mt-1 group">
-                                <i data-lucide="edit" class="size-4 mr-2"></i>
-                                {{ __('Edit Acara') }}
-                            </x-nav-link>
-                        @endif
+                        {{-- 2. LINK EDIT ACARA (Selalu Aktif) --}}
+                        <x-nav-link :href="route('pembuat.acara.edit', $acaraSlug)" :active="request()->routeIs('pembuat.acara.edit')" class="mt-1 group">
+                            <i data-lucide="edit" class="size-4 mr-2"></i>
+                            {{ __('Edit Acara') }}
+                        </x-nav-link>
 
-                        {{-- 3. LINK UPLOAD SURAT IZIN (Pending Only) --}}
-                        @if ($routeAcara->status === 'pending_verifikasi')
+                        {{-- 3. LINK UPLOAD SURAT IZIN (Pending OR Rejected) --}}
+                        {{-- Muncul di kedua status ini agar user bisa upload ulang perbaikan --}}
+                        @if ($isRestrictedStatus)
                             <x-nav-link :href="route('pembuat.verifikasi.show', $acaraSlug)" :active="request()->routeIs('verifikasi-izin.show')"
                                 class="mt-1 group bg-yellow-50 border border-yellow-200 text-yellow-700">
                                 <i data-lucide="file-check" class="size-4 mr-2"></i>
@@ -151,8 +143,9 @@
                 @endif
 
                 {{-- 4. LAPORAN PENJUALAN --}}
-                @if (isset($routeAcara) && $routeAcara->status === 'pending_verifikasi')
-                    <div class="group pl-4 flex items-center px-3 py-2 text-gray-400 cursor-not-allowed opacity-50">
+                @if ($isRestrictedStatus)
+                    <div class="group pl-4 flex items-center px-3 py-2 text-gray-400 cursor-not-allowed opacity-50"
+                        title="Menu terkunci. Status: {{ ucfirst($routeAcara->status) }}">
                         <i data-lucide="chart-no-axes-combined" class="size-4 mr-2"></i>
                         {{ __('Laporan Penjualan') }}
                     </div>
@@ -164,8 +157,9 @@
                 @endif
 
                 {{-- 5. DAFTAR PESERTA --}}
-                @if (isset($routeAcara) && $routeAcara->status === 'pending_verifikasi')
-                    <div class="group pl-4 flex items-center px-3 py-2 text-gray-400 cursor-not-allowed opacity-50">
+                @if ($isRestrictedStatus)
+                    <div class="group pl-4 flex items-center px-3 py-2 text-gray-400 cursor-not-allowed opacity-50"
+                        title="Menu terkunci. Status: {{ ucfirst($routeAcara->status) }}">
                         <i data-lucide="ticket-check" class="size-4 mr-2"></i>
                         {{ __('Daftar Peserta') }}
                     </div>
@@ -176,20 +170,20 @@
                     </x-nav-link>
                 @endif
 
-                {{-- 6. CHECK IN / CHECK OUT (Logic Waktu) --}}
+                {{-- 6. CHECK IN / CHECK OUT --}}
                 @if (!$routeAcara->is_online)
                     @php
-                        // Kondisi Disable: Status Pending ATAU Belum Mulai ATAU Sudah Selesai
-                        $disableCheckIn = $routeAcara->status === 'pending_verifikasi' || !$hasStarted || $isFinished;
+                        // Kondisi Disable: Status Restricted (Pending/Rejected) ATAU Belum Mulai
+                        $disableCheckIn = $isRestrictedStatus || !$hasStarted;
 
                         // Pesan Tooltip
                         $tooltipText = '';
                         if ($routeAcara->status === 'pending_verifikasi') {
                             $tooltipText = 'Menunggu verifikasi';
+                        } elseif ($routeAcara->status === 'rejected') {
+                            $tooltipText = 'Acara ditolak (Rejected)';
                         } elseif (!$hasStarted) {
                             $tooltipText = 'Acara belum dimulai';
-                        } elseif ($isFinished) {
-                            $tooltipText = 'Acara telah selesai';
                         }
                     @endphp
 
@@ -225,8 +219,9 @@
                 @endif
 
                 {{-- 7. LAPORAN TRANSAKSI --}}
-                @if (isset($routeAcara) && $routeAcara->status === 'pending_verifikasi')
-                    <div class="group pl-4 flex items-center px-3 py-2 text-gray-400 cursor-not-allowed opacity-50">
+                @if ($isRestrictedStatus)
+                    <div class="group pl-4 flex items-center px-3 py-2 text-gray-400 cursor-not-allowed opacity-50"
+                        title="Menu terkunci. Status: {{ ucfirst($routeAcara->status) }}">
                         <i data-lucide="credit-card" class="size-4 mr-2"></i>
                         {{ __('Laporan Transaksi') }}
                     </div>
@@ -242,7 +237,6 @@
         <div class="border-t border-gray-200 dark:border-gray-200 my-3 mx-2"></div>
         <h3 class="mx-3 text-gray-500 font-medium">Lainnya</h3>
 
-        <!-- Menu Lainnya -->
         <x-nav-link :href="route('pembuat.profile')" :active="request()->routeIs('pembuat.profile')" class="mt-1 group">
             <i data-lucide="user" class="size-5 mr-2"></i>
             {{ __('Profile Kreator') }}
@@ -279,13 +273,12 @@
         @csrf
         <x-nav-link :href="route('logout')" class="mt-1 group"
             onclick="event.preventDefault();
-                                                this.closest('form').submit();">
+                                            this.closest('form').submit();">
             <i data-lucide="log-out" class="size-5 mr-2"></i>Logout
         </x-nav-link>
     </form>
 </nav>
 
-<!-- User Profile Footer -->
 <div class="mt-auto border-2 m-2 rounded-md border-gray-200  dark:border-indigo-100 bg-gray-50 ">
     <div class="p-4">
         <div class="flex items-center gap-3">
@@ -293,7 +286,6 @@
                 $onPembuat = request()->routeIs('pembuat.*');
                 $kreator = auth()->user()->kreator ?? null;
             @endphp
-            <!-- Avatar -->
             <div class="flex-shrink-0">
                 @if ($onPembuat && $kreator && $kreator->logo)
                     <img src="{{ asset('storage/' . $kreator->logo) }}" alt="{{ $kreator->nama_kreator }}"
@@ -309,7 +301,6 @@
                 @endif
             </div>
 
-            <!-- User Info -->
             <div class="flex-1 min-w-0">
                 @if ($onPembuat && $kreator)
                     <p class="text-sm font-medium text-gray-900 truncate">{{ $kreator->nama_kreator }}</p>
@@ -319,12 +310,6 @@
                     <p class="text-xs text-gray-500 dark:text-gray-400 truncate">{{ auth()->user()->email }}</p>
                 @endif
             </div>
-
-            {{-- <!-- Settings Icon -->
-            <a href="{{ route('profile.edit') }}"
-                class="flex-shrink-0 p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
-                <i data-lucide="settings" class="size-5"></i>
-            </a> --}}
         </div>
     </div>
 </div>

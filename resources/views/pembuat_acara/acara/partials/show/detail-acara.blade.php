@@ -1,15 +1,10 @@
 <div class="col-span-12 lg:col-span-8 space-y-6">
-    @php
-        // Cek apakah acara sudah selesai
-        $isFinished = \Carbon\Carbon::parse($acara->waktu_selesai)->isPast();
-    @endphp
 
     <div
         class="relative h-72 w-full rounded-lg flex items-center justify-center overflow-hidden bg-gradient-to-br from-indigo-100 to-purple-100">
         @if ($acara->banner_acara)
-            {{-- Tambahkan class grayscale jika selesai --}}
-            <img src="{{ asset('storage/' . $acara->banner_acara) }}"
-                class="h-full w-full object-cover {{ $isFinished ? 'grayscale' : '' }}">
+            {{-- Gambar normal tanpa grayscale --}}
+            <img src="{{ asset('storage/' . $acara->banner_acara) }}" class="h-full w-full object-cover">
 
             <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent">
             </div>
@@ -21,15 +16,8 @@
                         <i data-lucide="file-edit" class="size-3"></i>
                         Draft
                     </span>
-
-                    {{-- LOGIKA BARU: Cek Selesai Dulu --}}
-                @elseif($acara->status == 'published' && $isFinished)
-                    <span
-                        class="inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-semibold bg-slate-600 text-white border border-slate-400">
-                        <i data-lucide="flag" class="size-3"></i>
-                        Telah Selesai
-                    </span>
                 @elseif($acara->status == 'published')
+                    {{-- Status Published Normal (Tidak peduli tanggal lewat) --}}
                     <span
                         class="inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-semibold bg-green-500 text-white">
                         <i data-lucide="check-circle" class="size-3"></i>
@@ -147,20 +135,13 @@
                                 <p class="font-medium text-gray-900">{{ $tiket->kuota }} tiket</p>
                             </div>
 
-                            {{-- LOGIKA STATUS TIKET JUGA DIUPDATE --}}
+                            {{-- Status Tiket (Hapus logika 'Berakhir', kembalikan ke Aktif) --}}
                             <div class="bg-white rounded-lg p-3">
                                 <p class="text-gray-500 text-xs mb-1">Status</p>
-                                @if ($isFinished)
-                                    <span
-                                        class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-slate-100 text-slate-700">
-                                        Berakhir
-                                    </span>
-                                @else
-                                    <span
-                                        class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-700">
-                                        Aktif
-                                    </span>
-                                @endif
+                                <span
+                                    class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-700">
+                                    Aktif
+                                </span>
                             </div>
                         </div>
 

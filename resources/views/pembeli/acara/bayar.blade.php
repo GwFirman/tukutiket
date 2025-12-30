@@ -144,10 +144,15 @@
                         </div>
                     @else
                         <!-- Upload Payment Proof -->
-                        <div class="bg-white rounded-xl overflow-hidden border border-gray-300">
+                        <div class="bg-white rounded-xl overflow-hidden border border-gray-300" x-data="{ selectedBank: '' }"
+                            x-init="// Share selectedBank with the form above
+                            $watch('selectedBank', value => {
+                                document.querySelector('input[name=bank_tujuan]').value = value;
+                            })">
                             <div class="bg-gray-50 px-6 py-4 border-b border-gray-300">
-                                <h3 class="text-lg font-bold text-gray-900">Upload Bukti Pembayaran</h3>
-                                <p class="text-sm text-gray-600 mt-1">Upload screenshot atau foto bukti transfer Anda
+                                <h3 class="text-lg font-bold text-gray-900">Konfirmasi Pembayaran</h3>
+                                <p class="text-sm text-gray-600 mt-1">Pilih rekening tujuan dan upload bukti transfer
+                                    Anda
                                 </p>
                             </div>
                             <div class="p-6">
@@ -157,38 +162,139 @@
                                     <input type="hidden" name="kode_pesanan" value="{{ $pesanan->kode_pesanan }}">
                                     <input type="hidden" name="bank_tujuan" id="bank_tujuan">
 
-                                    <!-- Dropzone dengan aspect ratio custom (lebih pendek dari 16:9) -->
-                                    <div id="buktiPreview"
-                                        class="flex items-center justify-center w-full h-64 border-2 border-dashed border-gray-300 rounded-lg bg-gray-50 cursor-pointer hover:bg-gray-100 transition overflow-hidden">
-                                        <span class="text-gray-500 text-sm text-center" id="dropzoneText">
-                                            <svg class="w-10 h-10 mb-3 text-gray-400 mx-auto" fill="none"
-                                                stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
-                                            </svg>
-                                            <strong>Seret dan letakkan gambar di sini</strong><br>
-                                            atau klik untuk memilih file<br>
-                                            <p class="text-xs text-gray-500 mt-2">PNG, JPG, JPEG (MAX. 5MB)</p>
-                                        </span>
-                                        <img id="previewImage" src=""
-                                            class="hidden w-full h-full object-cover rounded-lg"
-                                            alt="Preview Bukti Pembayaran">
+                                    <!-- Bank Account Selection -->
+                                    <div>
+                                        <h4 class="text-sm font-semibold text-gray-900 mb-3">Pilih Rekening Tujuan
+                                            Transfer</h4>
+                                        <div class="space-y-3">
+                                            <!-- BCA Option -->
+                                            <label
+                                                class="border rounded-lg p-3 cursor-pointer hover:border-blue-300 transition-colors flex items-center"
+                                                :class="selectedBank === 'bca' ? 'border-blue-500 bg-blue-50' :
+                                                    'border-gray-200'"
+                                                @click="selectedBank = 'bca'">
+                                                <input type="radio" name="bank" value="bca"
+                                                    x-model="selectedBank"
+                                                    class="text-blue-600 h-4 w-4 flex-shrink-0">
+                                                <div class="flex items-center space-x-3 ml-3 flex-1">
+                                                    <img src="https://upload.wikimedia.org/wikipedia/commons/5/5c/Bank_Central_Asia.svg"
+                                                        alt="BCA" class="h-6">
+                                                    <div>
+                                                        <p class="font-medium text-gray-900 text-sm">Bank Central Asia
+                                                        </p>
+                                                        <p class="text-xs text-gray-600">No. Rekening: <span
+                                                                class="font-mono font-medium">1234567890</span></p>
+                                                        <p class="text-xs text-gray-600">A.n: PT TukuTiket Indonesia
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                            </label>
+
+                                            <!-- Mandiri Option -->
+                                            <label
+                                                class="border rounded-lg p-3 cursor-pointer hover:border-blue-300 transition-colors flex items-center"
+                                                :class="selectedBank === 'mandiri' ? 'border-blue-500 bg-blue-50' :
+                                                    'border-gray-200'"
+                                                @click="selectedBank = 'mandiri'">
+                                                <input type="radio" name="bank" value="mandiri"
+                                                    x-model="selectedBank"
+                                                    class="text-blue-600 h-4 w-4 flex-shrink-0">
+                                                <div class="flex items-center space-x-3 ml-3 flex-1">
+                                                    <img src="https://upload.wikimedia.org/wikipedia/commons/a/ad/Bank_Mandiri_logo_2016.svg"
+                                                        alt="Mandiri" class="h-6">
+                                                    <div>
+                                                        <p class="font-medium text-gray-900 text-sm">Bank Mandiri</p>
+                                                        <p class="text-xs text-gray-600">No. Rekening: <span
+                                                                class="font-mono font-medium">1122334455</span></p>
+                                                        <p class="text-xs text-gray-600">A.n: PT TukuTiket Indonesia
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                            </label>
+
+                                            <!-- BRI Option -->
+                                            <label
+                                                class="border rounded-lg p-3 cursor-pointer hover:border-blue-300 transition-colors flex items-center"
+                                                :class="selectedBank === 'bri' ? 'border-blue-500 bg-blue-50' :
+                                                    'border-gray-200'"
+                                                @click="selectedBank = 'bri'">
+                                                <input type="radio" name="bank" value="bri"
+                                                    x-model="selectedBank"
+                                                    class="text-blue-600 h-4 w-4 flex-shrink-0">
+                                                <div class="flex items-center space-x-3 ml-3 flex-1">
+                                                    <img src="https://upload.wikimedia.org/wikipedia/commons/2/2e/BRI_2020.svg"
+                                                        alt="BRI" class="h-6">
+                                                    <div>
+                                                        <p class="font-medium text-gray-900 text-sm">Bank BRI</p>
+                                                        <p class="text-xs text-gray-600">No. Rekening: <span
+                                                                class="font-mono font-medium">5566778899</span></p>
+                                                        <p class="text-xs text-gray-600">A.n: PT TukuTiket Indonesia
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                            </label>
+                                        </div>
+
+                                        <!-- Transfer Amount Info -->
+                                        <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-3 mt-3">
+                                            <div class="flex items-start">
+                                                <svg class="h-4 w-4 text-yellow-400 mt-0.5" fill="currentColor"
+                                                    viewBox="0 0 20 20">
+                                                    <path fill-rule="evenodd"
+                                                        d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+                                                        clip-rule="evenodd" />
+                                                </svg>
+                                                <div class="ml-2">
+                                                    <p class="text-sm font-medium text-yellow-800">Jumlah transfer:
+                                                        <span class="font-bold">Rp
+                                                            {{ number_format($pesanan->total_harga, 0, ',', '.') }}</span>
+                                                    </p>
+                                                    <p class="text-xs text-yellow-700 mt-1">Pastikan nominal transfer
+                                                        sesuai
+                                                        dengan
+                                                        jumlah di atas.</p>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
 
-                                    <!-- Input tersembunyi -->
-                                    <input type="file" name="bukti_pembayaran" id="bukti_pembayaran"
-                                        accept="image/*" class="hidden" required />
+                                    <!-- Upload Payment Proof Section -->
+                                    <div>
+                                        <h4 class="text-sm font-semibold text-gray-900 mb-3">Upload Bukti Pembayaran
+                                        </h4>
+                                        <div id="buktiPreview"
+                                            class="flex items-center justify-center w-full h-64 border-2 border-dashed border-gray-300 rounded-lg bg-gray-50 cursor-pointer hover:bg-gray-100 transition overflow-hidden">
+                                            <span class="text-gray-500 text-sm text-center" id="dropzoneText">
+                                                <svg class="w-10 h-10 mb-3 text-gray-400 mx-auto" fill="none"
+                                                    stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                        stroke-width="2"
+                                                        d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                                                </svg>
+                                                <strong>Seret dan letakkan gambar di sini</strong><br>
+                                                atau klik untuk memilih file<br>
+                                                <p class="text-xs text-gray-500 mt-2">PNG, JPG, JPEG (MAX. 5MB)</p>
+                                            </span>
+                                            <img id="previewImage" src=""
+                                                class="hidden w-full h-full object-cover rounded-lg"
+                                                alt="Preview Bukti Pembayaran">
+                                        </div>
 
-                                    @error('bukti_pembayaran')
-                                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                                    @enderror
+                                        <!-- Input tersembunyi -->
+                                        <input type="file" name="bukti_pembayaran" id="bukti_pembayaran"
+                                            accept="image/*" class="hidden" required />
 
-                                    <!-- Remove File Button -->
-                                    <div id="removeFileBtn" class="text-center hidden">
-                                        <button type="button" onclick="removeFile()"
-                                            class="text-red-600 hover:text-red-800 text-sm font-medium">
-                                            Hapus File
-                                        </button>
+                                        @error('bukti_pembayaran')
+                                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                        @enderror
+
+                                        <!-- Remove File Button -->
+                                        <div id="removeFileBtn" class="text-center hidden">
+                                            <button type="button" onclick="removeFile()"
+                                                class="text-red-600 hover:text-red-800 text-sm font-medium">
+                                                Hapus File
+                                            </button>
+                                        </div>
                                     </div>
 
                                     <!-- Submit Button -->
@@ -309,107 +415,6 @@
                                     input.value = '';
                                 }
                             </script>
-                        </div>
-                    @endif
-
-                    @if (!in_array($pesanan->status_pembayaran, ['pending', 'paid']))
-                        <!-- Bank Account Options -->
-                        <div class="bg-white rounded-xl overflow-hidden">
-                            <div class="bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-4">
-                                <h2 class="text-lg font-bold text-white flex items-center">
-                                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor"
-                                        viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
-                                    </svg>
-                                    Rekening Tujuan Transfer
-                                </h2>
-                            </div>
-                            <div class="p-6 space-y-3" x-data="{ selectedBank: '' }" x-init="// Share selectedBank with the form above
-                            $watch('selectedBank', value => {
-                                document.querySelector('input[name=bank_tujuan]').value = value;
-                            })">
-                                <!-- BCA Option -->
-                                <div class="border rounded-lg p-3 cursor-pointer hover:border-blue-300 transition-colors"
-                                    :class="selectedBank === 'bca' ? 'border-blue-500 bg-blue-50' : 'border-gray-200'"
-                                    @click="selectedBank = 'bca'">
-                                    <div class="flex items-center justify-between">
-                                        <div class="flex items-center space-x-3">
-                                            <img src="https://upload.wikimedia.org/wikipedia/commons/5/5c/Bank_Central_Asia.svg"
-                                                alt="BCA" class="h-6">
-                                            <div>
-                                                <p class="font-medium text-gray-900 text-sm">Bank Central Asia</p>
-                                                <p class="text-xs text-gray-600">No. Rekening: <span
-                                                        class="font-mono font-medium">1234567890</span></p>
-                                                <p class="text-xs text-gray-600">A.n: PT TukuTiket Indonesia</p>
-                                            </div>
-                                        </div>
-                                        <input type="radio" name="bank" value="bca" x-model="selectedBank"
-                                            class="text-blue-600 h-4 w-4">
-                                    </div>
-                                </div>
-
-                                <!-- Mandiri Option -->
-                                <div class="border rounded-lg p-3 cursor-pointer hover:border-blue-300 transition-colors"
-                                    :class="selectedBank === 'mandiri' ? 'border-blue-500 bg-blue-50' : 'border-gray-200'"
-                                    @click="selectedBank = 'mandiri'">
-                                    <div class="flex items-center justify-between">
-                                        <div class="flex items-center space-x-3">
-                                            <img src="https://upload.wikimedia.org/wikipedia/commons/a/ad/Bank_Mandiri_logo_2016.svg"
-                                                alt="Mandiri" class="h-6">
-                                            <div>
-                                                <p class="font-medium text-gray-900 text-sm">Bank Mandiri</p>
-                                                <p class="text-xs text-gray-600">No. Rekening: <span
-                                                        class="font-mono font-medium">1122334455</span></p>
-                                                <p class="text-xs text-gray-600">A.n: PT TukuTiket Indonesia</p>
-                                            </div>
-                                        </div>
-                                        <input type="radio" name="bank" value="mandiri" x-model="selectedBank"
-                                            class="text-blue-600 h-4 w-4">
-                                    </div>
-                                </div>
-
-                                <!-- BRI Option -->
-                                <div class="border rounded-lg p-3 cursor-pointer hover:border-blue-300 transition-colors"
-                                    :class="selectedBank === 'bri' ? 'border-blue-500 bg-blue-50' : 'border-gray-200'"
-                                    @click="selectedBank = 'bri'">
-                                    <div class="flex items-center justify-between">
-                                        <div class="flex items-center space-x-3">
-                                            <img src="https://upload.wikimedia.org/wikipedia/commons/2/2e/BRI_2020.svg"
-                                                alt="BRI" class="h-6">
-                                            <div>
-                                                <p class="font-medium text-gray-900 text-sm">Bank BRI</p>
-                                                <p class="text-xs text-gray-600">No. Rekening: <span
-                                                        class="font-mono font-medium">5566778899</span></p>
-                                                <p class="text-xs text-gray-600">A.n: PT TukuTiket Indonesia</p>
-                                            </div>
-                                        </div>
-                                        <input type="radio" name="bank" value="bri" x-model="selectedBank"
-                                            class="text-blue-600 h-4 w-4">
-                                    </div>
-                                </div>
-
-                                <!-- Transfer Amount Info -->
-                                <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-3 mt-3">
-                                    <div class="flex items-start">
-                                        <svg class="h-4 w-4 text-yellow-400 mt-0.5" fill="currentColor"
-                                            viewBox="0 0 20 20">
-                                            <path fill-rule="evenodd"
-                                                d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
-                                                clip-rule="evenodd" />
-                                        </svg>
-                                        <div class="ml-2">
-                                            <p class="text-sm font-medium text-yellow-800">Jumlah transfer:
-                                                <span class="font-bold">Rp
-                                                    {{ number_format($pesanan->total_harga, 0, ',', '.') }}</span>
-                                            </p>
-                                            <p class="text-xs text-yellow-700 mt-1">Pastikan nominal transfer sesuai
-                                                dengan
-                                                jumlah di atas.</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
                         </div>
                     @endif
 

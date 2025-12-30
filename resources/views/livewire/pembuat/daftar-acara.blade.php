@@ -55,45 +55,43 @@
                         <tr>
                             <th
                                 class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
-                                Nama Acara</th>
+                                Nama Acara
+                            </th>
                             <th
                                 class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
-                                Waktu</th>
+                                Waktu
+                            </th>
                             <th
                                 class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
-                                Status</th>
+                                Status
+                            </th>
                             <th
                                 class="px-6 py-4 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">
-                                Aksi</th>
+                                Aksi
+                            </th>
                         </tr>
                     </thead>
 
                     <tbody class="bg-white divide-y divide-gray-200">
                         @foreach ($acaras->sortByDesc('waktu_mulai') as $acara)
-                            @php
-                                // Cek apakah waktu selesai sudah lewat
-                                $isFinished = \Carbon\Carbon::parse($acara->waktu_selesai)->isPast();
-                            @endphp
-
-                            <tr class="hover:bg-gray-50 transition-colors {{ $isFinished ? 'bg-gray-50/60' : '' }}">
+                            <tr class="hover:bg-gray-50 transition-colors">
 
                                 {{-- 1. Kolom Nama Acara --}}
                                 <td class="pl-6 pr-10 py-4 whitespace-nowrap">
                                     <div class="flex items-center">
-                                        {{-- Gambar (Grayscale jika selesai) --}}
+                                        {{-- Gambar --}}
                                         @if ($acara->banner_acara)
                                             <img src="{{ Storage::url($acara->banner_acara) }}"
-                                                class="h-16 w-16 rounded-lg object-cover shadow-md {{ $isFinished ? 'grayscale' : '' }}" />
+                                                class="h-16 w-16 rounded-lg object-cover shadow-md" />
                                         @else
                                             <div
-                                                class="h-16 w-16 rounded-lg bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center shadow-md {{ $isFinished ? 'grayscale' : '' }}">
+                                                class="h-16 w-16 rounded-lg bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center shadow-md">
                                                 <i data-lucide="image" class="text-white size-6"></i>
                                             </div>
                                         @endif
 
                                         <div class="ml-4">
-                                            <div
-                                                class="text-sm font-bold {{ $isFinished ? 'text-gray-500' : 'text-gray-900' }}">
+                                            <div class="text-sm font-bold text-gray-900">
                                                 {{ $acara->nama_acara }}
                                             </div>
                                             <div class="flex items-center gap-1 mt-1 text-xs text-gray-500">
@@ -107,8 +105,7 @@
                                 {{-- 2. Kolom Waktu --}}
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     <div class="text-sm space-y-1">
-                                        <div
-                                            class="flex items-center {{ $isFinished ? 'text-gray-500' : 'text-gray-900' }}">
+                                        <div class="flex items-center text-gray-900">
                                             <span class="font-medium mr-2 text-xs text-gray-400 w-12">Mulai:</span>
                                             <span>{{ \Carbon\Carbon::parse($acara->waktu_mulai)->format('d M Y') }}</span>
                                         </div>
@@ -119,25 +116,16 @@
                                     </div>
                                 </td>
 
-                                {{-- 3. Kolom Status (MODIFIED) --}}
+                                {{-- 3. Kolom Status (NORMAL - Sesuai Database) --}}
                                 <td class="px-6 py-4 whitespace-nowrap">
-                                    @if ($acara->status === 'published' && $isFinished)
-                                        {{-- KONDISI: Published tapi Tanggal Lewat -> Tampil "Selesai" --}}
-                                        <span
-                                            class="inline-flex px-2.5 py-1 text-xs font-semibold rounded-full bg-slate-100 text-slate-600 border border-slate-200">
-                                            Selesai
-                                        </span>
-                                    @else
-                                        {{-- KONDISI: Status Normal --}}
-                                        <span
-                                            class="inline-flex px-2.5 py-1 text-xs font-semibold rounded-full 
-                        @if ($acara->status === 'published') bg-green-100 text-green-800
-                        @elseif($acara->status === 'draft') bg-yellow-100 text-yellow-800
-                        @elseif($acara->status === 'archived') bg-red-100 text-red-800
-                        @else bg-gray-100 text-gray-800 @endif">
-                                            {{ ucfirst($acara->status) }}
-                                        </span>
-                                    @endif
+                                    <span
+                                        class="inline-flex px-2.5 py-1 text-xs font-semibold rounded-full 
+                                    @if ($acara->status === 'published') bg-green-100 text-green-800
+                                    @elseif($acara->status === 'draft') bg-yellow-100 text-yellow-800
+                                    @elseif($acara->status === 'archived') bg-red-100 text-red-800
+                                    @else bg-gray-100 text-gray-800 @endif">
+                                        {{ ucfirst($acara->status) }}
+                                    </span>
                                 </td>
 
                                 {{-- 4. Kolom Aksi --}}

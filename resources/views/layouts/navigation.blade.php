@@ -1,146 +1,428 @@
-<nav x-data="{ open: false }" class="bg-white border-b border-gray-100">
-    <!-- Primary Navigation Menu -->
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex justify-between h-16">
-            <div class="flex">
-                <!-- Logo -->
-                <div class="shrink-0 flex items-center">
+<nav
+    class="mt-5 mb-4 px-2 flex-1 overflow-y-auto overflow-x-hidden scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 hover:scrollbar-thumb-gray-400">
 
-                    <a href="{{ route('dashboard') }}">
-                        <x-application-logo class="block h-9 w-auto fill-current text-gray-800" />
-                    </a>
+    <x-nav-link :href="route('beranda')" :active="request()->routeIs('beranda')" class="group">
+
+        <i data-lucide="compass" class="size-5 mr-2"></i>
+
+        {{ __('Jelajahi Acara') }}
+
+    </x-nav-link>
+
+
+
+    @if (request()->routeIs('pembeli.*') || request()->routeIs('profile.*'))
+
+        <!-- Menu khusus untuk pembeli -->
+
+        <x-nav-link :href="route('pembeli.pesanan-saya')" :active="request()->routeIs('pembeli.pesanan-saya')" class="mt-1 group">
+
+            <i data-lucide="shopping-cart" class="size-5 mr-2"></i>
+
+            {{ __('Pesanan Saya') }}
+
+        </x-nav-link>
+
+
+
+        <x-nav-link :href="route('pembeli.tiket-saya')" :active="request()->routeIs('pembeli.tiket-saya')" class="mt-1 group">
+
+            <i data-lucide="ticket" class="size-5 mr-2"></i>
+
+            {{ __('Tiket Saya') }}
+
+        </x-nav-link>
+
+
+
+        <div class="border-t border-gray-200 dark:border-gray-200 my-3 mx-2"></div>
+
+        <h3 class="mx-3 text-gray-500 font-medium">Lainnya</h3>
+
+
+
+        <x-nav-link :href="route('profile.edit')" :active="request()->routeIs('profile.*')" class="mt-1 group">
+
+            <i data-lucide="circle-user-round" class="size-5 mr-2"></i>
+
+            {{ __('Profile') }}
+
+        </x-nav-link>
+
+
+
+
+
+        @if (auth()->user()->hasRole('kreator'))
+            <x-nav-link :href="route('pembuat.dashboard')" class="mt-1 group">
+
+                <i data-lucide="ticket" class="size-5 mr-2"></i>
+
+                {{ __('Mode kreator') }}
+
+            </x-nav-link>
+        @endif
+    @else
+        @php
+
+            // Cek status verifikasi kreator
+
+            $kreator = auth()->user()->kreator;
+
+            $verifikasi = $kreator ? $kreator->verifikasi : null;
+
+            $isVerified = $verifikasi && $verifikasi->status === 'approved';
+
+        @endphp
+
+
+
+        {{-- Banner Peringatan jika belum terverifikasi --}}
+
+        @if (!$isVerified)
+            <div class="mx-2 mb-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+
+                <div class="flex items-start gap-2">
+
+                    <i data-lucide="alert-triangle" class="size-5 text-yellow-600 flex-shrink-0 mt-0.5"></i>
+
+                    <div>
+
+                        <p class="text-xs text-yellow-800 font-medium">Akun Belum Terverifikasi</p>
+
+                        <p class="text-xs text-yellow-600 mt-1">Lengkapi verifikasi untuk mengakses semua fitur.</p>
+
+                    </div>
+
                 </div>
 
-                <!-- Navigation Links -->
+            </div>
+        @endif
+
+
+
+        <div class="border-t border-gray-200 dark:border-gray-200 my-3 mx-2"></div>
+
+        <h3 class="mx-3 text-gray-500 font-medium">Acara</h3>
+
+
+
+        <!-- Menu default/pembuat -->
+
+        @if ($isVerified)
+            <x-nav-link :href="route('pembuat.dashboard')" :active="request()->routeIs('pembuat.dashboard')" class="group">
+
+                <i data-lucide="home" class="size-5 mr-2"></i>
+
+                {{ __('Dashboard') }}
+
+            </x-nav-link>
+
+
+
+            <x-nav-link :href="route('pembuat.acara.index')" :active="request()->routeIs('pembuat.acara.*')" class="mt-1 group">
+
+                <i data-lucide="calendar" class="size-5 mr-2"></i>
+
+                {{ __('Events') }}
+
+            </x-nav-link>
+        @else
+            {{-- Menu Disabled --}}
+
+            <div class="flex items-center px-3 py-2 text-gray-400 cursor-not-allowed opacity-50"
+                title="Verifikasi akun untuk mengakses">
+
+                <i data-lucide="home" class="size-5 mr-2"></i>
+
+                <span>{{ __('Dashboard') }}</span>
+
+                <i data-lucide="lock" class="size-3 ml-auto"></i>
+
+            </div>
+
+
+
+            <div class="flex items-center px-3 py-2 text-gray-400 cursor-not-allowed opacity-50 mt-1"
+                title="Verifikasi akun untuk mengakses">
+
+                <i data-lucide="calendar" class="size-5 mr-2"></i>
+
+                <span>{{ __('Events') }}</span>
+
+                <i data-lucide="lock" class="size-3 ml-auto"></i>
+
+            </div>
+        @endif
+
+
+
+        @if (request()->is('kreator/acara/*') && !request()->routeIs('pembuat.acara.create') && $isVerified)
+
+            <div class="ml-4 mt-1 space-y-1">
+
                 @php
-                    $isPembuat = request()->routeIs('pembuat.*');
+
+                    // Ambil parameter 'acara' dari route saat ini
+
+                    $routeAcara = request()->route('acara');
+
+                    // Cek apakah parameter berupa Model atau ID
+
+                    if (is_object($routeAcara)) {
+                        // Jika Route Model Binding aktif, $routeAcara adalah instance Model Acara
+
+                        $acaraId = $routeAcara->id;
+
+                        $acaraNama = $routeAcara->nama_acara;
+
+                        $acaraSlug = $routeAcara->slug;
+                    } else {
+                        // Jika tidak, $routeAcara adalah ID (integer/string)
+
+                        $acaraId = $routeAcara;
+
+                        $acaraNama = null;
+
+                        $acaraSlug = null;
+                    }
+
                 @endphp
 
-                <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                    <x-nav-link :href="route($isPembuat ? 'pembuat.dashboard' : 'pembeli.dashboard')" :active="request()->routeIs($isPembuat ? 'pembuat.dashboard' : 'pembeli.dashboard')">
-                        {{ __('Dashboard') }}
-                    </x-nav-link>
-                </div>
-                <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                    @if ($isPembuat)
-                        {{-- Jika di area pembuat --}}
-                        <x-nav-link :href="route('pembuat.acara.create')" :active="request()->routeIs('pembuat.acara.create')">
-                            {{ __('Buat Acara') }}
+
+
+                @if ($acaraId)
+
+                    <div class="mt-2     border-t border-gray-200">
+
+                        @if ($acaraSlug)
+                            <x-nav-link :href="route('pembuat.acara.show', $acaraSlug)" :active="request()->routeIs('pembuat.acara.show')" class="mt-1 group">
+
+                                {{-- <i data-lucide="eye" class="size-4 mr-2"></i> --}}
+
+                                {{ $acaraNama }}
+
+                            </x-nav-link>
+                        @endif
+
+
+
+                        <x-nav-link :href="route('pembuat.acara.edit', $acaraSlug)" :active="request()->routeIs('pembuat.acara.edit')" class="mt-1 group">
+
+                            <i data-lucide="edit" class="size-4 mr-2"></i>
+
+                            {{ __('Edit Acara') }}
+
                         </x-nav-link>
 
-                        <x-nav-link :href="route('pembuat.acara.index')" :active="request()->routeIs('pembuat.acara.index')">
-                            {{ __('Acara Saya') }}
-                        </x-nav-link>
+
+
+                        @if ($routeAcara->status === 'pending_verifikasi')
+                            <x-nav-link :href="route('pembuat.verifikasi.show', $acaraSlug)" :active="request()->routeIs('verifikasi-izin.show')"
+                                class="mt-1 group bg-yellow-50 border border-yellow-200 text-yellow-700">
+
+                                <i data-lucide="file-check" class="size-4 mr-2"></i>
+
+                                {{ __('Upload Surat Izin') }}
+
+                                <i data-lucide="alert-circle" class="size-3 ml-auto text-yellow-600"></i>
+
+                            </x-nav-link>
+                        @endif
+
+                    </div>
+
+                @endif
+
+
+
+                @if (isset($routeAcara) && $routeAcara->status === 'pending_verifikasi')
+                    <div class="group pl-4 flex items-center px-3 py-2 text-gray-400 cursor-not-allowed opacity-50">
+
+                        <i data-lucide="chart-no-axes-combined" class="size-4 mr-2"></i>
+
+                        {{ __('Laporan Penjualan') }}
+
+                    </div>
+                @else
+                    <x-nav-link :href="route('pembuat.acara.laporan-penjualan', $acaraSlug)" :active="request()->routeIs('pembuat.acara.laporan-penjualan')" class="group pl-4">
+
+                        <i data-lucide="chart-no-axes-combined" class="size-4 mr-2"></i>
+
+                        {{ __('Laporan Penjualan') }}
+
+                    </x-nav-link>
+                @endif
+
+
+
+                @if (isset($routeAcara) && $routeAcara->status === 'pending_verifikasi')
+                    <div class="group pl-4 flex items-center px-3 py-2 text-gray-400 cursor-not-allowed opacity-50">
+
+                        <i data-lucide="ticket-check" class="size-4 mr-2"></i>
+
+                        {{ __('Daftar Peserta') }}
+
+                    </div>
+                @else
+                    <x-nav-link :href="route('pembuat.acara.daftar-peserta', $acaraSlug)" :active="request()->routeIs('pembuat.acara.daftar-peserta')" class="group pl-4">
+
+                        <i data-lucide="ticket-check" class="size-4 mr-2"></i>
+
+                        {{ __('Daftar Peserta') }}
+
+                    </x-nav-link>
+                @endif
+
+
+
+                @if (!$routeAcara->is_online)
+
+                    @if (isset($routeAcara) && $routeAcara->status === 'pending_verifikasi')
+                        <div class="group pl-4 flex items-center px-3 py-2 text-gray-400 cursor-not-allowed opacity-50">
+
+                            <i data-lucide="user-round-check" class="size-4 mr-2"></i>
+
+                            {{ __('Check in peserta') }}
+
+                        </div>
+
+
+
+                        <div class="group pl-4 flex items-center px-3 py-2 text-gray-400 cursor-not-allowed opacity-50">
+
+                            <i data-lucide="user-round-minus" class="size-4 mr-2"></i>
+
+                            {{ __('Check out peserta') }}
+
+                        </div>
                     @else
-                        {{-- Jika di area pembeli (user biasa) --}}
-                        <x-nav-link :href="route('pembeli.tiket.index')" :active="request()->routeIs('pembeli.tiket.index')">
-                            {{ __('Tiket Saya') }}
+                        <x-nav-link :href="route('pembuat.checkin.index', $acaraSlug)" :active="request()->routeIs('pembuat.checkin.index')" class="group pl-4">
+
+                            <i data-lucide="user-round-check" class="size-4 mr-2"></i>
+
+                            {{ __('Check in peserta') }}
+
+                        </x-nav-link>
+
+
+
+                        <x-nav-link :href="route('pembuat.checkout.index', $acaraSlug)" :active="request()->routeIs('pembuat.checkout.index')" class="group pl-4">
+
+                            <i data-lucide="user-round-minus" class="size-4 mr-2"></i>
+
+                            {{ __('Check out peserta') }}
+
                         </x-nav-link>
                     @endif
-                </div>
-                {{-- 
-                <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex"> <x-nav-link :href="route('pembuat.acara.index')"
-                        :active="request()->routeIs('pembuat.acara.index')"> {{ __('Acara Saya') }} </x-nav-link> </div> --}}
+
+                @endif
+
+
+
+                @if (isset($routeAcara) && $routeAcara->status === 'pending_verifikasi')
+                    <div class="group pl-4 flex items-center px-3 py-2 text-gray-400 cursor-not-allowed opacity-50">
+
+                        <i data-lucide="credit-card" class="size-4 mr-2"></i>
+
+                        {{ __('Laporan Transaksi') }}
+
+                    </div>
+                @else
+                    <x-nav-link :href="route('pembuat.transaksi.index', $acaraSlug)" :active="request()->routeIs('pembuat.transaksi.index', 'pembuat.transaksi.acc')" class="group pl-4">
+
+                        <i data-lucide="credit-card" class="size-4 mr-2"></i>
+
+                        {{ __('Laporan Transaksi') }}
+
+                    </x-nav-link>
+                @endif
+
             </div>
 
-            <!-- Settings Dropdown -->
-            <div class="hidden sm:flex sm:items-center sm:ms-6">
-                <x-dropdown align="right" width="48">
-                    <x-slot name="trigger">
-                        <button
-                            class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 bg-white hover:text-gray-700 focus:outline-none transition ease-in-out duration-150">
-                            <div>{{ Auth::user()->name }}</div>
-
-                            <div class="ms-1">
-                                <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg"
-                                    viewBox="0 0 20 20">
-                                    <path fill-rule="evenodd"
-                                        d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-                                        clip-rule="evenodd" />
-                                </svg>
-                            </div>
-                        </button>
-                    </x-slot>
-
-                    <x-slot name="content">
-                        <x-dropdown-link :href="route('profile.edit')">
-                            {{ __('Profile') }}
-                        </x-dropdown-link>
-
-                        @role('kreator')
-                            <x-dropdown-link :href="route('pembuat.dashboard')">
-                                {{ __('Dashboard Acara') }}
-                            </x-dropdown-link>
-                        @endrole
+        @endif
 
 
 
-                        <!-- Authentication -->
-                        <form method="POST" action="{{ route('logout') }}">
-                            @csrf
+        <div class="border-t border-gray-200 dark:border-gray-200 my-3 mx-2"></div>
 
-                            <x-dropdown-link :href="route('logout')"
-                                onclick="event.preventDefault();
+        <h3 class="mx-3 text-gray-500 font-medium">Lainnya</h3>
+
+
+
+        <!-- Menu Lainnya -->
+
+        <x-nav-link :href="route('pembuat.profile')" :active="request()->routeIs('pembuat.profile')" class="mt-1 group">
+
+            <i data-lucide="user" class="size-5 mr-2"></i>
+
+            {{ __('Profile Kreator') }}
+
+        </x-nav-link>
+
+
+
+
+
+        {{-- Verifikasi Data selalu aktif --}}
+
+        <x-nav-link :href="route('pembuat.verifikasi-data.index')" :active="request()->routeIs('pembuat.verifikasi-data.index')" class="group">
+
+            <i data-lucide="shield-check" class="size-5 mr-2"></i>
+
+            {{ __('Verifikasi Data') }}
+
+            @if (!$isVerified)
+                <span class="ml-auto px-2 py-0.5 text-xs bg-yellow-100 text-yellow-700 rounded-full">Pending</span>
+            @else
+                <span class="ml-auto px-2 py-0.5 text-xs bg-green-100 text-green-700 rounded-full">✓</span>
+            @endif
+
+        </x-nav-link>
+
+
+
+
+
+        <x-nav-link :href="route('pembeli.tiket-saya')" :active="request()->routeIs('pembeli.tiket-saya')" class=" group">
+
+            <i data-lucide="ticket" class="size-5 mr-2"></i>
+
+            {{ __('Mode Pembeli') }}
+
+        </x-nav-link>
+
+
+
+        @if (auth()->user()->hasRole('admin'))
+            <x-nav-link :href="route('admin.dashboard')" class="mt-1 group">
+
+                <i data-lucide="settings" class="size-5 mr-2"></i>
+
+                {{ __('Mode admin') }}
+
+            </x-nav-link>
+        @endif
+
+    @endif
+
+
+
+    <div class="border-t border-gray-200 dark:border-gray-200 my-3 mx-2"></div>
+
+    <form method="POST" action="{{ route('logout') }}">
+
+        @csrf
+
+        <x-nav-link :href="route('logout')" class="mt-1 group"
+            onclick="event.preventDefault();
+
                                                 this.closest('form').submit();">
-                                {{ __('Log Out') }}
-                            </x-dropdown-link>
-                        </form>
-                    </x-slot>
-                </x-dropdown>
-            </div>
 
-            <!-- Hamburger -->
-            <div class="-me-2 flex items-center sm:hidden">
-                <button @click="open = ! open"
-                    class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 focus:text-gray-500 transition duration-150 ease-in-out">
-                    <svg class="h-6 w-6" stroke="currentColor" fill="none" viewBox="0 0 24 24">
-                        <path :class="{ 'hidden': open, 'inline-flex': !open }" class="inline-flex"
-                            stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M4 6h16M4 12h16M4 18h16" />
-                        <path :class="{ 'hidden': !open, 'inline-flex': open }" class="hidden" stroke-linecap="round"
-                            stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                </button>
-            </div>
-        </div>
-    </div>
+            <i data-lucide="log-out" class="size-5 mr-2"></i>Logout
 
-    <!-- Responsive Navigation Menu -->
-    <div :class="{ 'block': open, 'hidden': !open }" class="hidden sm:hidden">
-        <div class="pt-2 pb-3 space-y-1">
-            <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
-                {{ __('Dashboard') }}
-            </x-responsive-nav-link>
-        </div>
+        </x-nav-link>
 
-        <!-- Responsive Settings Options -->
-        <div class="pt-4 pb-1 border-t border-gray-200">
-            <div class="px-4">
-                <div class="font-medium text-base text-gray-800">{{ Auth::user()->name }}</div>
-                <div class="font-medium text-sm text-gray-500">{{ Auth::user()->email }}</div>
-            </div>
+    </form>
 
-            <div class="mt-3 space-y-1">
-                <x-responsive-nav-link :href="route('profile.edit')">
-                    {{ __('Profile') }}
-                </x-responsive-nav-link>
-
-                <x-responsive-nav-link :href="route('profile.edit')">
-                    {{ __('Profile') }}
-                </x-responsive-nav-link>
-
-
-                <!-- Authentication -->
-                <form method="POST" action="{{ route('logout') }}">
-                    @csrf
-
-                    <x-responsive-nav-link :href="route('logout')"
-                        onclick="event.preventDefault();
-                                        this.closest('form').submit();">
-                        {{ __('Log Out') }}
-                    </x-responsive-nav-link>
-                </form>
-            </div>
-        </div>
-    </div>
 </nav>

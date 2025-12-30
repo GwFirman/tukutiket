@@ -194,26 +194,14 @@
                                 </div>
                             </div>
 
-                            {{-- FOOTER ACTION --}}
                             <div class="flex gap-2 mt-auto">
                                 @php
-                                    // 1. Ambil Tanggal Hari Ini (Jam di-reset jadi 00:00:00)
-                                    $hariIni = \Carbon\Carbon::now()->startOfDay();
+                                    // LOGIKA STANDARD:
+                                    // Tombol hanya mati jika tiket SUDAH EXPIRED (melewati batas waktu berlaku).
+                                    // Tidak ada lagi pengecekan "Belum Mulai".
 
-                                    // 2. Ambil Tanggal Acara (Jam di-reset jadi 00:00:00)
-                                    $tanggalAcara = \Carbon\Carbon::parse($acara->waktu_mulai)->startOfDay();
-
-                                    // 3. LOGIKA SEDERHANA:
-                                    // Cek apakah Hari Ini "Kurang Dari" Tanggal Acara.
-                                    // Jika Hari Ini == Tanggal Acara, hasilnya FALSE (Berarti tombol AKTIF).
-                                    $isBelumHarinya = $hariIni->lessThan($tanggalAcara);
-
-                                    // Setup Disable Status
-                                    // Tombol Utama mati jika: Expired ATAU Belum Harinya
-                                    $isMainDisabled = $uiState === 'expired' || $isBelumHarinya;
-
-                                    // Tombol Download mati jika: Belum Harinya
-                                    $isDownloadDisabled = $isBelumHarinya;
+                                    $isMainDisabled = $uiState === 'expired';
+                                    $isDownloadDisabled = false; // Selalu boleh download
                                 @endphp
 
                                 {{-- Tombol Detail / Gunakan --}}
@@ -226,9 +214,6 @@
 
                                     @if ($uiState === 'expired')
                                         Tiket Hangus
-                                    @elseif ($isBelumHarinya)
-                                        <i data-lucide="lock" class="size-4"></i>
-                                        Belum Mulai
                                     @elseif($uiState === 'used')
                                         Lihat Detail
                                     @else
@@ -237,16 +222,12 @@
                                 </a>
 
                                 {{-- Tombol Download --}}
-                                <a href="{{ $isDownloadDisabled ? '#' : route('pembeli.tiket.download', $tiket->id) }}"
-                                    class="px-4 rounded-lg transition inline-flex items-center justify-center border 
-        {{ $isDownloadDisabled
-            ? 'bg-gray-100 text-gray-400 cursor-not-allowed border-gray-200'
-            : 'bg-gray-50 text-gray-700 hover:bg-gray-200 border-gray-200' }}"
-                                    @if ($isDownloadDisabled) onclick="return false;" @endif
-                                    title="{{ $isDownloadDisabled ? 'Tiket dapat diunduh pada hari acara' : 'Download PDF' }}">
+                                {{-- Selalu Aktif (Kecuali Anda ingin mematikannya saat expired, ubah $isDownloadDisabled jadi true) --}}
+                                <a href="{{ route('pembeli.tiket.download', $tiket->id) }}"
+                                    class="px-4 rounded-lg transition inline-flex items-center justify-center border bg-gray-50 text-gray-700 hover:bg-gray-200 border-gray-200"
+                                    title="Download PDF">
 
-                                    <i data-lucide="{{ $isDownloadDisabled ? 'lock' : 'download' }}"
-                                        class="size-5"></i>
+                                    <i data-lucide="download" class="size-5"></i>
                                 </a>
                             </div>
                         </div>

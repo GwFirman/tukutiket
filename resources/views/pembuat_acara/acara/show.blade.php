@@ -13,11 +13,18 @@
 
     <div class="max-w-5xl mx-auto px-6 lg:mt-4 lg:px-0 pb-6">
         <!-- Action Buttons -->
+
         @include('pembuat_acara.acara.partials.show.action')
         @if ($acara->status == 'pending_verifikasi')
             <div class="bg-orange-100 border-l-4 border-orange-500 text-orange-700 p-4" role="alert">
                 <p class="font-bold">Peringatan</p>
                 <p>Acara memerlukan dokumen izin sebelum dapat dipublikasikan.</p>
+            </div>
+        @endif
+        @if ($acara->status == 'rejected')
+            <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4" role="alert">
+                <p class="font-bold">Acara Ditolak</p>
+                <p>Upload ulang surat izin acara, atau hubungi contact person.</p>
             </div>
         @endif
 

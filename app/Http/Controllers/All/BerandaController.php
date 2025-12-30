@@ -15,17 +15,14 @@ class BerandaController extends Controller
      */
     public function index()
     {
-        // 1. Ambil acara yang Published DAN Belum Selesai
+        // 1. Ambil SEMUA acara yang Published (Termasuk yang sudah lewat)
         $acaras = Acara::with('jenisTiket')
             ->where('status', 'published')
-            ->where(function ($query) {
-                // Logika: Tampilkan jika Waktu Selesai >= Waktu Sekarang
-                $query->where('waktu_selesai', '>=', now());
-            })
-            ->orderBy('waktu_mulai', 'asc') // Urutkan dari yang paling dekat tanggal mainnya
+            // Filter waktu_selesai sudah DIHAPUS disini
+            ->orderBy('waktu_mulai', 'asc') // Urutkan dari tanggal terlama ke terbaru
             ->get();
 
-        // 2. Ambil kreator populer (Kode tetap sama)
+        // 2. Ambil kreator populer (Tetap sama)
         $kreatorsPopuler = \App\Models\Kreator::whereHas('verifikasi', function ($q) {
             $q->where('status', 'approved');
         })

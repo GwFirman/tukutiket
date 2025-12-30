@@ -11,16 +11,16 @@
     <div class="border-t border-gray-200 dark:border-gray-200 my-3 mx-2"></div>
     <h3 class="mx-3 text-gray-500 font-medium">Moderasi</h3>
 
-    <!-- Moderasi Event -->
+    {{-- <!-- Moderasi Event -->
     <x-nav-link :href="route('admin.mod-event.index')" :active="request()->routeIs('admin.mod-event.*')" class="mt-1 group">
         <i data-lucide="calendar" class="size-5 mr-2"></i>
         {{ __('Moderasi Event') }}
-    </x-nav-link>
+    </x-nav-link> --}}
 
     <!-- Moderasi Kreator -->
     <x-nav-link :href="route('admin.mod-kreator')" :active="request()->routeIs('admin.mod-kreator.*')" class="mt-1 group">
         <i data-lucide="users" class="size-5 mr-2"></i>
-        {{ __('Moderasi Kreator') }}
+        {{ __('Verifikasi Kreator') }}
     </x-nav-link>
 
     <!-- Verifikasi Acara -->

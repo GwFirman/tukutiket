@@ -313,9 +313,9 @@ class AcaraController extends Controller
         // 3. Ambil Data Lama
         $acara = Acara::findOrFail($id);
 
-        if ($acara->id_pembuat !== Auth::id()) {
-            abort(403, 'Unauthorized.');
-        }
+        // if ($acara->id_pembuat !== Auth::id()) {
+        //     abort(403, 'Unauthorized.');
+        // }
 
         // ============================================================
         // 4. LOGIKA STATUS (HANDLING REJECTED / PENDING / DRAFT TO PUBLISH)

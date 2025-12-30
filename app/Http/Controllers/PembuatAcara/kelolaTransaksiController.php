@@ -18,9 +18,9 @@ class kelolaTransaksiController extends Controller
         // $acara = Acara::where('slug', $acaraSlug)->firstOrFail();
 
         // Pastikan hanya pembuat acara yang dapat mengakses
-        if ($acara->id_pembuat !== Auth::id()) {
-            abort(403, 'Anda tidak memiliki akses ke halaman ini.');
-        }
+        // if ($acara->id_pembuat !== Auth::id()) {
+        //     abort(403, 'Anda tidak memiliki akses ke halaman ini.');
+        // }
 
         // Ambil semua pesanan untuk acara ini dengan relasi melalui detail pesanan -> jenis tiket -> acara
         $pesanan = Pesanan::whereHas('detailPesanan.jenisTiket', function ($query) use ($acara) {
@@ -118,9 +118,9 @@ class kelolaTransaksiController extends Controller
         ]);
 
         // ensure organizer owns the event
-        if ($acara->id_pembuat !== Auth::id()) {
-            abort(403, 'Anda tidak memiliki akses ke halaman ini.');
-        }
+        // if ($acara->id_pembuat !== Auth::id()) {
+        //     abort(403, 'Anda tidak memiliki akses ke halaman ini.');
+        // }
 
         $pesanan = Pesanan::where('kode_pesanan', $kodePesanan)
             ->with('detailPesanan', 'detailPesanan.jenisTiket')

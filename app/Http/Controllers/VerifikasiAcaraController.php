@@ -17,9 +17,9 @@ class VerifikasiAcaraController extends Controller
     public function show(Acara $acara)
     {
         // Ensure the event belongs to the authenticated user (kreator)
-        if ($acara->id_kreator != Auth::user()->kreator->id) {
-            abort(403, 'Unauthorized');
-        }
+        // if ($acara->id_kreator != Auth::user()->kreator->id) {
+        //     abort(403, 'Unauthorized');
+        // }
 
         // Load existing verifications
         $verifikasi = VerifikasiAcara::where('id_acara', $acara->id)->get();
@@ -33,9 +33,9 @@ class VerifikasiAcaraController extends Controller
     public function store(Request $request, Acara $acara)
     {
         // Ensure the event belongs to the authenticated user (kreator)
-        if ($acara->id_kreator != Auth::user()->kreator->id) {
-            abort(403, 'Unauthorized');
-        }
+        // if ($acara->id_kreator != Auth::user()->kreator->id) {
+        //     abort(403, 'Unauthorized');
+        // }
 
         // Check if already has pending documents
         $existingDocs = VerifikasiAcara::where('id_acara', $acara->id)

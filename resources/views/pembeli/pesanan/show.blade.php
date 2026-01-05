@@ -9,7 +9,7 @@
         </div>
     </x-slot>
 
-    <div class="mb-5 sm:py-8">
+    <div class="mb-5 ">
         <div class="max-w-5xl mx-auto px-6 lg:px-0">
 
             <!-- Header -->

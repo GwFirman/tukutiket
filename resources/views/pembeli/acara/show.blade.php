@@ -158,7 +158,8 @@
                                                                 <p class="font-medium flex items-center text-base">
                                                                     <i data-lucide="calendar"
                                                                         class="h-3 w-3 mr-1 text-indigo-400"></i>
-                                                                    {{ \Carbon\Carbon::parse($tiket->penjualan_mulai)->format('d-m-Y') }}
+                                                                    {{ \Carbon\Carbon::parse($tiket->penjualan_mulai)->locale('id')->translatedFormat('d F Y') }}
+                                                                    {{-- {{ \Carbon\Carbon::parse($tiket->penjualan_mulai)->format('d M Y') }} --}}
                                                                 </p>
                                                             </div>
 
@@ -167,7 +168,9 @@
                                                                 <p class="font-medium flex items-center text-base">
                                                                     <i data-lucide="calendar"
                                                                         class="h-3 w-3 mr-1 text-indigo-400"></i>
-                                                                    {{ \Carbon\Carbon::parse($tiket->penjualan_selesai)->format('d-m-Y') }}
+                                                                    {{-- {{ \Carbon\Carbon::parse($tiket->penjualan_selesai)->format('d-m-Y') }}
+                                                                     --}}
+                                                                    {{ \Carbon\Carbon::parse($tiket->penjualan_selesai)->locale('id')->translatedFormat('d F Y') }}
                                                                 </p>
                                                             </div>
                                                         </div>

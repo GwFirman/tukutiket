@@ -58,13 +58,70 @@ class PesananController extends Controller
      */
     public function store(Request $request)
     {
+        // Validasi input
+        $validated = $request->validate([
+            'acara_id' => 'required|exists:acara,id',
+            'nama_pemesan' => 'required|string|max:255',
+            'email_pemesan' => 'required|email|max:255',
+            'tickets' => 'required|array|min:1',
+            'tickets.*.id' => 'required|exists:jenis_tiket,id',
+            'tickets.*.quantity' => 'required|integer|min:1',
+            'tickets.*.price' => 'required|numeric|min:0',
+            'tickets.*.total' => 'required|numeric|min:0',
+            'peserta' => 'required|array',
+        ]);
+
+        // Validasi data peserta
+        foreach ($request->tickets as $ticket) {
+            $ticketId = $ticket['id'];
+            $quantity = $ticket['quantity'];
+            $pesertaData = $request->input("peserta.{$ticketId}", []);
+
+            // // Pastikan jumlah peserta sesuai dengan quantity
+            // if (count($pesertaData) !== $quantity) {
+            //     return redirect()->back()
+            //         ->withErrors(['peserta' => 'Jumlah data peserta untuk tiket '.$ticketId.' harus sesuai dengan jumlah tiket yang dibeli.'])
+            //         ->withInput();
+            // }
+
+            // Validasi setiap peserta
+            foreach ($pesertaData as $index => $peserta) {
+                if (empty($peserta['nama'])) {
+                    return redirect()->back()
+                        ->withErrors(['peserta' => 'Nama peserta untuk tiket harus diisi.'])
+                        ->withInput();
+                }
+                if (empty($peserta['email'])) {
+                    return redirect()->back()
+                        ->withErrors(['peserta' => 'Email peserta untuk tiket harus diisi.'])
+                        ->withInput();
+                }
+                // Validasi format email
+                if (! filter_var($peserta['email'], FILTER_VALIDATE_EMAIL)) {
+                    return redirect()->back()
+                        ->withErrors(['peserta' => 'Email peserta tidak valid.'])
+                        ->withInput();
+                }
+                if (empty($peserta['telp'])) {
+                    return redirect()->back()
+                        ->withErrors(['peserta' => 'Nomor telepon peserta untuk tiket harus diisi.'])
+                        ->withInput();
+                }
+                // Validasi format nomor telepon (minimal 8 karakter dan hanya angka)
+                if (! preg_match('/^[0-9]{8,20}$/', str_replace(['-', ' ', '+'], '', $peserta['telp']))) {
+                    return redirect()->back()
+                        ->withErrors(['peserta' => 'Nomor telepon peserta tidak valid.'])
+                        ->withInput();
+                }
+            }
+        }
+
         $pesanan = Pesanan::create([
             'id_pembeli' => Auth::id(),
             // 'id_acara' => $request->acara_id,
             'kode_pesanan' => 'ORD-'.strtoupper(Str::random(8)),
             'total_harga' => $request->grand_total,
             'status_pembayaran' => $request->grand_total == 0 ? 'paid' : 'unpaid', // Jika gratis langsung paid
-            'metode_pembayaran' => $request->metode_pembayaran,
             'email_pemesan' => $request->email_pemesan,
             'nama_pemesan' => $request->nama_pemesan,
             'no_telp_peserta' => $request->no_telp_pemesan,

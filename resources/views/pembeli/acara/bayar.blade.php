@@ -28,7 +28,7 @@
         </div>
     </x-slot>
 
-    <div class="min-h-screen bg-gray-50 py-8">
+    <div class="min-h-screen bg-gray-50 lg:py-8">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-24">
             <!-- Alert Info -->
             <div class="bg-blue-50 border-l-4 border-blue-400 p-4 mb-6 rounded-r-lg">
@@ -53,16 +53,11 @@
                 <!-- Alert Rejected -->
                 <div class="bg-red-50 border-l-4 border-red-400 p-4 mb-6 rounded-r-lg">
                     <div class="flex">
-                        <div class="flex-shrink-0">
-                            <svg class="h-5 w-5 text-red-400" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd"
-                                    d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
-                                    clip-rule="evenodd" />
-                            </svg>
-                        </div>
+
                         <div class="ml-3">
                             <p class="text-sm text-red-700 font-medium">
-                                Pembayaran Anda ditolak. Silakan hubungi customer service kami untuk informasi lebih
+                                Pembayaran Anda ditolak. Ulangi Pembayaran atau hubungi customer service kami untuk
+                                informasi lebih
                                 lanjut.
                             </p>
                         </div>
@@ -144,9 +139,8 @@
                         </div>
                     @else
                         <!-- Upload Payment Proof -->
-                        <div class="bg-white rounded-xl overflow-hidden border border-gray-300" x-data="{ selectedBank: '' }"
-                            x-init="// Share selectedBank with the form above
-                            $watch('selectedBank', value => {
+                        <div class="bg-white rounded-xl overflow-hidden border border-gray-300" x-data="{ selectedBank: '', fileSelected: false }"
+                            x-init="$watch('selectedBank', value => {
                                 document.querySelector('input[name=bank_tujuan]').value = value;
                             })">
                             <div class="bg-gray-50 px-6 py-4 border-b border-gray-300">
@@ -165,7 +159,7 @@
                                     <!-- Bank Account Selection -->
                                     <div>
                                         <h4 class="text-sm font-semibold text-gray-900 mb-3">Pilih Rekening Tujuan
-                                            Transfer</h4>
+                                            Transfer <span class="text-red-500">*</span></h4>
                                         <div class="space-y-3">
                                             <!-- BCA Option -->
                                             <label
@@ -261,6 +255,7 @@
                                     <!-- Upload Payment Proof Section -->
                                     <div>
                                         <h4 class="text-sm font-semibold text-gray-900 mb-3">Upload Bukti Pembayaran
+                                            <span class="text-red-500">*</span>
                                         </h4>
                                         <div id="buktiPreview"
                                             class="flex items-center justify-center w-full h-64 border-2 border-dashed border-gray-300 rounded-lg bg-gray-50 cursor-pointer hover:bg-gray-100 transition overflow-hidden">
@@ -282,7 +277,8 @@
 
                                         <!-- Input tersembunyi -->
                                         <input type="file" name="bukti_pembayaran" id="bukti_pembayaran"
-                                            accept="image/*" class="hidden" required />
+                                            accept="image/*" class="hidden" required
+                                            @change="fileSelected = $event.target.files.length > 0" />
 
                                         @error('bukti_pembayaran')
                                             <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
@@ -298,13 +294,14 @@
                                     </div>
 
                                     <!-- Submit Button -->
-                                    <button type="submit"
-                                        class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 rounded-lg transition-colors flex items-center justify-center gap-2">
-                                        <svg class="w-5 h-5" fill="none" stroke="currentColor"
-                                            viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                        </svg>
+                                    <button type="submit" :disabled="!selectedBank || !fileSelected"
+                                        :class="{
+                                            'opacity-50 cursor-not-allowed': !selectedBank || !
+                                                fileSelected,
+                                            'hover:bg-blue-700': selectedBank && fileSelected
+                                        }"
+                                        class="w-full bg-blue-600 text-white font-medium py-3 rounded-lg transition-colors flex items-center justify-center gap-2">
+
                                         Konfirmasi Pembayaran
                                     </button>
                                 </form>
@@ -318,7 +315,6 @@
                                                     <path fill-rule="evenodd"
                                                         d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
                                                         clip-rule="evenodd" />
-                                                </svg>
                                             </div>
                                             <div class="ml-3">
                                                 <h3 class="text-sm font-medium text-red-800">Terjadi kesalahan:</h3>
@@ -373,12 +369,13 @@
                                     const files = e.dataTransfer.files;
                                     if (files.length > 0) {
                                         input.files = files; // sinkron ke input
-                                        handleFiles();
+                                        input.dispatchEvent(new Event('change'));
                                     }
                                 });
 
                                 // Fungsi untuk preview gambar
                                 function handleFiles() {
+                                    if (input.files.length === 0) return;
                                     const file = input.files[0];
                                     if (file && file.type.startsWith('image/')) {
                                         // Validate file size (5MB)
@@ -413,6 +410,7 @@
                                     dropzone.classList.remove('border-green-500', 'bg-green-50');
                                     dropzone.classList.add('border-gray-300');
                                     input.value = '';
+                                    input.dispatchEvent(new Event('change'));
                                 }
                             </script>
                         </div>

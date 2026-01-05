@@ -1,10 +1,37 @@
-<x-app-layout>
+<x-guest-layout>
     <form action="{{ route('pembeli.checkout.store') }}" method="POST">
         @csrf
         <!-- Hidden input untuk acara_id -->
         <input type="hidden" name="acara_id" value="{{ $acara->id }}">
 
-        <div class="px-6 pb-6 sm:px-6 lg:px-24 py-0 md:py-12 ">
+        <div class="max-w-7xl mx-auto px-4 py-10 sm:px-6 lg:px-8">
+            @if ($errors->any())
+                <div class="mb-6 bg-red-50 border-l-4 border-red-500 rounded-r-lg p-4 md:max-w-7xl mx-auto">
+                    <div class="flex items-start gap-3">
+                        <div class="flex-shrink-0 mt-0.5">
+                            <svg class="h-5 w-5 text-red-400" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd"
+                                    d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                                    clip-rule="evenodd" />
+                            </svg>
+                        </div>
+                        <div class="flex-1">
+                            <h3 class="text-sm font-medium text-red-800 mb-2">
+                                Terdapat beberapa kesalahan, silakan perbaiki:
+                            </h3>
+                            <ul class="space-y-1 text-sm text-red-700">
+                                @foreach ($errors->all() as $error)
+                                    <li class="flex items-start gap-2">
+                                        <span
+                                            class="inline-block w-1.5 h-1.5 bg-red-500 rounded-full mt-1.5 flex-shrink-0"></span>
+                                        <span>{{ $error }}</span>
+                                    </li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            @endif
             <div class="md:flex gap-2">
                 <div class="bg-white  sm:rounded-lg col-span-8 flex-1">
                     @include('pembeli.acara.partials.chekcout.detail-acara')
@@ -55,4 +82,4 @@
 
     </form>
     <!-- filepath: d:\Kulyeah\magang\Project\tukutiket\resources\views\pembeli\acara\checkout.blade.php -->
-</x-app-layout>
+</x-guest-layout>

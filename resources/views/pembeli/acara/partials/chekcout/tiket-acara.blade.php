@@ -291,7 +291,7 @@
                                                         
                                                         <div class="space-y-3">
                                                             <div>
-                                                                <label class="text-xs text-gray-500 mb-1 block">Nama Lengkap *</label>
+                                                                <label class="text-xs text-gray-500 mb-1 block">Nama Lengkap <span class="text-red-500">*</span></label>
                                                                 <input type="text" 
                                                                     name="peserta[${ticketId}][${i}][nama]" 
                                                                     required
@@ -300,15 +300,17 @@
                                                             </div>
                                                             <div class="grid grid-cols-2 gap-3">
                                                                 <div>
-                                                                    <label class="text-xs text-gray-500 mb-1 block">Email</label>
+                                                                    <label class="text-xs text-gray-500 mb-1 block">Email <span class="text-red-500">*</span></label>
                                                                     <input type="email" 
+                                                                    required
                                                                         name="peserta[${ticketId}][${i}][email]"
                                                                         class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                                                                         placeholder="email@example.com">
                                                                 </div>
                                                                 <div>
-                                                                    <label class="text-xs text-gray-500 mb-1 block">No. Telepon</label>
+                                                                    <label class="text-xs text-gray-500 mb-1 block">No. Telepon <span class="text-red-500">*</span></label>
                                                                     <input type="tel" 
+                                                                    required
                                                                         name="peserta[${ticketId}][${i}][telp]"
                                                                         class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                                                                         placeholder="08xxxxxxxxxx">
